@@ -1,0 +1,3 @@
+[submodule "MadelineProto"]
+	path = MadelineProto
+	url = https://github.com/danog/MadelineProto.git
