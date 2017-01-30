@@ -7,6 +7,7 @@ require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
 require 'time.php';
 require 'weather.php';
+require 'supergroup.php';
 $number = '+12053903877';
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize
 ('session.madeline');
@@ -103,44 +104,7 @@ while (true) {
             strlen($update['update']['message']['message']) !== 0) {
                 $first_char = substr($update['update']['message']['message'][0],
                 0, 1);
-                if ($update['update']['message']['to_id']['_'] ==
-'peerChannel') {
-                    $channelParticipantsAdmin = ['_' =>
-'channelParticipantsAdmins'];
 
-                    $admins = $MadelineProto->channels->getParticipants(
-['channel' => -100 . $update['update']['message']['to_id']['channel_id'],
-'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0, ]);
-                    foreach ($admins['users'] as $key) {
-                        $adminid = $key['id'];
-                        if (array_key_exists('username', $key)) {
-                        $adminname = "@".$key['username'];
-                        } else {
-                        $adminname = $key['first_name'];
-                        }
-                        if (!isset($entity_)) {
-                            $entity_ = [['_' => 'inputMessageEntityMentionName',
-'offset' => 0, 'length' => strlen($adminname), 'user_id' => $adminid]];
-                            $length = strlen($adminname) + 2;
-                            $message = $adminname."\r\n";
-                            var_dump($length);
-                        } else {
-                            $entity_[] = ['_' =>
-'inputMessageEntityMentionName', 'offset' => $length, 'length' =>
-strlen($adminname), 'user_id' => $adminid];
-                            $length = $length + 2 + strlen($adminname);
-
-                            $message = $message.$adminname."\r\n";
-                        }
-                    }
-                    $entity = $entity_;
-                    var_dump($entity_, true);
-                    unset($entity_);
-                    $sentMessage = $MadelineProto->messages->sendMessage
-                            (['peer' => 198770907, 'message' => $message, 'entities'
-                            => $entity]);
-                            \danog\MadelineProto\Logger::log($sentMessage);
-                }
                 if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
                     $msg_str = substr(
                     $update['update']['message']['message'], 1);
@@ -172,6 +136,10 @@ strlen($adminname), 'user_id' => $adminid];
                         => [['_' => 'messageEntityUnknown',
                         'offset' => 0, 'length' => strlen($message)]]]);
                         \danog\MadelineProto\Logger::log($sentMessage);
+                        break;
+
+                        case 'adminlist':
+                        adminlist($update, $MadelineProto);
                         break;
                     }
                 }
