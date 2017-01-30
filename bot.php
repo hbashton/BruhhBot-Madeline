@@ -113,26 +113,33 @@ while (true) {
 'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0, ]);
                     foreach ($admins['users'] as $key) {
                         $adminid = $key['id'];
+                        if (array_key_exists('username', $key)) {
+                        $adminname = "@".$key['username'];
+                        } else {
                         $adminname = $key['first_name'];
+                        }
                         if (!isset($entity_)) {
                             $entity_ = [['_' => 'inputMessageEntityMentionName',
-'offset' => 0, 'length' => strlen($adminname),
-                            'user_id' => $adminid]];
-                            $length = strlen($adminname);
+'offset' => 0, 'length' => strlen($adminname), 'user_id' => $adminid]];
+                            $length = strlen($adminname) + 2;
+                            $message = $adminname."\r\n";
+                            var_dump($length);
                         } else {
-                            $length = strlen($length) + 1 + strlen($adminname);
-                            array_push($entity_, ['_' =>
-'inputMessageEntityMentionName', 'offset' => strlen($entity_), 'length' =>
-strlen($length)]);
+                            $entity_[] = ['_' =>
+'inputMessageEntityMentionName', 'offset' => $length, 'length' =>
+strlen($adminname), 'user_id' => $adminid];
+                            $length = $length + 2 + strlen($adminname);
+
+                            $message = $message.$adminname."\r\n";
                         }
                     }
                     $entity = $entity_;
+                    var_dump($entity_, true);
                     unset($entity_);
                     $sentMessage = $MadelineProto->messages->sendMessage
-                            (['peer' => $peer, 'message' => $message, 'entities'
+                            (['peer' => 198770907, 'message' => $message, 'entities'
                             => $entity]);
                             \danog\MadelineProto\Logger::log($sentMessage);
-                    var_dump($admins, true);
                 }
                 if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
                     $msg_str = substr(
@@ -159,11 +166,11 @@ strlen($length)]);
                         $msg_str = implode(" ",$msg_arr);
                         $message = getweather($msg_str);
                         $peer = $MadelineProto->get_info($update['update']
-                        ['message']['to_id'])['InputPeer'];
+                        ['message']['to_id'])['bot_api_id'];
                         $sentMessage = $MadelineProto->messages->sendMessage
-                        (['peer' => '@hunter_bruhh', 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities'
-                        => $entity]);
+                        (['peer' => $peer, 'message' => $message, 'entities'
+                        => [['_' => 'messageEntityUnknown',
+                        'offset' => 0, 'length' => strlen($message)]]]);
                         \danog\MadelineProto\Logger::log($sentMessage);
                         break;
                     }
