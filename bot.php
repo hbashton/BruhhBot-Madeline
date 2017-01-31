@@ -91,6 +91,12 @@ while (true) {
                         'offset' => 0, 'length' => strlen($message)]]]);
                         \danog\MadelineProto\Logger::log($sentMessage);
                         break 2;
+
+                        case 'id':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        idme($update, $MadelineProto, $msg_str);
+                        break 2;
                         }
                     }
                 }
@@ -141,6 +147,24 @@ while (true) {
                         case 'adminlist':
                         adminlist($update, $MadelineProto);
                         break;
+
+                        case 'ban':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        banme($update, $MadelineProto, $msg_str);
+                        break;
+
+                        case 'unban':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        unbanme($update, $MadelineProto, $msg_str);
+                        break;
+
+                        case 'id':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        idme($update, $MadelineProto, $msg_str);
+                        break;
                     }
                 }
             }
@@ -160,14 +184,37 @@ while (true) {
                         } else {
                         $username = $user_info['first_name'];
                         }
+                        $ch_id = -100 . $update['update']['message']['to_id']
+                        ['channel_id'];
                         $mention = $MadelineProto->get_info($update
                         ['update']['message']['action']['users'][0])
                         ['bot_api_id'];
+                        $peer = $MadelineProto->get_info($update['update']
+                            ['message']['to_id'])['InputPeer'];
+                        if (!file_exists('banlist.json')) {
+                            $json_data = [];
+                            $json_data[$ch_id] = [];
+                            file_put_contents('banlist.json', json_encode($json_data));
+                        }
+                        $file = file_get_contents("banlist.json");
+                        $banlist = json_decode($file, true);
+                        if (array_key_exists($ch_id, $banlist)) {
+                            if (in_array($mention, $banlist[$ch_id])) {
+                                $message = "NO! I don't like them!";
+                                $kick = $MadelineProto->channels->kickFromChannel(
+                ['channel' => $peer, 'user_id' => $mention, 'kicked' => true]);
+                                $sentMessage = $MadelineProto->messages->sendMessage
+                                (['peer' => $peer, 'message' => $message]);
+                                if(isset($kick)) {
+                                    \danog\MadelineProto\Logger::log($kick);
+                                }
+                                \danog\MadelineProto\Logger::log($sentMessage);
+                                break 2;
+                            }
+                        }
                         $bot_id = $MadelineProto->API->datacenter->authorization
                         ['user']['id'];
                         if ($mention !== $bot_id) {
-                            $peer = $MadelineProto->get_info($update['update']
-                            ['message']['to_id'])['InputPeer'];
                             $message = "Hi " . $username . ", welcome to " .
                             $title;
                             $sentMessage = $MadelineProto->messages->sendMessage

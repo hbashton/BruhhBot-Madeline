@@ -86,3 +86,6 @@ docs_md
 
 .env
 composer.lock
+
+#json db
+*.json
