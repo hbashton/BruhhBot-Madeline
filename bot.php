@@ -5,10 +5,14 @@ require 'MadelineProto/vendor/autoload.php';
 require 'vendor/autoload.php';
 require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
-require 'time.php';
-require 'weather.php';
-require 'supergroup.php';
-$number = '+12053903877';
+require_once 'banhammer.php';
+require_once 'id_.php';
+require_once 'moderators.php';
+require_once 'promote.php';
+require_once 'save_get.php';
+require_once 'supergroup.php';
+require_once 'time.php';
+require_once 'weather.php';
 $MadelineProto = \danog\MadelineProto\Serialization::deserialize
 ('session.madeline');
 Requests::register_autoloader();
@@ -81,7 +85,6 @@ while (true) {
                         case 'weather':
                         unset($msg_arr[0]);
                         $msg_str = implode(" ",$msg_arr);
-                        #var_dump(getloc($msg_str));
                         $message = getweather($msg_str);
                         $peer = $MadelineProto->get_info($update['update']
                         ['message']['from_id'])['bot_api_id'];
@@ -110,7 +113,11 @@ while (true) {
             strlen($update['update']['message']['message']) !== 0) {
                 $first_char = substr($update['update']['message']['message'][0],
                 0, 1);
-
+                if (preg_match_all('/#/', $first_char, $matches)) {
+                    $msg_str = substr($update['update']['message']['message'], 1);
+                    $msg_arr = explode(' ',trim($msg_str));
+                    getme($update, $MadelineProto, $msg_arr[0]);
+                }
                 if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
                     $msg_str = substr(
                     $update['update']['message']['message'], 1);
@@ -154,16 +161,48 @@ while (true) {
                         banme($update, $MadelineProto, $msg_str);
                         break;
 
+                        case 'modlist':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        modlist($update, $MadelineProto, $msg_str);
+                        break;
+
                         case 'unban':
                         unset($msg_arr[0]);
                         $msg_str = implode(" ",$msg_arr);
                         unbanme($update, $MadelineProto, $msg_str);
                         break;
 
+                        case 'promote':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        promoteme($update, $MadelineProto, $msg_str);
+                        break;
+
+                        case 'demote':
+                        unset($msg_arr[0]);
+                        $msg_str = implode(" ",$msg_arr);
+                        demoteme($update, $MadelineProto, $msg_str);
+                        break;
+
+                        case 'save':
+                        $name = $msg_arr[1];
+                        unset($msg_arr[0]);
+                        unset($msg_arr[1]);
+                        $msg_str = implode(" ",$msg_arr);
+                        saveme($update, $MadelineProto, $msg_str, $name);
+                        break;
+
                         case 'id':
                         unset($msg_arr[0]);
                         $msg_str = implode(" ",$msg_arr);
                         idme($update, $MadelineProto, $msg_str);
+                        break;
+
+                        case 'end':
+                        if (from_master($update, $MadelineProto)) {
+                            exit(0);
+                        }
                         break;
                     }
                 }
@@ -176,80 +215,79 @@ while (true) {
                         ['update']['message']['action']['users'][0])['User'];
                         if ($update['update']['message']['to_id']['_'] ==
                         'peerChannel') {
-                        $title = $MadelineProto->get_info(-100 . $update
-                        ['update']['message']['to_id']['channel_id'])
-                        ['Chat']['title'];
-                        if (array_key_exists('username', $user_info)) {
-                        $username = $user_info['username'];
-                        } else {
-                        $username = $user_info['first_name'];
-                        }
-                        $ch_id = -100 . $update['update']['message']['to_id']
-                        ['channel_id'];
-                        $mention = $MadelineProto->get_info($update
-                        ['update']['message']['action']['users'][0])
-                        ['bot_api_id'];
-                        $peer = $MadelineProto->get_info($update['update']
-                            ['message']['to_id'])['InputPeer'];
-                        if (!file_exists('banlist.json')) {
-                            $json_data = [];
-                            $json_data[$ch_id] = [];
-                            file_put_contents('banlist.json', json_encode($json_data));
-                        }
-                        $file = file_get_contents("banlist.json");
-                        $banlist = json_decode($file, true);
-                        if (array_key_exists($ch_id, $banlist)) {
-                            if (in_array($mention, $banlist[$ch_id])) {
-                                $message = "NO! I don't like them!";
-                                $kick = $MadelineProto->channels->kickFromChannel(
-                ['channel' => $peer, 'user_id' => $mention, 'kicked' => true]);
-                                $sentMessage = $MadelineProto->messages->sendMessage
-                                (['peer' => $peer, 'message' => $message]);
-                                if(isset($kick)) {
-                                    \danog\MadelineProto\Logger::log($kick);
+                            $title = $MadelineProto->get_info(-100 . $update
+                            ['update']['message']['to_id']['channel_id'])
+                            ['Chat']['title'];
+                            if (array_key_exists('username', $user_info)) {
+                                $username = $user_info['username'];
+                            } else {
+                                $username = $user_info['first_name'];
+                            }
+                            $ch_id = -100 . $update['update']['message']['to_id']
+                            ['channel_id'];
+                            $mention = $MadelineProto->get_info($update
+                            ['update']['message']['action']['users'][0])
+                            ['bot_api_id'];
+                            $peer = $MadelineProto->get_info($update['update']
+                                ['message']['to_id'])['InputPeer'];
+                            if (!file_exists('banlist.json')) {
+                                $json_data = [];
+                                $json_data[$ch_id] = [];
+                                file_put_contents('banlist.json', json_encode($json_data));
+                            }
+                            $file = file_get_contents("banlist.json");
+                            $banlist = json_decode($file, true);
+                            if (array_key_exists($ch_id, $banlist)) {
+                                if (in_array($mention, $banlist[$ch_id])) {
+                                    $message = "NO! They are NOT allowed here ";
+                                    $kick = $MadelineProto->channels->kickFromChannel(
+                    ['channel' => $peer, 'user_id' => $mention, 'kicked' => true]);
+                                    $sentMessage = $MadelineProto->messages->sendMessage
+                                    (['peer' => $peer, 'message' => $message]);
+                                    if(isset($kick)) {
+                                        \danog\MadelineProto\Logger::log($kick);
+                                    }
+                                    \danog\MadelineProto\Logger::log($sentMessage);
+                                    break 2;
                                 }
+                            }
+                            $bot_id = $MadelineProto->API->datacenter->authorization
+                            ['user']['id'];
+                            if ($mention !== $bot_id) {
+                                $message = "Hi " . $username . ", welcome to " .
+                                $title;
+                                $sentMessage = $MadelineProto->messages->sendMessage
+                                (['peer' => $peer, 'message' => $message, 'entities'
+                                => [['_' => 'inputMessageEntityMentionName',
+                                'offset' => 3, 'length' => strlen($username),
+                                'user_id' => $mention]]]);
                                 \danog\MadelineProto\Logger::log($sentMessage);
-                                break 2;
+                            } else {
+                                $info = $MadelineProto->get_info($update
+                                ['update']['message']['to_id']);
+                                $adminid = $MadelineProto->get_info(getenv
+                                ('TEST_USERNAME'))['bot_api_id'];
+                                $get_chat_info = $MadelineProto->
+                                get_pwr_chat(
+                                $info['bot_api_id']);
+                                foreach (
+                                $get_chat_info['participants'] as $key) {
+                                    $id = $key['user']['id'];
+                                    if ($adminid !== $id) {
+                                        $master_present = 'false';
+                                    } else {
+                                        $master_present = 'true';
+                                        break;
+                                    }
+                                }
+
+                                if ($master_present == 'false') {
+                                    $leave = $MadelineProto->channels->leaveChannel
+                                    (['channel' => $info['bot_api_id']]);
+                                    \danog\MadelineProto\Logger::log($leave);
+                                }
                             }
                         }
-                        $bot_id = $MadelineProto->API->datacenter->authorization
-                        ['user']['id'];
-                        if ($mention !== $bot_id) {
-                            $message = "Hi " . $username . ", welcome to " .
-                            $title;
-                            $sentMessage = $MadelineProto->messages->sendMessage
-                            (['peer' => $peer, 'message' => $message, 'entities'
-                            => [['_' => 'inputMessageEntityMentionName',
-                            'offset' => 3, 'length' => strlen($username),
-                            'user_id' => $mention]]]);
-                            \danog\MadelineProto\Logger::log($sentMessage);
-                        } else {
-                            $info = $MadelineProto->get_info($update
-                            ['update']['message']['to_id']);
-                            $adminid = $MadelineProto->get_info(getenv
-                            ('TEST_USERNAME'))['bot_api_id'];
-                            $get_chat_info = $MadelineProto->
-                            get_pwr_chat(
-                            $info['bot_api_id']);
-                            foreach (
-                            $get_chat_info['participants'] as $key) {
-                                    $id = $key['user']['id'];
-                                        if ($adminid !== $id) {
-                                            $master_present = 'false';
-                                        } else {
-                                            $master_present = 'true';
-                                            break;
-                                        }
-                                }
-
-                            if ($master_present == 'false') {
-                                $leave = $MadelineProto->channels->leaveChannel
-                                (['channel' => $info['bot_api_id']]);
-                                \danog\MadelineProto\Logger::log($leave);
-                                }
-
-                             }
-                         }
                     }
                     break;
                     case 'messageActionChatDeleteUser':

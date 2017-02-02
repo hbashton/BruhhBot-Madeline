@@ -16,6 +16,7 @@ function idme($update, $MadelineProto, $msg_arr) {
             break;
     }
     if ($cont == "true") {
+        $msg_id = $update['update']['message']['id'];
         $first_char = substr($msg_arr, 0, 1);
         if (preg_match_all('/@/', $first_char, $matches)) {
             try {
@@ -47,13 +48,15 @@ function idme($update, $MadelineProto, $msg_arr) {
             $message = "I can't find a user called ".$msg_arr.". Who's that?";
         }
         $sentMessage = $MadelineProto->messages->sendMessage
-    (['peer' => $peer, 'message' => $message]);
+    (['peer' => $peer, 'reply_to_msg_id' =>
+    $msg_id, 'message' => $message]);
     \danog\MadelineProto\Logger::log($sentMessage);
 
     }
 }
 
 function adminlist($update, $MadelineProto) {
+    $msg_id = $update['update']['message']['id'];
     if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
     $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
     $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
@@ -80,7 +83,6 @@ function adminlist($update, $MadelineProto) {
             $adminid]];
             $length = $offset + strlen($adminname) + 2;
             $message = $message.$adminname."\r\n";
-            var_dump($length);
         } else {
             $entity_[] = ['_' =>
             'inputMessageEntityMentionName', 'offset' => $length,
@@ -91,194 +93,76 @@ function adminlist($update, $MadelineProto) {
     }
     $entity = $entity_;
     $entity[] = $messageEntityBold;
-    var_dump($entity_, true);
     unset($entity_);
     $sentMessage = $MadelineProto->messages->sendMessage
-    (['peer' => $peer, 'message' => $message,
+    (['peer' => $peer, 'reply_to_msg_id' =>
+    $msg_id, 'message' => $message,
     'entities' => $entity]);
     \danog\MadelineProto\Logger::log($sentMessage);
     }
 }
 
-function banme($update, $MadelineProto, $msg_str) {
+function modlist($update, $MadelineProto) {
+    $msg_id = $update['update']['message']['id'];
     if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(-100 . $update['update']['message']
-        ['to_id']['channel_id'])['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 11,
-        'length' => strlen($title) ];
-        $admins = $MadelineProto->channels->getParticipants(
-    ['channel' => -100 . $update['update']['message']['to_id']['channel_id'],
-        'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0, ]);
-        if (is_numeric($msg_str)) {
-            $userid = (int) $msg_str;
-        } else {
-            if (array_key_exists('entities', $update['update']['message'])) {
-                foreach ($update['update']['message']['entities'] as $key) {
-                    if (array_key_exists('user_id', $key)) {
-                        $userid = $key['user_id'];
-                        break;
-                    } else {
-                        $message = "I can't find a user called ".$msg_str.". Who's that?";
-                    }
-                }
-            }
-            if (!isset($userid)) {
-                $first_char = substr($msg_str,
-                0, 1);
-                if (preg_match_all('/@/', $first_char, $matches)) {
-                    try {
-                        $userid = $MadelineProto->get_info($msg_str)['bot_api_id'];
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        $message = "I can't find a user called ".$msg_str.". Who's that?";
-            }
-                } else {
-                    $message = "I can't find a user called ".$msg_str.". Who's that?";
-                    $sentMessage = $MadelineProto->messages->sendMessage
-                    (['peer' => $peer, 'message' => $message]);
-                    \danog\MadelineProto\Logger::log($sentMessage);
-                }
-            }
-        }
-            if (isset($userid)) {
-            foreach ($admins['users'] as $key) {
-                $adminid = $key['id'];
-                if ($adminid == $userid) {
-                    $mod = "true";
-                    break;
-                } else {
-                    $mod = "false";
-                }
-            }
-            if ($mod == "false") {
-                $info = $MadelineProto->get_info($userid);
-                var_dump($info);
-                if (array_key_exists('username', $info['User'])) {
-                    $username = $info['User']['username'];
-                } else {
-                    $username = $info['User']['first_name'];
-                }
-                if (!file_exists('banlist.json')) {
-                    $json_data = [];
-                    $json_data[$ch_id] = [];
-                    file_put_contents('banlist.json', json_encode($json_data));
-                }
-                    $file = file_get_contents("banlist.json");
-                    $banlist = json_decode($file, true);
-                    if (array_key_exists($ch_id, $banlist)) {
-                        if (!in_array($userid, $banlist[$ch_id])) {
-                            array_push($banlist[$ch_id], $userid);
-                            file_put_contents('banlist.json', json_encode($banlist));
-                            $message = "User ".$username." banned from ".$title;
-                            $kick = $MadelineProto->channels->kickFromChannel(
-                ['channel' => $peer, 'user_id' => $userid, 'kicked' => true]);
-                        } else {
-                            $message = "User ".$username." is already banned from ".$title;
-                        }
-                    } else {
-                        $banlist[$ch_id] = [];
-                        $kick = $MadelineProto->channels->kickFromChannel(
-            ['channel' => $peer, 'user_id' => $userid, 'kicked' => true, ]);
-                        array_push($banlist[$ch_id], $userid);
-                        file_put_contents('banlist.json', json_encode($banlist));
-                        $message = "User ".$username." banned from ".$title;
-                        }
+    $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+    $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
+    $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+    ['InputPeer'];
+    $title = $MadelineProto->get_info(-100 . $update['update']['message']
+    ['to_id']['channel_id'])['Chat']['title'];
+    $message = "Moderators for $title:"."\r\n";
+    $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
+    'length' => 15 + strlen($title) ];
+    if (!file_exists('promoted.json')) {
+        $json_data = [];
+        $json_data[$ch_id] = [];
+        file_put_contents('promoted.json', json_encode($json_data));
+    }
+    $file = file_get_contents("promoted.json");
+    $promoted = json_decode($file, true);
+    if (array_key_exists($ch_id, $promoted)) {
+        foreach ($promoted[$ch_id] as $i => $key) {
+            $user = $MadelineProto->get_info($key)['User'];
+            if (array_key_exists('username', $user)) {
+                $username = $user['username'];
             } else {
-                $message = "You can't ban mods!?";
+                $username = $user['first_name'];
             }
+            if (!isset($entity_)) {
+                $offset = strlen($message);
+                $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
+                $offset, 'length' => strlen($username), 'user_id' =>
+                $key]];
+                $length = $offset + strlen($username) + 2;
+                $message = $message.$username."\r\n";
+            } else {
+                $entity_[] = ['_' =>
+                'inputMessageEntityMentionName', 'offset' => $length,
+                'length' => strlen($username), 'user_id' => $key];
+                $length = $length + 2 + strlen($username);
+                $message = $message.$username."\r\n";
             }
-            $sentMessage = $MadelineProto->messages->sendMessage
-            (['peer' => $peer, 'message' => $message]);
-            if(isset($kick)) {
-            \danog\MadelineProto\Logger::log($kick);
-            }
-            \danog\MadelineProto\Logger::log($sentMessage);
         }
     }
-
-
-function unbanme($update, $MadelineProto, $msg_str) {
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(-100 . $update['update']['message']
-        ['to_id']['channel_id'])['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 11,
-        'length' => strlen($title) ];
-        $admins = $MadelineProto->channels->getParticipants(
-    ['channel' => -100 . $update['update']['message']['to_id']['channel_id'],
-        'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0, ]);
-        if (is_numeric($msg_str)) {
-            $userid = (int) $msg_str;
-        } else {
-            if (array_key_exists('entities', $update['update']['message'])) {
-                foreach ($update['update']['message']['entities'] as $key) {
-                    if (array_key_exists('user_id', $key)) {
-                        $userid = $key['user_id'];
-                        break;
-                    } else {
-                        $message = "I can't find a user called ".$msg_str.". Who's that?";
-                    }
-                }
-            }
-            if (!isset($userid)) {
-                $first_char = substr($msg_str,
-                0, 1);
-                if (preg_match_all('/@/', $first_char, $matches)) {
-                    try {
-                        $userid = $MadelineProto->get_info($msg_str)['bot_api_id'];
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {
-                        $message = "I can't find a user called ".$msg_str.". Who's that?";
-            }
-                } else {
-                    $message = "I can't find a user called ".$msg_str.". Who's that?";
-                    $sentMessage = $MadelineProto->messages->sendMessage
-                    (['peer' => $peer, 'message' => $message]);
-                    \danog\MadelineProto\Logger::log($sentMessage);
-                }
-            }
-        }
-                if (isset($userid)) {
-                $info = $MadelineProto->get_info($userid);
-                if (array_key_exists('username', $info['User'])) {
-                    $username = $info['User']['username'];
-                } else {
-                    $username = $info['User']['first_name'];
-                }
-                if (!file_exists('banlist.json')) {
-                    $json_data = [];
-                    $json_data[$ch_id] = [];
-                    file_put_contents('banlist.json', json_encode($json_data));
-                }
-                    $file = file_get_contents("banlist.json");
-                    $banlist = json_decode($file, true);
-                    if (array_key_exists($ch_id, $banlist)) {
-                        if (in_array($userid, $banlist[$ch_id])) {
-                            if (($key = array_search
-                    ($userid, $banlist[$ch_id])) !== false) {
-                                unset($banlist[$ch_id][$key]);
-                            }
-                            file_put_contents('banlist.json', json_encode($banlist));
-                            $message = "User ".$username." unbanned from ".$title;
-                            $kick = $MadelineProto->channels->kickFromChannel(
-                ['channel' => $peer, 'user_id' => $userid, 'kicked' => false]);
-                        } else {
-                            $message = "User ".$username." is already welcome in ".$title;
-                        }
-                    } else {
-                        $message = "User ".$username." is already welcome in ".$title;
-                        }
-            }
-            $sentMessage = $MadelineProto->messages->sendMessage
-            (['peer' => $peer, 'message' => $message]);
-            if(isset($kick)) {
-            \danog\MadelineProto\Logger::log($kick);
-            }
-            \danog\MadelineProto\Logger::log($sentMessage);
-        }
+    if (!isset($entity_)) {
+        $messageEntityBold = [['_' => 'messageEntityBold', 'offset' => 0,
+        'length' => 15 + strlen($title) ]];
+        $message = "There are no moderators for ".$title;
+        $sentMessage = $MadelineProto->messages->sendMessage
+        (['peer' => $peer, 'reply_to_msg_id' =>
+        $msg_id, 'message' => $message,
+        'entities' => $messageEntityBold]);
     }
+    if (!isset($sentMessage)) {
+        $entity = $entity_;
+        $entity[] = $messageEntityBold;
+        unset($entity_);
+        $sentMessage = $MadelineProto->messages->sendMessage
+        (['peer' => $peer, 'reply_to_msg_id' =>
+        $msg_id, 'message' => $message,
+        'entities' => $entity]);
+    }
+    \danog\MadelineProto\Logger::log($sentMessage);
+}
+}
