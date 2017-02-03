@@ -11,7 +11,7 @@ function from_master($update, $MadelineProto) {
     }
 }
 
-function is_master($userid, $MadelineProto) {
+function is_master($MadelineProto, $userid) {
     if ($userid == $MadelineProto->get_info(getenv
     ('TEST_USERNAME'))['bot_api_id']) {
         return true;
@@ -37,6 +37,27 @@ function from_admin($update, $MadelineProto) {
                 }
             }
     if ($mod == "true" or from_master($update, $MadelineProto)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function is_admin($update, $MadelineProto, $userid) {
+    $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
+    $admins = $MadelineProto->channels->getParticipants(
+    ['channel' => -100 . $update['update']['message']['to_id']['channel_id'],
+    'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0]);
+    foreach ($admins['users'] as $key) {
+                $adminid = $key['id'];
+                if ($adminid == $userid) {
+                    $mod = "true";
+                    break;
+                } else {
+                    $mod = "false";
+                }
+            }
+    if ($mod == "true" or is_master($MadelineProto, $userid)) {
         return true;
     } else {
         return false;
@@ -82,9 +103,36 @@ function from_mod($update, $MadelineProto) {
         } else {
             $mod = "false";
         }
+        if ($mod == "true" or from_master($update, $MadelineProto)) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
     }
-    if ($mod == "true" or from_master($update, $MadelineProto)) {
-        return true;
+}
+
+function is_mod($update, $MadelineProto, $userid) {
+    $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+    if (!file_exists('promoted.json')) {
+        $json_data = [];
+        $json_data[$ch_id] = [];
+        file_put_contents('promoted.json', json_encode($json_data));
+    }
+    $file = file_get_contents("promoted.json");
+    $promoted = json_decode($file, true);
+    if (array_key_exists($ch_id, $promoted)) {
+        if (in_array($userid, $promoted[$ch_id])) {
+            $mod = "true";
+        } else {
+            $mod = "false";
+        }
+        if ($mod == "true" or is_master($MadelineProto, $userid)) {
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
@@ -93,6 +141,15 @@ function from_mod($update, $MadelineProto) {
 function from_admin_mod($update, $MadelineProto) {
     if (from_mod($update, $MadelineProto) or from_admin($update, $MadelineProto)
     or from_master($update, $MadelineProto)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function is_admin_mod($update, $MadelineProto, $userid) {
+    if (is_mod($update, $MadelineProto, $userid) or is_admin($update, $MadelineProto, $userid)
+    or is_master($MadelineProto, $userid)) {
         return true;
     } else {
         return false;

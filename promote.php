@@ -39,24 +39,41 @@ function promoteme($update, $MadelineProto, $msg) {
                         array_push($promoted[$ch_id], $userid);
                         file_put_contents('promoted.json', json_encode($promoted));
                         $message = "User ".$username." is now a moderator of ".$title;
+                        $entity = ['_' => 'messageEntityBold',
+                        'offset' => strlen($message) - strlen($title),
+                        'length' => strlen($title) ];
                     } else {
                         $message = "User ".$username." is already a moderator of ".$title;
+                        $entity = ['_' => 'messageEntityBold',
+                        'offset' => strlen($message) - strlen($title),
+                        'length' => strlen($title) ];
                     }
                 } else {
                     $promoted[$ch_id] = [];
                     array_push($promoted[$ch_id], $userid);
                     file_put_contents('promoted.json', json_encode($promoted));
                     $message = "User ".$username." is now a moderator of ".$title;
+                    $entity = ['_' => 'messageEntityBold',
+                        'offset' => strlen($message) - strlen($title),
+                        'length' => strlen($title) ];
                     }
             } else {
-                $message = "I don't know of anyone called ".$message;
+                $message = "I don't know of anyone called ".$msg;
+
             }
         } else {
             $message = "Only the best get to promote people. You're not the best";
         }
-        $sentMessage = $MadelineProto->messages->sendMessage
+        if (isset($mention)) {
+            $mention[] = $entity;
+            $sentMessage = $MadelineProto->messages->sendMessage
+            (['peer' => $peer, 'reply_to_msg_id' =>
+            $msg_id, 'message' => $message, 'entities' => $mention]);
+        } else {
+            $sentMessage = $MadelineProto->messages->sendMessage
         (['peer' => $peer, 'reply_to_msg_id' =>
-        $msg_id, 'message' => $message, 'entities' => $mention]);
+        $msg_id, 'message' => $message]);
+        }
         \danog\MadelineProto\Logger::log($sentMessage);
     }
 }

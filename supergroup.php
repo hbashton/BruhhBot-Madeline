@@ -6,16 +6,22 @@ function idme($update, $MadelineProto, $msg_arr) {
         case 'peerUser':
             $peer = $MadelineProto->get_info($update['update']
             ['message']['from_id'])['bot_api_id'];
+            $noid = "Your Telegram ID is $peer";
             $cont = "true";
             break;
         case 'peerChannel':
             $peer = $MadelineProto->
             get_info($update['update']['message']['to_id'])
             ['InputPeer'];
+            $title = $MadelineProto->get_info(-100 . $update['update']['message']
+            ['to_id']['channel_id'])['Chat']['title'];
+            $ch_id = $update['update']['message']['to_id']['channel_id'];
+            $noid = "The Telegram ID of ".$title." is ".$ch_id;
             $cont = "true";
             break;
     }
     if ($cont == "true") {
+        var_dump($msg_arr);
         $msg_id = $update['update']['message']['id'];
         $first_char = substr($msg_arr, 0, 1);
         if (preg_match_all('/@/', $first_char, $matches)) {
@@ -47,6 +53,9 @@ function idme($update, $MadelineProto, $msg_arr) {
         if (!isset($message)) {
             $message = "I can't find a user called ".$msg_arr.". Who's that?";
         }
+        if (empty($msg_arr)) {
+            $message = $noid;
+        }
         $sentMessage = $MadelineProto->messages->sendMessage
     (['peer' => $peer, 'reply_to_msg_id' =>
     $msg_id, 'message' => $message]);
@@ -72,7 +81,7 @@ function adminlist($update, $MadelineProto) {
     foreach ($admins['users'] as $key) {
         $adminid = $key['id'];
         if (array_key_exists('username', $key)) {
-        $adminname = "@".$key['username'];
+        $adminname = $key['username'];
         } else {
         $adminname = $key['first_name'];
         }
@@ -146,8 +155,8 @@ function modlist($update, $MadelineProto) {
         }
     }
     if (!isset($entity_)) {
-        $messageEntityBold = [['_' => 'messageEntityBold', 'offset' => 0,
-        'length' => 15 + strlen($title) ]];
+        $messageEntityBold = [['_' => 'messageEntityBold', 'offset' => 28,
+        'length' => strlen($title) ]];
         $message = "There are no moderators for ".$title;
         $sentMessage = $MadelineProto->messages->sendMessage
         (['peer' => $peer, 'reply_to_msg_id' =>

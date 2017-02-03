@@ -7,6 +7,7 @@ require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
 require_once 'banhammer.php';
 require_once 'id_.php';
+require_once 'lock.php';
 require_once 'moderators.php';
 require_once 'promote.php';
 require_once 'save_get.php';
@@ -186,9 +187,13 @@ while (true) {
                         break;
 
                         case 'save':
-                        $name = $msg_arr[1];
+                        if (isset($msg_arr[1])) {
+                            $name = $msg_arr[1];
+                            unset($msg_arr[1]);
+                        } else {
+                            $name = "";
+                        }
                         unset($msg_arr[0]);
-                        unset($msg_arr[1]);
                         $msg_str = implode(" ",$msg_arr);
                         saveme($update, $MadelineProto, $msg_str, $name);
                         break;
@@ -197,6 +202,17 @@ while (true) {
                         unset($msg_arr[0]);
                         $msg_str = implode(" ",$msg_arr);
                         idme($update, $MadelineProto, $msg_str);
+                        break;
+
+                        case 'lock':
+                        if (isset($msg_arr[1])) {
+                            $name = $msg_arr[1];
+                            unset($msg_arr[1]);
+                        } else {
+                            $name = "";
+                        }
+                        unset($msg_arr[0]);
+                        lockme($update, $MadelineProto, $name);
                         break;
 
                         case 'end':
