@@ -166,7 +166,7 @@ function unbanme($update, $MadelineProto, $msg_str) {
                     }
                 }
                 if (isset($userid)) {
-                $username = $id[1];
+                $username = $id[2];
                 if (!file_exists('banlist.json')) {
                     $json_data = [];
                     $json_data[$ch_id] = [];
@@ -182,6 +182,11 @@ function unbanme($update, $MadelineProto, $msg_str) {
                             }
                             file_put_contents('banlist.json', json_encode($banlist));
                             $message = "User ".$username." unbanned from ".$title;
+                            $mention = [['_' => 'inputMessageEntityMentionName',
+                            'offset' => 5, 'length' => strlen($username), 'user_id' => $userid]];
+                            $sentMessage = $MadelineProto->messages->sendMessage
+                            (['peer' => $peer, 'reply_to_msg_id' =>
+                            $msg_id, 'message' => $message, 'entities' => $mention]);
                             try {
                             $kick = $MadelineProto->channels->kickFromChannel(
                 ['channel' => $peer, 'user_id' => $userid, 'kicked' => false]);
@@ -189,8 +194,18 @@ function unbanme($update, $MadelineProto, $msg_str) {
                             }
                         } else {
                             $message = "User ".$username." is not banned!";
+                            $mention = [['_' => 'inputMessageEntityMentionName',
+                            'offset' => 5, 'length' => strlen($username), 'user_id' => $userid]];
+                            $sentMessage = $MadelineProto->messages->sendMessage
+                            (['peer' => $peer, 'reply_to_msg_id' =>
+                            $msg_id, 'message' => $message, 'entities' => $mention]);
                         }
                     } else {
+                        $mention = [['_' => 'inputMessageEntityMentionName',
+                        'offset' => 5, 'length' => strlen($username), 'user_id' => $userid]];
+                        $sentMessage = $MadelineProto->messages->sendMessage
+                        (['peer' => $peer, 'reply_to_msg_id' =>
+                        $msg_id, 'message' => $message, 'entities' => $mention]);
                         $message = "User ".$username." is not banned!";
                     }
                 }

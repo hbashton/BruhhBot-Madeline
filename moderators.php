@@ -139,8 +139,7 @@ function is_mod($update, $MadelineProto, $userid) {
 }
 
 function from_admin_mod($update, $MadelineProto) {
-    if (from_mod($update, $MadelineProto) or from_admin($update, $MadelineProto)
-    or from_master($update, $MadelineProto)) {
+    if (from_mod($update, $MadelineProto) or from_admin($update, $MadelineProto) or from_master($update, $MadelineProto)) {
         return true;
     } else {
         return false;

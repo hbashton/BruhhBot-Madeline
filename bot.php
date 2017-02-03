@@ -6,6 +6,7 @@ require 'vendor/autoload.php';
 require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
 require_once 'banhammer.php';
+require_once 'check_msg.php';
 require_once 'id_.php';
 require_once 'lock.php';
 require_once 'moderators.php';
@@ -110,116 +111,129 @@ while (true) {
             $res = json_encode($update, JSON_PRETTY_PRINT);
             var_dump($update);
             if (array_key_exists('message', $update['update']['message']) &&
-            is_string($update['update']['message']['message']) &&
-            strlen($update['update']['message']['message']) !== 0) {
-                $first_char = substr($update['update']['message']['message'][0],
-                0, 1);
-                if (preg_match_all('/#/', $first_char, $matches)) {
-                    $msg_str = substr($update['update']['message']['message'], 1);
-                    $msg_arr = explode(' ',trim($msg_str));
-                    getme($update, $MadelineProto, $msg_arr[0]);
-                }
-                if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
-                    $msg_str = substr(
-                    $update['update']['message']['message'], 1);
-                    $msg_id = $update['update']['message']['id'];
-                    $msg_arr = explode(' ',trim($msg_str));
-                    switch ($msg_arr[0]) {
-                        case 'time':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        $message = getloc($msg_str);
-                        $peer = $MadelineProto->get_info($update['update']
-                            ['message']['to_id'])['InputPeer'];
-                        $sentMessage = $MadelineProto->messages->sendMessage
-                        (['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities'
-                        => [['_' => 'messageEntityUnknown',
-                        'offset' => 0, 'length' => strlen($message)]]]);
-                        \danog\MadelineProto\Logger::log($sentMessage);
-                        break;
+            is_string($update['update']['message']['message'])) {
+                check_locked($update, $MadelineProto);
+                if (strlen($update['update']['message']['message']) !== 0) {
+                    $first_char = substr($update['update']['message']['message'][0],
+                    0, 1);
+                    if (preg_match_all('/#/', $first_char, $matches)) {
+                        $msg_str = substr($update['update']['message']['message'], 1);
+                        $msg_arr = explode(' ',trim($msg_str));
+                        getme($update, $MadelineProto, $msg_arr[0]);
+                    }
+                    if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
+                        $msg_str = substr(
+                        $update['update']['message']['message'], 1);
+                        $msg_id = $update['update']['message']['id'];
+                        $msg_arr = explode(' ',trim($msg_str));
+                        switch ($msg_arr[0]) {
+                            case 'time':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            $message = getloc($msg_str);
+                            $peer = $MadelineProto->get_info($update['update']
+                                ['message']['to_id'])['InputPeer'];
+                            $sentMessage = $MadelineProto->messages->sendMessage
+                            (['peer' => $peer, 'reply_to_msg_id' =>
+                            $msg_id, 'message' => $message, 'entities'
+                            => [['_' => 'messageEntityUnknown',
+                            'offset' => 0, 'length' => strlen($message)]]]);
+                            \danog\MadelineProto\Logger::log($sentMessage);
+                            break;
 
-                        case 'weather':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        $message = getweather($msg_str);
-                        $peer = $MadelineProto->get_info($update['update']
-                        ['message']['to_id'])['bot_api_id'];
-                        $sentMessage = $MadelineProto->messages->sendMessage
-                        (['peer' => $peer, 'message' => $message, 'entities'
-                        => [['_' => 'messageEntityUnknown',
-                        'offset' => 0, 'length' => strlen($message)]]]);
-                        \danog\MadelineProto\Logger::log($sentMessage);
-                        break;
+                            case 'weather':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            $message = getweather($msg_str);
+                            $peer = $MadelineProto->get_info($update['update']
+                            ['message']['to_id'])['bot_api_id'];
+                            $sentMessage = $MadelineProto->messages->sendMessage
+                            (['peer' => $peer, 'message' => $message, 'entities'
+                            => [['_' => 'messageEntityUnknown',
+                            'offset' => 0, 'length' => strlen($message)]]]);
+                            \danog\MadelineProto\Logger::log($sentMessage);
+                            break;
 
-                        case 'adminlist':
-                        adminlist($update, $MadelineProto);
-                        break;
+                            case 'adminlist':
+                            adminlist($update, $MadelineProto);
+                            break;
 
-                        case 'ban':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        banme($update, $MadelineProto, $msg_str);
-                        break;
+                            case 'ban':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            banme($update, $MadelineProto, $msg_str);
+                            break;
 
-                        case 'modlist':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        modlist($update, $MadelineProto, $msg_str);
-                        break;
+                            case 'modlist':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            modlist($update, $MadelineProto, $msg_str);
+                            break;
 
-                        case 'unban':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        unbanme($update, $MadelineProto, $msg_str);
-                        break;
+                            case 'unban':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            unbanme($update, $MadelineProto, $msg_str);
+                            break;
 
-                        case 'promote':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        promoteme($update, $MadelineProto, $msg_str);
-                        break;
+                            case 'promote':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            promoteme($update, $MadelineProto, $msg_str);
+                            break;
 
-                        case 'demote':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        demoteme($update, $MadelineProto, $msg_str);
-                        break;
+                            case 'demote':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            demoteme($update, $MadelineProto, $msg_str);
+                            break;
 
-                        case 'save':
-                        if (isset($msg_arr[1])) {
-                            $name = $msg_arr[1];
-                            unset($msg_arr[1]);
-                        } else {
-                            $name = "";
+                            case 'save':
+                            if (isset($msg_arr[1])) {
+                                $name = $msg_arr[1];
+                                unset($msg_arr[1]);
+                            } else {
+                                $name = "";
+                            }
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            saveme($update, $MadelineProto, $msg_str, $name);
+                            break;
+
+                            case 'id':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            idme($update, $MadelineProto, $msg_str);
+                            break;
+
+                            case 'lock':
+                            if (isset($msg_arr[1])) {
+                                $name = $msg_arr[1];
+                                unset($msg_arr[1]);
+                            } else {
+                                $name = "";
+                            }
+                            unset($msg_arr[0]);
+                            lockme($update, $MadelineProto, $name);
+                            break;
+
+                            case 'unlock':
+                            if (isset($msg_arr[1])) {
+                                $name = $msg_arr[1];
+                                unset($msg_arr[1]);
+                            } else {
+                                $name = "";
+                            }
+                            unset($msg_arr[0]);
+                            unlockme($update, $MadelineProto, $name);
+                            break;
+
+                            case 'end':
+                            if (from_master($update, $MadelineProto)) {
+                                exit(0);
+                            }
+                            break;
                         }
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        saveme($update, $MadelineProto, $msg_str, $name);
-                        break;
-
-                        case 'id':
-                        unset($msg_arr[0]);
-                        $msg_str = implode(" ",$msg_arr);
-                        idme($update, $MadelineProto, $msg_str);
-                        break;
-
-                        case 'lock':
-                        if (isset($msg_arr[1])) {
-                            $name = $msg_arr[1];
-                            unset($msg_arr[1]);
-                        } else {
-                            $name = "";
-                        }
-                        unset($msg_arr[0]);
-                        lockme($update, $MadelineProto, $name);
-                        break;
-
-                        case 'end':
-                        if (from_master($update, $MadelineProto)) {
-                            exit(0);
-                        }
-                        break;
                     }
                 }
             }

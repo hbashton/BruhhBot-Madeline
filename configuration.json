@@ -1,1 +1,55 @@
-{"gif":"Gifs are now locked","sticker":"Stickers are now locked","video":"Videos are now locked","arabic":"Arabic is now locked","photo":"Photos are now locked", "voice":"Voice messages are now locked","already":{"gif":"Gifs are already locked","sticker":"Stickers are already locked","video":"Videos are already locked","arabic":"Arabic is already locked","photo":"Photos are already locked","voice":"Voice Messages are already locked"}}
+{
+"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contact", "contacts", "geo"],
+"lock":
+    {
+    "gif":"Gifs are now locked",
+    "sticker":"Stickers are now locked",
+    "video":"Videos are now locked",
+    "arabic":"Arabic is now locked",
+    "photo":"Photos are now locked",
+    "audio":"Audio messages are now locked",
+    "geo":"Geo messages are now locked",
+    "contact":"Contact messages are now locked",
+    "contacts":"Contact messages are now locked",
+    "document":"All document types are now locked",
+    "already":
+        {
+        "gif":"Gifs are already locked",
+        "sticker":"Stickers are already locked",
+        "video":"Videos are already locked",
+        "arabic":"Arabic is already locked",
+        "photo":"Photos are already locked",
+        "audio":"Audio Messages are already locked",
+        "geo":"Geo messages are already locked",
+        "contact":"Contact messages are already locked",
+        "contacts":"Contact messages are already locked",
+        "document":"All document types are already locked"
+        }
+    },
+"unlock":
+    {
+    "gif":"Gifs are now unlocked",
+    "sticker":"Stickers are now unlocked",
+    "video":"Videos are now unlocked",
+    "arabic":"Arabic is now unlocked",
+    "photo":"Photos are now unlocked",
+    "audio":"Audio messages are now unlocked",
+    "geo":"Geo messages are now unlocked",
+    "contact":"Contact messages are now unlocked",
+    "contacts":"Contact messages are now unlocked",
+    "document":"All document types are now unlocked",
+    "already":
+        {
+        "gif":"Gifs are already unlocked",
+        "sticker":"Stickers are already unlocked",
+        "video":"Videos are already unlocked",
+        "arabic":"Arabic is already unlocked",
+        "photo":"Photos are already unlocked",
+        "audio":"Audio Messages are already unlocked",
+        "geo":"Geo messages are already unlocked",
+        "contact":"Contact messages are already unlocked",
+        "contacts":"Contact messages are already unlocked",
+        "document":"All document types are already unlocked",
+        }
+    }
+}
