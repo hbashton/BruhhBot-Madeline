@@ -1,30 +1,16 @@
-From ce0407d61db7763aff0011877f514ce59a1fb03a Mon Sep 17 00:00:00 2001
+From a757a5af4955c1688ae59ceee466a979f34d469c Mon Sep 17 00:00:00 2001
 From: halogenOS Code Review <xosdeveloperbruhh@gmail.com>
 Date: Sun, 29 Jan 2017 19:04:06 -0600
 Subject: [PATCH 1/1] Remove log spam
 
 ---
- composer.json                                            | 2 +-
  src/danog/MadelineProto/MTProtoTools/CallHandler.php     | 2 +-
  src/danog/MadelineProto/MTProtoTools/ResponseHandler.php | 2 +-
  src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 4 ++--
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/composer.json b/composer.json
-index 8ce2d3c..c4add2b 100644
---- a/composer.json
-+++ b/composer.json
-@@ -8,7 +8,7 @@
-     "require": {
-         "php": ">=5.6.0",
-         "danog/phpstruct": "^1.2",
--        "phpseclib/phpseclib": "dev-master|^2.0.4",
-+        "phpseclib/phpseclib": "dev-master#9220bcd49a1f981791ee45f8e8178658c8951ed2",
-         "vlucas/phpdotenv": "^2.4"
-     },
-     "require-dev": {
 diff --git a/src/danog/MadelineProto/MTProtoTools/CallHandler.php b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-index 3474d4c..25aa1fa 100644
+index b605439..5f67dc7 100644
 --- a/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 @@ -24,7 +24,7 @@ trait CallHandler
@@ -50,7 +36,7 @@ index 01acbfd..772016b 100644
              switch ($response['_']) {
                  case 'msgs_ack':
 diff --git a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-index a8c96cb..b65b3b5 100644
+index fad790c..f4af308 100644
 --- a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 @@ -137,7 +137,7 @@ trait UpdateHandler
