@@ -1,6 +1,15 @@
 #!/usr/bin/env php
 <?php
 
+class Exec extends Thread {
+    public function __construct($command) {
+        $this->command = $command;
+    }
+    public function run() {
+        $this->command;
+    }
+}
+
 function check_locked($update, $MadelineProto) {
     switch ($update['update']['message']['to_id']['_']) {
     case 'peerChannel':
@@ -11,7 +20,7 @@ function check_locked($update, $MadelineProto) {
         $cont = "true";
         break;
     }
-    if ($cont == "true") {
+    if (isset($cont)) {
         if (is_bot_admin($update, $MadelineProto)) {
             $msg_ = $update["update"]["message"];
             if (array_key_exists("media", $msg_)) {
@@ -36,20 +45,20 @@ function check_locked($update, $MadelineProto) {
                             switch ($key["_"]) {
                                 case 'documentAttributeSticker':
                                     $type = "sticker";
-                                    break 2;
+                                    break 3;
                                 case 'documentAttributeAnimated':
                                     $type = "gif";
-                                    break 2;
+                                    break 3;
                                 case 'documentAttributeVideo':
                                     $type = "video";
-                                    break 2;
+                                    break 3;
                                 case 'documentAttributeAudio':
                                     $type = "audio";
-                                    break 2;
+                                    break 3;
                             }
                         }
-                        $type = "document";
-                        break;
+                    $type = "document";
+                    break;
                 }
                 if (!empty($type)) {
                     if (!from_admin_mod($update, $MadelineProto)) {
@@ -65,7 +74,10 @@ function check_locked($update, $MadelineProto) {
                             if (in_array($type, $locked[$ch_id])) {
                                 $delete = $MadelineProto->channels->deleteMessages
                                 (['channel' => $peer, 'id' => [$msg_id] ]);
-                                \danog\MadelineProto\Logger::log($delete);
+                                #\danog\MadelineProto\Logger::log($delete);
+                                $thred = new Exec($delete);
+                                $thred->start();
+                                $thred->join();
                             }
                         }
                     }

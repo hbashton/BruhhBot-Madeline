@@ -13,7 +13,7 @@ function lockme($update, $MadelineProto, $msg) {
     }
     $coniguration = file_get_contents("configuration.json");
     $cfg = json_decode($coniguration, true);
-    if ($cont == "true") {
+    if (isset($cont)) {
         if (!empty($msg)) {
             if (in_array($msg, $cfg["types"])) {
                 if (from_admin_mod($update, $MadelineProto)) {
@@ -43,7 +43,7 @@ function lockme($update, $MadelineProto, $msg) {
                         }
                     } else {
                         $locked[$ch_id] = [];
-                        array_push($locked[$ch_id], $userid);
+                        array_push($locked[$ch_id], $msg);
                         file_put_contents('locked.json', json_encode($locked));
                         $message = $cfg["lock"][$msg];
                         $entity = ['_' => 'messageEntityBold',
@@ -85,7 +85,7 @@ function unlockme($update, $MadelineProto, $msg) {
     }
     $coniguration = file_get_contents("configuration.json");
     $cfg = json_decode($coniguration, true);
-    if ($cont == "true") {
+    if (isset($cont)) {
         if (!empty($msg)) {
             if (in_array($msg, $cfg["types"])) {
                 if (from_admin_mod($update, $MadelineProto)) {

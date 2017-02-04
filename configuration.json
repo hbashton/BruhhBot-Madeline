@@ -1,5 +1,5 @@
 {
-"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contact", "contacts", "geo"],
+"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contact", "contacts", "geo", "document", "documents"],
 "lock":
     {
     "gif":"Gifs are now locked",
@@ -11,7 +11,8 @@
     "geo":"Geo messages are now locked",
     "contact":"Contact messages are now locked",
     "contacts":"Contact messages are now locked",
-    "document":"All document types are now locked",
+    "document":"All Document types are now locked",
+    "documents":"All Document types are now locked",
     "already":
         {
         "gif":"Gifs are already locked",
@@ -23,7 +24,8 @@
         "geo":"Geo messages are already locked",
         "contact":"Contact messages are already locked",
         "contacts":"Contact messages are already locked",
-        "document":"All document types are already locked"
+        "document":"All Document types are already locked",
+        "documents":"All Document types are already locked"
         }
     },
 "unlock":
@@ -37,7 +39,8 @@
     "geo":"Geo messages are now unlocked",
     "contact":"Contact messages are now unlocked",
     "contacts":"Contact messages are now unlocked",
-    "document":"All document types are now unlocked",
+    "document":"All Document types are now unlocked",
+    "documents":"All Document types are now unlocked",
     "already":
         {
         "gif":"Gifs are already unlocked",
@@ -49,7 +52,8 @@
         "geo":"Geo messages are already unlocked",
         "contact":"Contact messages are already unlocked",
         "contacts":"Contact messages are already unlocked",
-        "document":"All document types are already unlocked",
+        "document":"All Document types are already unlocked",
+        "documents":"All Document types are alreday unlocked"
         }
     }
 }

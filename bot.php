@@ -12,6 +12,7 @@ require_once 'lock.php';
 require_once 'moderators.php';
 require_once 'promote.php';
 require_once 'save_get.php';
+require_once 'set_info.php';
 require_once 'supergroup.php';
 require_once 'time.php';
 require_once 'weather.php';
@@ -112,7 +113,13 @@ while (true) {
             var_dump($update);
             if (array_key_exists('message', $update['update']['message']) &&
             is_string($update['update']['message']['message'])) {
-                check_locked($update, $MadelineProto);
+                $command = check_locked($update, $MadelineProto);
+                $check = new Exec($command);
+                $check->start();
+                $check->join();
+                if (isset($GLOBALS['from_user_chat_photo'])) {
+                    set_chat_photo($update, $MadelineProto);
+                }
                 if (strlen($update['update']['message']['message']) !== 0) {
                     $first_char = substr($update['update']['message']['message'][0],
                     0, 1);
@@ -156,6 +163,12 @@ while (true) {
 
                             case 'adminlist':
                             adminlist($update, $MadelineProto);
+                            break;
+
+                            case 'kick':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            kickhim($update, $MadelineProto, $msg_str);
                             break;
 
                             case 'ban':
@@ -204,6 +217,16 @@ while (true) {
                             unset($msg_arr[0]);
                             $msg_str = implode(" ",$msg_arr);
                             idme($update, $MadelineProto, $msg_str);
+                            break;
+
+                            case 'setphoto':
+                            set_chat_photo($update, $MadelineProto);
+                            break;
+
+                            case 'setname':
+                            unset($msg_arr[0]);
+                            $msg_str = implode(" ",$msg_arr);
+                            set_chat_title($update, $MadelineProto, $msg_str);
                             break;
 
                             case 'lock':

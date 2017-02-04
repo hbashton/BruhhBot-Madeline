@@ -16,7 +16,7 @@ function catch_id($update, $MadelineProto, $user) {
             }
             $userid = $MadelineProto->get_info($user)['bot_api_id'];
             return array(true, $userid, $username);
-        } catch (\danog\MadelineProto\RPCErrorException $e) {
+        } catch (Exception $e) {
             return array(false);
         }
     } else {

@@ -4,17 +4,11 @@
 function banme($update, $MadelineProto, $msg_str) {
     $msg_id = $update['update']['message']['id'];
     if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
         $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
         ['InputPeer'];
         $title = $MadelineProto->get_info(-100 . $update['update']['message']
         ['to_id']['channel_id'])['Chat']['title'];
         $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 11,
-        'length' => strlen($title) ];
-        $admins = $MadelineProto->channels->getParticipants(
-        ['channel' => -100 . $update['update']['message']['to_id']['channel_id'],
-        'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0, ]);
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto)) {
                 if ($msg_str) {
@@ -51,7 +45,16 @@ function banme($update, $MadelineProto, $msg_str) {
                     }
                     if (isset($userid)) {
                         if (!is_admin_mod($update, $MadelineProto, $userid)) {
-                            $info = $MadelineProto->get_info($userid);
+                            try {
+                                $info = $MadelineProto->get_info($userid);
+                            } catch (danog\MadelineProto\Exception $e) {
+                                $message = "$userid is not a valid ID";
+                                $sentMessage = $MadelineProto->messages->sendMessage
+                                (['peer' => $peer, 'reply_to_msg_id' =>
+                                $msg_id, 'message' => $message]);
+                                \danog\MadelineProto\Logger::log($sentMessage);
+                                return;
+                            }
                             if (array_key_exists('username', $info['User'])) {
                                 $username = $info['User']['username'];
                             } else {
@@ -120,17 +123,11 @@ function banme($update, $MadelineProto, $msg_str) {
 function unbanme($update, $MadelineProto, $msg_str) {
     $msg_id = $update['update']['message']['id'];
     if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $channelParticipantsAdmin = ['_' => 'channelParticipantsAdmins'];
         $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
         ['InputPeer'];
         $title = $MadelineProto->get_info(-100 . $update['update']['message']
         ['to_id']['channel_id'])['Chat']['title'];
         $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 11,
-        'length' => strlen($title) ];
-        $admins = $MadelineProto->channels->getParticipants(
-    ['channel' => -100 . $update['update']['message']['to_id']['channel_id'],
-        'filter' => $channelParticipantsAdmin, 'offset' => 0, 'limit' => 0, ]);
         if (from_admin_mod($update, $MadelineProto)) {
             if ($msg_str) {
                 if (is_numeric($msg_str)) {
@@ -227,6 +224,98 @@ function unbanme($update, $MadelineProto, $msg_str) {
         }
         if(isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
+        }
+        \danog\MadelineProto\Logger::log($sentMessage);
+    }
+}
+
+
+function kickhim($update, $MadelineProto, $msg_str) {
+    $msg_id = $update['update']['message']['id'];
+    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+        ['InputPeer'];
+        $title = $MadelineProto->get_info(-100 . $update['update']['message']
+        ['to_id']['channel_id'])['Chat']['title'];
+        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        if (is_bot_admin($update, $MadelineProto)) {
+            if (from_admin_mod($update, $MadelineProto)) {
+                if ($msg_str) {
+                    if (is_numeric($msg_str)) {
+                        $userid = (int) $msg_str;
+                    } else {
+                        if (array_key_exists('entities', $update['update']['message'])) {
+                            foreach ($update['update']['message']['entities'] as $key) {
+                                if (array_key_exists('user_id', $key)) {
+                                    $userid = $key['user_id'];
+                                    $id = catch_id($update, $MadelineProto, $userid);
+                                    break;
+                                } else {
+                                    $message = "I don't know anyone with the name ".$msg_str;
+                                }
+                            }
+                        }
+                        if (!isset($userid)) {
+                            $first_char = substr($msg_str, 0, 1);
+                            if (preg_match_all('/@/', $first_char, $matches)) {
+                                $id = catch_id($update, $MadelineProto, $msg_str);
+                                if ($id[0]) {
+                                    $userid = $id[1];
+                                } else {
+                                    $message = "I can't find a user called ".$msg_str.". Who's that?";
+                                }
+                            } else {
+                                $message = "I don't know anyone with the name ".$msg_str;
+                                $sentMessage = $MadelineProto->messages->sendMessage
+                                (['peer' => $peer, 'reply_to_msg_id' =>
+                                $msg_id, 'message' => $message]);
+                            }
+                        }
+                    }
+                    if (isset($userid)) {
+                        if (!is_admin_mod($update, $MadelineProto, $userid)) {
+                            $info = $MadelineProto->get_info($userid);
+                            if (array_key_exists('username', $info['User'])) {
+                                $username = $info['User']['username'];
+                            } else {
+                                $username = $info['User']['first_name'];
+                            }
+                            try {
+                            $kick = $MadelineProto->channels->kickFromChannel(
+                ['channel' => $peer, 'user_id' => $userid, 'kicked' => true]);
+                            $kickback = $MadelineProto->channels->kickFromChannel(
+                            ['channel' => $peer, 'user_id' => $userid, 'kicked' => false]);
+                            $message = "User ".$username." kicked from ".$title;
+                            } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                $message = "$username isn't even here man.";
+                            }
+
+                        } else {
+                            $message = "You can't kick mods!?";
+                        }
+                    }
+                } else {
+                $message = "Use /kick @username to kick someone from this chat!";
+                $code = [['_' => 'messageEntityItalic', 'offset' => 9,
+                'length' => 9]];
+                $sentMessage = $MadelineProto->messages->sendMessage
+                (['peer' => $peer, 'reply_to_msg_id' =>
+                $msg_id, 'message' => $message, 'entities' => $code]);
+                }
+            } else {
+                $message = "Only mods can use me to kick butts";
+            }
+        } else {
+            $message = "I have to be an admin for this to work";
+        }
+        if (!isset($sentMessage)) {
+            $sentMessage = $MadelineProto->messages->sendMessage
+            (['peer' => $peer, 'reply_to_msg_id' =>
+            $msg_id, 'message' => $message]);
+        }
+        if(isset($kick)) {
+        \danog\MadelineProto\Logger::log($kick);
+        \danog\MadelineProto\Logger::log($kickback);
         }
         \danog\MadelineProto\Logger::log($sentMessage);
     }

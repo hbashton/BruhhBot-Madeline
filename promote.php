@@ -15,7 +15,7 @@ function promoteme($update, $MadelineProto, $msg) {
         $cont = "true";
         break;
     }
-    if ($cont == "true") {
+    if (isset($cont)) {
         $msg_id = $update['update']['message']['id'];
         if (from_admin($update, $MadelineProto)) {
             $id = catch_id($update, $MadelineProto, $msg);
@@ -92,7 +92,7 @@ function demoteme($update, $MadelineProto, $msg) {
         $cont = "true";
         break;
     }
-    if ($cont == "true") {
+    if (isset($cont)) {
         $msg_id = $update['update']['message']['id'];
         if (from_admin($update, $MadelineProto)) {
             $id = catch_id($update, $MadelineProto, $msg);
