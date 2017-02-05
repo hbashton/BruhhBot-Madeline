@@ -1,5 +1,5 @@
 {
-"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contact", "contacts", "geo", "document", "documents"],
+"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contact", "contacts", "geo", "document", "documents", "flood"],
 "lock":
     {
     "gif":"Gifs are now locked",
@@ -13,6 +13,7 @@
     "contacts":"Contact messages are now locked",
     "document":"All Document types are now locked",
     "documents":"All Document types are now locked",
+    "flood":"Flooding is now locked. By default the limit is 10",
     "already":
         {
         "gif":"Gifs are already locked",
@@ -25,7 +26,8 @@
         "contact":"Contact messages are already locked",
         "contacts":"Contact messages are already locked",
         "document":"All Document types are already locked",
-        "documents":"All Document types are already locked"
+        "documents":"All Document types are already locked",
+        "flood":"Flooding is already locked"
         }
     },
 "unlock":
@@ -41,6 +43,7 @@
     "contacts":"Contact messages are now unlocked",
     "document":"All Document types are now unlocked",
     "documents":"All Document types are now unlocked",
+    "flood":"Flooding is now unlocked",
     "already":
         {
         "gif":"Gifs are already unlocked",
@@ -53,7 +56,8 @@
         "contact":"Contact messages are already unlocked",
         "contacts":"Contact messages are already unlocked",
         "document":"All Document types are already unlocked",
-        "documents":"All Document types are alreday unlocked"
+        "documents":"All Document types are alreday unlocked",
+        "flood":"Flooding is already unlocked"
         }
     }
 }
