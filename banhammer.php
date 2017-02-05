@@ -166,15 +166,19 @@ function banme($update, $MadelineProto, $msg_str)
             }
         }
         if (!isset($sentMessage)) {
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
+            if (isset($message)) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' =>
+                    $msg_id, 'message' => $message]
+                );
+            }
         }
         if (isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
         }
-        \danog\MadelineProto\Logger::log($sentMessage);
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }
 
@@ -439,15 +443,19 @@ function kickhim($update, $MadelineProto, $msg_str)
             }
         }
         if (!isset($sentMessage)) {
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
+            if (isset($message)) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' =>
+                    $msg_id, 'message' => $message]
+                );
+            }
         }
         if (isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
             \danog\MadelineProto\Logger::log($kickback);
         }
-        \danog\MadelineProto\Logger::log($sentMessage);
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }

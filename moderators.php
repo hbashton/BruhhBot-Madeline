@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function from_master($update, $MadelineProto)
+function from_master($update, $MadelineProto, $str = "", $send = false)
 {
     if ($MadelineProto->get_info(
         $update['update']
@@ -28,6 +28,17 @@ function from_master($update, $MadelineProto)
     ) {
         return true;
     } else {
+        if ($send) {
+            $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+            ['InputPeer'];
+            $msg_id = $update['update']['message']['id'];
+            $message = $str;
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                ['peer' => $peer, 'reply_to_msg_id' =>
+                $msg_id, 'message' => $message]
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
         return false;
     }
 }
@@ -76,7 +87,7 @@ function from_admin($update, $MadelineProto, $str = "", $send = false)
                 ['peer' => $peer, 'reply_to_msg_id' =>
                 $msg_id, 'message' => $message]
             );
-                \danog\MadelineProto\Logger::log($sentMessage);
+            \danog\MadelineProto\Logger::log($sentMessage);
         }
         return false;
     }
@@ -219,7 +230,7 @@ function from_admin_mod($update, $MadelineProto, $str = "", $send = false)
 
 function is_admin_mod($update, $MadelineProto, $userid)
 {
-    if (is_mod($update, $MadelineProto, $userid) 
+    if (is_mod($update, $MadelineProto, $userid)
         or is_admin($update, $MadelineProto, $userid)
         or is_master($MadelineProto, $userid)
     ) {

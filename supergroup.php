@@ -17,6 +17,126 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
+ function addadmin($update, $MadelineProto, $msg)
+{
+    $msg_id = $update['update']['message']['id'];
+    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+        $mods = "Only my master can promote new admins.";
+        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+        ['InputPeer'];
+        $title = $MadelineProto->get_info(
+            -100 . $update['update']['message']
+            ['to_id']['channel_id']
+        )['Chat']['title'];
+        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        $from_id = $MadelineProto->get_info(
+            $update
+            ['update']['message']['from_id']
+        )['bot_api_id'];
+        if (is_bot_admin($update, $MadelineProto)) {
+            if (from_master($update, $MadelineProto, $mods, true)) {
+                $id = catch_id($update, $MadelineProto, $msg);
+                    if ($id[0]) {
+                        $userid = $id[1];
+                        $username = $id[2];
+                    } else {
+                        $message = "I can't find a user called ".
+                        "$msg_str. Who's that?";
+                    }
+                if (isset($userid)) {
+                        $channelRoleModerator = [
+                            '_' => 'channelRoleModerator',
+                        ];
+                        try {
+                            $editadmin = $MadelineProto->channels->editAdmin(
+                            ['channel' => $peer, 'user_id' => $userid,
+                            'role' => $channelRoleModerator ]
+                            );
+                            $entity = [[
+                                '_' => 'inputMessageEntityMentionName',
+                                'offset' => 0,
+                                'length' => strlen($username),
+                                'user_id' => $userid
+                            ]];
+                            $message = "$username is now an admin!!!!!";
+                            $sentMessage = $MadelineProto->messages->sendMessage(
+                            ['peer' => $peer, 'reply_to_msg_id' =>
+                            $msg_id, 'message' => $message, 'entities' => $entity]
+                           );
+                            \danog\MadelineProto\Logger::log($editadmin);
+
+                        } catch (Exception $e) {
+                            $message = "I am not the owner of this chat, and ".
+                            "cannot add any admins";
+                        }
+                }
+                if (!isset($sentMessage)) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        ['peer' => $peer, 'reply_to_msg_id' =>
+                        $msg_id, 'message' => $message]
+                    );
+                }
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+        }
+    }
+}
+function rmadmin($update, $MadelineProto, $msg)
+{
+    $msg_id = $update['update']['message']['id'];
+    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+        $mods = "Only my master can promote new admins.";
+        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+        ['InputPeer'];
+        $title = $MadelineProto->get_info(
+            -100 . $update['update']['message']
+            ['to_id']['channel_id']
+        )['Chat']['title'];
+        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        $from_id = $MadelineProto->get_info(
+            $update
+            ['update']['message']['from_id']
+        )['bot_api_id'];
+        if (is_bot_admin($update, $MadelineProto)) {
+            if (from_master($update, $MadelineProto, $mods, true)) {
+                $id = catch_id($update, $MadelineProto, $msg);
+                    if ($id[0]) {
+                        $userid = $id[1];
+                        $username = $id[2];
+                    } else {
+                        $message = "I can't find a user called ".
+                        "$msg_str. Who's that?";
+                    }
+                if (isset($userid)) {
+                        $channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
+                        $editadmin = $MadelineProto->channels->editAdmin(
+                        ['channel' => $peer, 'user_id' => $userid,
+                        'role' => $channelRoleEmpty ]
+                        );
+                        \danog\MadelineProto\Logger::log($editadmin);
+                        $entity = [[
+                                '_' => 'inputMessageEntityMentionName',
+                                'offset' => 0,
+                                'length' => strlen($username),
+                                'user_id' => $userid
+                            ]];
+                        $message = "$username is..no longer an admin. I am sorry";
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                        ['peer' => $peer, 'reply_to_msg_id' =>
+                        $msg_id, 'message' => $message, 'entities' => $entity]
+                        );
+                }
+                if (!isset($sentMessage)) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        ['peer' => $peer, 'reply_to_msg_id' =>
+                        $msg_id, 'message' => $message]
+                    );
+                }
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+        }
+    }
+}
 function idme($update, $MadelineProto, $msg_arr)
 {
     switch ($update['update']['message']['to_id']['_']) {

@@ -302,6 +302,18 @@ while (true) {
                                 invite_user($update, $MadelineProto, $msg_str);
                                 break;
 
+                            case 'addadmin':
+                                unset($msg_arr[0]);
+                                $msg_str = implode(" ", $msg_arr);
+                                addadmin($update, $MadelineProto, $msg_str);
+                                break;
+
+                                case 'rmadmin':
+                                unset($msg_arr[0]);
+                                $msg_str = implode(" ", $msg_arr);
+                                rmadmin($update, $MadelineProto, $msg_str);
+                                break;
+
                             case 'setname':
                                 unset($msg_arr[0]);
                                 $msg_str = implode(" ", $msg_arr);
@@ -365,10 +377,8 @@ while (true) {
                     switch ($update['update']['message']['action']['_']) {
                     case 'messageActionChatAddUser':
                         if ($update['update']['message']['out'] == false) {
-                            $user_id = $MadelineProto->get_info(
-                                $update
-                                ['update']['message']['action']['users'][0]
-                            )['User'];
+                            $user_id = $update
+                            ['update']['message']['action']['users'][0];
                             $channelType = $update
                             ['update']['message']['to_id']['_'];
                             if ($channelType == 'peerChannel'
@@ -384,7 +394,7 @@ while (true) {
                                             $user_id
                                         );
                                 if ($id[0]) {
-                                        $username = id[2];
+                                        $username = $id[2];
                                 }
                                         $ch_id = -100 .
                                         $update['update']['message']['to_id']

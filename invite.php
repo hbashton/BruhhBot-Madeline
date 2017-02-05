@@ -17,6 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
+
 function create_new_supergroup($update, $MadelineProto, $title, $about)
 {
     if ($update['update']['message']['to_id']['_'] == "peerUser") {
@@ -92,8 +93,8 @@ function export_new_invite($update, $MadelineProto)
                     );
                     \danog\MadelineProto\Logger::log($sentMessage);
                 } catch (Exception $e) {
-                    $message = "I am not the owner of this chat.
-On the bright side, just save the message with my /save command.";
+                    $message = "I am not the owner of this chat. On the bright ".
+                    "side, just save the message with my /save command.";
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         ['peer' => $peer, 'reply_to_msg_id' =>
                         $msg_id, 'message' => $message]
@@ -213,7 +214,7 @@ function invite_user($update, $MadelineProto, $msg_str)
                     }
                 } else {
                     $message = "Use /invite @username to ".
-                    "invite someone tothis chat!";
+                    "invite someone to this chat!";
                     $code = [['_' => 'messageEntityItalic', 'offset' => 12,
                     'length' => 9]];
                     $sentMessage = $MadelineProto->messages->sendMessage(

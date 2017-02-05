@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function saveme($update, $MadelineProto, $msg, $name) 
+function saveme($update, $MadelineProto, $msg, $name)
 {
     switch ($update['update']['message']['to_id']['_']) {
     case 'peerUser':
@@ -40,7 +40,7 @@ function saveme($update, $MadelineProto, $msg, $name)
     if (isset($cont)) {
         $msg_id = $update['update']['message']['id'];
         $mods = "Only mods get to save messages. You don't fit that criteria.";
-        if (isset($peerUSER) 
+        if (isset($peerUSER)
             or from_admin_mod($update, $MadelineProto, $mods, true)
         ) {
             if (!empty($name) && !empty($msg)) {
@@ -64,7 +64,7 @@ function saveme($update, $MadelineProto, $msg, $name)
                     }
                     $saved[$ch_id][$name] = $msg;
                     file_put_contents('saved.json', json_encode($saved));
-                    $message = "Message ".$name." has been saved";
+                    $message = "Message $name has been saved";
                     $code = [['_' => 'messageEntityBold', 'offset' => 8,
                     'length' => strlen($name)]];
                     $sentMessage = $MadelineProto->messages->sendMessage(
@@ -76,7 +76,7 @@ function saveme($update, $MadelineProto, $msg, $name)
                     $saved[$ch_id]["from"] = [];
                     $saved[$ch_id][$name] = $msg;
                     file_put_contents('saved.json', json_encode($saved));
-                    $message = "Message ".$name." has been saved";
+                    $message = "Message $name has been saved";
                     $code = [['_' => 'messageEntityBold', 'offset' => 8,
                     'length' => strlen($name)]];
                     $sentMessage = $MadelineProto->messages->sendMessage(
@@ -94,18 +94,18 @@ function saveme($update, $MadelineProto, $msg, $name)
                     $msg_id, 'message' => $message, 'entities' => $code]
                 );
             }
+            if (!isset($sentMessage)) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' =>
+                    $msg_id, 'message' => $message]
+                );
+            }
+            \danog\MadelineProto\Logger::log($sentMessage);
         }
-        if (!isset($sentMessage)) {
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
-        }
-        \danog\MadelineProto\Logger::log($sentMessage);
     }
 }
 
-function getme($update, $MadelineProto, $name) 
+function getme($update, $MadelineProto, $name)
 {
     switch ($update['update']['message']['to_id']['_']) {
     case 'peerUser':
@@ -174,7 +174,7 @@ function getme($update, $MadelineProto, $name)
     }
 }
 
-function savefrom($update, $MadelineProto, $name) 
+function savefrom($update, $MadelineProto, $name)
 {
     switch ($update['update']['message']['to_id']['_']) {
     case 'peerUser':

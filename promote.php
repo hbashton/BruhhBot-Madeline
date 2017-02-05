@@ -78,12 +78,16 @@ function promoteme($update, $MadelineProto, $msg)
                 $msg_id, 'message' => $message, 'entities' => $mention]
             );
         } else {
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
+            if (isset($message)) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' =>
+                    $msg_id, 'message' => $message]
+                );
+            }
         }
-        \danog\MadelineProto\Logger::log($sentMessage);
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }
 
@@ -104,8 +108,6 @@ function demoteme($update, $MadelineProto, $msg)
             if ($id[0]) {
                 $userid = $id[1];
                 $username = $id[2];
-                $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                5, 'length' => strlen($username), 'user_id' => $userid]];
                 if (!file_exists('promoted.json')) {
                     $json_data = [];
                     $json_data[$ch_id] = [];
@@ -137,6 +139,10 @@ function demoteme($update, $MadelineProto, $msg)
                 $message = "I don't know of anyone called ".$message;
             }
         }
+        $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
+        5, 'length' => strlen($username), 'user_id' => $userid],  ['_' => 'messageEntityBold',
+        'offset' => strlen($message) - strlen($title),
+        'length' => strlen($title) ]];
         $sentMessage = $MadelineProto->messages->sendMessage(
             ['peer' => $peer, 'reply_to_msg_id' =>
             $msg_id, 'message' => $message, 'entities' => $mention]

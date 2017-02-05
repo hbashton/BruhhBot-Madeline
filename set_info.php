@@ -47,10 +47,8 @@ function set_chat_photo($update, $MadelineProto)
                             $update['update']['message']
                         )
                         ) {
-                            $mediatype = ['update']['message']['media']['_'];
+                            $mediatype = $update['update']['message']['media']['_'];
                             if ($mediatype == "messageMediaPhoto") {
-                                $message = "Thanks! I've updated the photo for ".
-                                $title;
                                 $hash = $update
                                 ['update']['message']['media']['photo']
                                 ['access_hash'];
@@ -63,12 +61,22 @@ function set_chat_photo($update, $MadelineProto)
                                 $inputChatPhoto = [
                                     '_' => 'inputChatPhoto',
                                     'id' => $inputPhoto];
-                                $changePhoto = $MadelineProto->
-                                channels->editPhoto(
-                                    ['channel' => $ch_id,
-                                    'photo' => $inputChatPhoto]
-                                );
-                                \danog\MadelineProto\Logger::log($changePhoto);
+                                    try {
+                                        $changePhoto = $MadelineProto->
+                                        channels->editPhoto(
+                                            ['channel' => $ch_id,
+                                            'photo' => $inputChatPhoto]
+                                        );
+                                        \danog\MadelineProto\Logger::log(
+                                            $changePhoto
+                                        );
+                                        $message = "Thanks! I've updated the photo".
+                                        " for $title";
+
+                                    } catch (Exception $e) {
+                                        $message = "I am not the owner of this ".
+                                        "chat, and cannot change the photo.";
+                                    }
                                 unset($GLOBALS['from_user_chat_photo']);
                             } else {
                                 $message = "The message you sent was not a photo! ".
@@ -126,22 +134,35 @@ function set_chat_title($update, $MadelineProto, $msg_str)
             )
             ) {
                 if (!empty($msg_str)) {
-                    $editTitle = $MadelineProto->channels->editTitle(
-                        ['channel' => $ch_id, 'title' => $msg_str ]
-                    );
-                    \danog\MadelineProto\Logger::log($editTitle);
-
-                    $message = "Chat Title successfully changed to $msg_str";
+                    try {
+                        $editTitle = $MadelineProto->channels->editTitle(
+                            ['channel' => $ch_id, 'title' => $msg_str ]
+                        );
+                        \danog\MadelineProto\Logger::log($editTitle);
+                        $message = "Chat Title successfully changed to $msg_str";
+                        $entity = [['_' => 'messageEntityBold',
+                            'offset' => strlen($message) - strlen($msg_str),
+                            'length' => strlen($msg_str)]];
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            ['peer' => $peer, 'reply_to_msg_id' =>
+                            $msg_id, 'message' => $message, 'entities' => $entity]
+                        );
+                    } catch (Exception $e) {
+                        $message = "I am not the owner of this chat, and cannot ".
+                        "change the title.";
+                    }
                 } else {
                     $message = "You can't make the title empty silly";
                 }
             }
         }
         if (isset($message)) {
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
+            if (!isset($sentMessage)) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' =>
+                    $msg_id, 'message' => $message]
+                );
+            }
             \danog\MadelineProto\Logger::log($sentMessage);
         }
     }

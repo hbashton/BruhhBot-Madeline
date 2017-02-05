@@ -136,9 +136,22 @@ function check_flood($update, $MadelineProto)
         if (array_key_exists($ch_id, $locked)) {
             if (in_array('flood', $locked[$ch_id])) {
                 if (is_bot_admin($update, $MadelineProto)) {
+                    if (from_admin_mod($update, $MadelineProto)) {
+                        global $flooder;
+                        $flooder['num'] = 0;
+                        $flooder['user'] = $fromid;
+                    }
                     if (!empty($GLOBALS['flooder'])) {
                         $flooder = $GLOBALS['flooder'];
                         if ($fromid == $flooder['user']) {
+                            $id = catch_id(
+                                    $update,
+                                    $MadelineProto,
+                                    $fromid
+                                );
+                            if ($id[0]) {
+                                $username = $id[2];
+                            }
                             $GLOBALS['flooder']['num'] = $flooder['num'] + 1;
                             $num = $GLOBALS['flooder']['num'];
                             if ($num >= $locked[$ch_id]['floodlimit']) {
@@ -146,18 +159,26 @@ function check_flood($update, $MadelineProto)
                                     $kick = $MadelineProto->
                                     channels->kickFromChannel(
                                         ['channel' => $peer,
-                                        'user_id' => $userid,
+                                        'user_id' => $fromid,
                                         'kicked' => true]
                                     );
                                     $message = "Flooding is not allowed here ".
                                     $username;
                                     $mention = [[
-                                        '_' => 'inputMessageEntityMentionName', 
-                                        'offset' => 29, 
-                                        'length' => strlen($username), 
+                                        '_' => 'inputMessageEntityMentionName',
+                                        'offset' => 29,
+                                        'length' => strlen($username),
                                         'user_id' => $fromid]];
+                                    if (isset($message)) {
+                                        $sentMessage = $MadelineProto->messages->sendMessage(
+                                        ['peer' => $peer, 'reply_to_msg_id' =>
+                                        $msg_id, 'message' => $message]
+                                        );
+                                    }
                                     \danog\MadelineProto\Logger::log($kick);
-                                    \danog\MadelineProto\Logger::log($sentMessage);
+                                    if (isset($sentMessage)) {
+                                        \danog\MadelineProto\Logger::log($sentMessage);
+                                    }
                                     unset($GLOBALS['flooder']);
                                 }
                             }
