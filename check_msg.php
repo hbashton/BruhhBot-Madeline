@@ -31,16 +31,12 @@ class Exec extends Thread
 
 function check_locked($update, $MadelineProto)
 {
-    switch ($update['update']['message']['to_id']['_']) {
-    case 'peerChannel':
-        $peer = $MadelineProto->
-        get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
         $msg_id = $update['update']['message']['id'];
-        $cont = "true";
-        break;
-    }
-    if (isset($cont)) {
         if (is_bot_admin($update, $MadelineProto)) {
             if (!from_admin_mod($update, $MadelineProto)) {
                 $msg_ = $update["update"]["message"];
@@ -82,8 +78,6 @@ function check_locked($update, $MadelineProto)
                         break;
                     }
                     if (!empty($type)) {
-                        $ch_id = -100 .
-                        $update['update']['message']['to_id']['channel_id'];
                         if (!file_exists('locked.json')) {
                             $json_data = [];
                             $json_data[$ch_id] = [];
@@ -117,20 +111,13 @@ function check_locked($update, $MadelineProto)
 
 function check_flood($update, $MadelineProto)
 {
-    if ($update['update']['message']['to_id']['_'] == "peerChannel") {
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
         $msg_id = $update['update']['message']['id'];
-        $fromid = $MadelineProto->get_info(
-            $update['update']
-            ['message']['from_id']
-        )['bot_api_id'];
-        if (!file_exists('locked.json')) {
-            $json_data = [];
-            $json_data[$ch_id] = [];
-            file_put_contents('locked.json', json_encode($json_data));
-        }
+        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+        check_json_array('locked.json', $ch_id);
         $file = file_get_contents("locked.json");
         $locked = json_decode($file, true);
         if (array_key_exists($ch_id, $locked)) {
@@ -145,10 +132,10 @@ function check_flood($update, $MadelineProto)
                         $flooder = $GLOBALS['flooder'];
                         if ($fromid == $flooder['user']) {
                             $id = catch_id(
-                                    $update,
-                                    $MadelineProto,
-                                    $fromid
-                                );
+                                $update,
+                                $MadelineProto,
+                                $fromid
+                            );
                             if ($id[0]) {
                                 $username = $id[2];
                             }
@@ -170,14 +157,20 @@ function check_flood($update, $MadelineProto)
                                         'length' => strlen($username),
                                         'user_id' => $fromid]];
                                     if (isset($message)) {
-                                        $sentMessage = $MadelineProto->messages->sendMessage(
-                                        ['peer' => $peer, 'reply_to_msg_id' =>
-                                        $msg_id, 'message' => $message]
+                                        $sentMessage = $MadelineProto->
+                                        messages->sendMessage(
+                                            ['peer' => $peer,
+                                            'reply_to_msg_id' => $msg_id,
+                                            'message' => $message]
                                         );
                                     }
-                                    \danog\MadelineProto\Logger::log($kick);
+                                    if (isset($kick)) {
+                                        \danog\MadelineProto\Logger::log($kick);
+                                    }
                                     if (isset($sentMessage)) {
-                                        \danog\MadelineProto\Logger::log($sentMessage);
+                                        \danog\MadelineProto\Logger::log(
+                                            $sentMessage
+                                        );
                                     }
                                     unset($GLOBALS['flooder']);
                                 }

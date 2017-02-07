@@ -17,23 +17,25 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function banme($update, $MadelineProto, $msg_str)
+function banme($update, $MadelineProto, $msg)
 {
-    $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
         $mods = "Only mods can use me to kick butts!";
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(
-            -100 . $update['update']['message']
-            ['to_id']['channel_id']
-        )['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                if ($msg_str) {
-                    if (is_numeric($msg_str)) {
-                        $userid = (int) $msg_str;
+                if ($msg) {
+                    if (is_numeric($msg)) {
+                        $userid = (int) $msg;
+                        $id = catch_id($update, $MadelineProto, $userid);
                     } else {
                         if (array_key_exists(
                             'entities',
@@ -53,124 +55,109 @@ function banme($update, $MadelineProto, $msg_str)
                                     break;
                                 } else {
                                     $message = "I don't know anyone with the name ".
-                                    $msg_str;
+                                    $msg;
                                 }
                             }
                         }
                         if (!isset($userid)) {
-                            $first_char = substr($msg_str, 0, 1);
+                            $first_char = substr($msg, 0, 1);
                             if (preg_match_all('/@/', $first_char, $matches)) {
-                                $id = catch_id($update, $MadelineProto, $msg_str);
+                                $id = catch_id($update, $MadelineProto, $msg);
                                 if ($id[0]) {
                                     $userid = $id[1];
                                 } else {
                                     $message = "I can't find a user called ".
-                                    "$msg_str. Who's that?";
+                                    "$msg. Who's that?";
+                                    $default['message'] = $message;
                                 }
                             } else {
                                 $message = "I don't know anyone with the name ".
-                                $msg_str;
-                                $sentMessage = $MadelineProto->
-                                messages->sendMessage(
-                                    ['peer' => $peer,
-                                    'reply_to_msg_id' => $msg_id,
-                                    'message' => $message]
-                                );
+                                $msg;
+                                $default['message'] = $message;
                             }
                         }
                     }
                     if (isset($userid)) {
-                        if (!is_admin_mod($update, $MadelineProto, $userid)) {
-                            try {
-                                $info = $MadelineProto->get_info($userid);
-                            } catch (danog\MadelineProto\Exception $e) {
+                        $banmod = "You can't ban mods?!?!";
+                        if (!is_admin_mod(
+                            $update,
+                            $MadelineProto,
+                            $userid,
+                            $banmod,
+                            true
+                        )
+                        ) {
+                            $info = cache_get_info(
+                                $update,
+                                $MadelineProto,
+                                $userid
+                            );
+                            if (!$info) {
                                 $message = "$userid is not a valid ID";
-                                $sentMessage = $MadelineProto->
-                                messages->sendMessage(
-                                    ['peer' => $peer,
-                                    'reply_to_msg_id' => $msg_id,
-                                    'message' => $message]
-                                );
-                                \danog\MadelineProto\Logger::log($sentMessage);
-                                return;
-                            }
-                            if (array_key_exists('username', $info['User'])) {
-                                $username = $info['User']['username'];
+                                $default['message'] = $message;
                             } else {
-                                $username = $info['User']['first_name'];
-                            }
-                            if (!file_exists('banlist.json')) {
-                                $json_data = [];
-                                $json_data[$ch_id] = [];
-                                file_put_contents(
-                                    'banlist.json',
-                                    json_encode($json_data)
-                                );
-                            }
+                                $username = $id[2];
+                                check_json_array('banlist.json', $ch_id);
                                 $file = file_get_contents("banlist.json");
                                 $banlist = json_decode($file, true);
-                            if (array_key_exists($ch_id, $banlist)) {
-                                if (!in_array($userid, $banlist[$ch_id])) {
-                                    array_push($banlist[$ch_id], $userid);
-                                    file_put_contents(
-                                        'banlist.json',
-                                        json_encode($banlist)
-                                    );
-                                    $message = "User $username banned from $title";
+                                if (array_key_exists($ch_id, $banlist)) {
+                                    if (!in_array($userid, $banlist[$ch_id])) {
+                                        array_push($banlist[$ch_id], $userid);
+                                        file_put_contents(
+                                            'banlist.json',
+                                            json_encode($banlist)
+                                        );
+                                        $message = "User $username banned from $title";
+                                        try {
+                                            $kick = $MadelineProto->
+                                            channels->kickFromChannel(
+                                                ['channel' => $peer,
+                                                'user_id' => $userid,
+                                                'kicked' => true]
+                                            );
+                                        } catch (
+                                            \danog\MadelineProto\RPCErrorException
+                                            $e
+                                        ) {
+                                        }
+                                    } else {
+                                        $message = "User ".$username." already banned";
+                                        $default['message'] = $message;
+                                    }
+                                } else {
+                                    $banlist[$ch_id] = [];
                                     try {
                                         $kick = $MadelineProto->
                                         channels->kickFromChannel(
                                             ['channel' => $peer,
                                             'user_id' => $userid,
-                                            'kicked' => true]
+                                            'kicked' => true, ]
                                         );
-                                    } catch (
-                                        \danog\MadelineProto\RPCErrorException
-                                        $e
-                                    ) {
+                                    } catch (\danog\MadelineProto\RPCErrorException $e) {
                                     }
-                                } else {
-                                    $message = "User ".$username." already banned";
-                                }
-                            } else {
-                                $banlist[$ch_id] = [];
-                                try {
-                                    $kick = $MadelineProto->
-                                    channels->kickFromChannel(
-                                        ['channel' => $peer,
-                                        'user_id' => $userid,
-                                        'kicked' => true, ]
+                                    array_push($banlist[$ch_id], $userid);
+                                    file_put_contents(
+                                        'banlist.json',
+                                        json_encode($banlist)
                                     );
-                                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                    $message = "User ".$username." banned from ".$title;
+                                    $default['message'] = $message;
                                 }
-                                array_push($banlist[$ch_id], $userid);
-                                file_put_contents(
-                                    'banlist.json',
-                                    json_encode($banlist)
-                                );
-                                $message = "User ".$username." banned from ".$title;
                             }
-                        } else {
-                            $message = "You can't ban mods!?";
                         }
+                    } else {
+                        $message = "Use /ban @username to ban someone from this chat!";
+                        $code = [['_' => 'messageEntityItalic', 'offset' => 9,
+                        'length' => 9]];
+                        $default['entities'] = $code;
+                        $default['message'] = $message;
                     }
-                } else {
-                    $message = "Use /ban @username to ban someone from this chat!";
-                    $code = [['_' => 'messageEntityItalic', 'offset' => 9,
-                    'length' => 9]];
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities' => $code]
-                    );
                 }
             }
         }
         if (!isset($sentMessage)) {
-            if (isset($message)) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message]
-                );
+            if (isset($default['message'])) {
+                $sentMessage = $MadelineProto->messages->sendMessage($default);
             }
         }
         if (isset($kick)) {
@@ -183,23 +170,25 @@ function banme($update, $MadelineProto, $msg_str)
 }
 
 
-function unbanme($update, $MadelineProto, $msg_str)
+function unbanme($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $mods = "Only mods can unban peeps!";
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(
-            -100 . $update['update']['message']
-            ['to_id']['channel_id']
-        )['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+    if (is_supergroup($update, $MadelineProto)) {
+        $mods = "Only mods can use me to unban peeps!";
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+        );
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                if ($msg_str) {
-                    if (is_numeric($msg_str)) {
-                        $userid = (int) $msg_str;
+                if ($msg) {
+                    if (is_numeric($msg)) {
+                        $userid = (int) $msg;
+                        $id = catch_id($update, $MadelineProto, $userid);
                     } else {
                         if (array_key_exists(
                             'entities',
@@ -215,43 +204,39 @@ function unbanme($update, $MadelineProto, $msg_str)
                                     break;
                                 } else {
                                     $message = "I don't know anyone with the name ".
-                                    $msg_str;
+                                    $msg;
+                                    $default['message'] = $message;
                                 }
                             }
                         }
                         if (!isset($userid)) {
-                            $first_char = substr($msg_str, 0, 1);
+                            $first_char = substr($msg, 0, 1);
                             if (preg_match_all('/@/', $first_char, $matches)) {
-                                $id = catch_id($update, $MadelineProto, $msg_str);
+                                $id = catch_id($update, $MadelineProto, $msg);
                                 if ($id[0]) {
                                     $userid = $id[1];
                                 } else {
                                     $message = "I can't find a user called ".
-                                    "$msg_str. Who's that?";
+                                    "$msg. Who's that?";
+                                    $default['message'] = $message;
                                 }
                             } else {
                                 $message = "I don't know anyone with the name ".
-                                $msg_str;
-                                $sentMessage = $MadelineProto->messages->sendMessage(
-                                    ['peer' => $peer, 'reply_to_msg_id' =>
-                                    $msg_id, 'message' => $message]
-                                );
-                                \danog\MadelineProto\Logger::log($sentMessage);
+                                $msg;
+                                $default['message'] = $message;
                             }
                         }
                     }
                     if (isset($userid)) {
                         $username = $id[2];
-                        if (!file_exists('banlist.json')) {
-                            $json_data = [];
-                            $json_data[$ch_id] = [];
-                            file_put_contents(
-                                'banlist.json',
-                                json_encode($json_data)
-                            );
-                        }
+                        check_json_array('banlist.json', $ch_id);
                         $file = file_get_contents("banlist.json");
                         $banlist = json_decode($file, true);
+                        $mention = [[
+                        '_' => 'inputMessageEntityMentionName',
+                        'offset' => 5,
+                        'length' => strlen($username),
+                        'user_id' => $userid]];
                         if (array_key_exists($ch_id, $banlist)) {
                             if (in_array($userid, $banlist[$ch_id])) {
                                 if (($key = array_search(
@@ -266,17 +251,8 @@ function unbanme($update, $MadelineProto, $msg_str)
                                     json_encode($banlist)
                                 );
                                 $message = "User $username unbanned from $title";
-                                $mention = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 5,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid]];
-                                $sentMessage = $MadelineProto->messages->sendMessage(
-                                    ['peer' => $peer,
-                                    'reply_to_msg_id' => $msg_id,
-                                    'message' => $message,
-                                    'entities' => $mention]
-                                );
+                                $default['message'] = $message;
+                                $default['entities'] = $mention;
                                 try {
                                     $kick = $MadelineProto->
                                     channels->kickFromChannel(
@@ -288,33 +264,13 @@ function unbanme($update, $MadelineProto, $msg_str)
                                 }
                             } else {
                                 $message = "User ".$username." is not banned!";
-                                $mention = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 5,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid]];
-                                $sentMessage = $MadelineProto->
-                                messages->sendMessage(
-                                    ['peer' => $peer,
-                                    'reply_to_msg_id' => $msg_id,
-                                    'message' => $message,
-                                    'entities' => $mention]
-                                );
+                                $default['message'] = $message;
+                                $default['entities'] = $mention;
                             }
                         } else {
-                            $mention = [[
-                                '_' => 'inputMessageEntityMentionName',
-                                'offset' => 5,
-                                'length' => strlen($username),
-                                'user_id' => $userid]];
-                            $sentMessage = $MadelineProto->
-                            messages->sendMessage(
-                                ['peer' => $peer,
-                                'reply_to_msg_id' => $msg_id,
-                                'message' => $message,
-                                'entities' => $mention]
-                            );
                             $message = "User $username is not banned!";
+                            $default['message'] = $message;
+                            $default['entities'];
                         }
                     }
                 } else {
@@ -322,44 +278,47 @@ function unbanme($update, $MadelineProto, $msg_str)
                     "chat!";
                     $code = [['_' => 'messageEntityItalic', 'offset' => 11,
                     'length' => 9]];
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities' => $code]
-                    );
+                    $default['message'] = $message;
+                    $default['entities'] = $code;
                 }
             }
         }
         if (!isset($sentMessage)) {
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
+            if (isset($default['message'])) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
         }
         if (isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
         }
-        \danog\MadelineProto\Logger::log($sentMessage);
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }
 
 
-function kickhim($update, $MadelineProto, $msg_str)
+function kickhim($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
     if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
         $mods = "Only mods can use me to kick butts!";
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(
-            -100 . $update['update']['message']
-            ['to_id']['channel_id']
-        )['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+        );
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                if ($msg_str) {
-                    if (is_numeric($msg_str)) {
-                        $userid = (int) $msg_str;
+                if ($msg) {
+                    if (is_numeric($msg)) {
+                        $userid = (int) $msg;
+                        $id = catch_id($update, $MadelineProto, $userid);
                     } else {
                         if (array_key_exists(
                             'entities',
@@ -375,35 +334,44 @@ function kickhim($update, $MadelineProto, $msg_str)
                                     break;
                                 } else {
                                     $message = "I don't know anyone with the name ".
-                                    $msg_str;
+                                    $msg;
+                                    $default['message'] = $message;
                                 }
                             }
                         }
                         if (!isset($userid)) {
-                            $first_char = substr($msg_str, 0, 1);
+                            $first_char = substr($msg, 0, 1);
                             if (preg_match_all('/@/', $first_char, $matches)) {
-                                $id = catch_id($update, $MadelineProto, $msg_str);
+                                $id = catch_id($update, $MadelineProto, $msg);
                                 if ($id[0]) {
                                     $userid = $id[1];
                                 } else {
                                     $message = "I can't find a user called ".
-                                    "$msg_str. Who's that?";
+                                    "$msg. Who's that?";
+                                    $default['message'] = $message;
                                 }
                             } else {
                                 $message = "I don't know anyone with the name ".
-                                $msg_str;
-                                $sentMessage = $MadelineProto->
-                                messages->sendMessage(
-                                    ['peer' => $peer,
-                                    'reply_to_msg_id' => $msg_id,
-                                    'message' => $message]
-                                );
+                                $msg;
+                                $default['message'] = $message;
                             }
                         }
                     }
                     if (isset($userid)) {
-                        if (!is_admin_mod($update, $MadelineProto, $userid)) {
-                            $info = $MadelineProto->get_info($userid);
+                        $username = $id[2];
+                        $kickmod = "You can't kick mods?!?!";
+                        if (!is_admin_mod(
+                            $update,
+                            $MadelineProto,
+                            $userid,
+                            $kickmod,
+                            true)) {
+                            $mention = [[
+                            '_' => 'inputMessageEntityMentionName',
+                            'offset' => 5,
+                            'length' => strlen($username),
+                            'user_id' => $userid]];
+                            $info = cache_get_info($update, $MadelineProto, $userid);
                             if (array_key_exists('username', $info['User'])) {
                                 $username = $info['User']['username'];
                             } else {
@@ -422,12 +390,18 @@ function kickhim($update, $MadelineProto, $msg_str)
                                     'kicked' => false]
                                 );
                                 $message = "User $username kicked from $title";
+                                $default['message'] = $message;
                             } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                $mention = [[
+                                '_' => 'inputMessageEntityMentionName',
+                                'offset' => 0,
+                                'length' => strlen($username),
+                                'user_id' => $userid]];
                                 $message = "$username isn't even here man.";
+                                $default['message'] = $message;
+                                $default['entities'] = $mention;
                             }
 
-                        } else {
-                            $message = "You can't kick mods!?";
                         }
                     }
                 } else {
@@ -435,18 +409,15 @@ function kickhim($update, $MadelineProto, $msg_str)
                     "chat!";
                     $code = [['_' => 'messageEntityItalic', 'offset' => 9,
                     'length' => 9]];
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities' => $code]
-                    );
+                    $default['message'] = $message;
+                    $default['entities'] = $code;
                 }
             }
         }
         if (!isset($sentMessage)) {
-            if (isset($message)) {
+            if (isset($default['message'])) {
                 $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message]
+                    $default
                 );
             }
         }

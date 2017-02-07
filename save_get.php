@@ -19,36 +19,35 @@
  */
 function saveme($update, $MadelineProto, $msg, $name)
 {
-    switch ($update['update']['message']['to_id']['_']) {
-    case 'peerUser':
-        $peer = $MadelineProto->get_info(
-            $update['update']
-            ['message']['from_id']
+    if (is_peeruser($update, $MadelineProto)) {
+        $peer = cache_get_info(
+            $update,
+            $MadelineProto,
+            $update['update']['message']['from_id']
         )['bot_api_id'];
         $ch_id = $peer;
-        $cont = "true";
-        $peerUSER = "yes";
-        break;
-    case 'peerChannel':
-        $peer = $MadelineProto->
-        get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $cont = "true";
-        break;
+        $cont = true;
+        $peerUSER = true;
     }
-    if (isset($cont)) {
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $cont = true;
+        $peerUSER = false;
+    }
+    if ($cont) {
         $msg_id = $update['update']['message']['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
         $mods = "Only mods get to save messages. You don't fit that criteria.";
-        if (isset($peerUSER)
+        if ($peerUSER
             or from_admin_mod($update, $MadelineProto, $mods, true)
         ) {
             if (!empty($name) && !empty($msg)) {
-                if (!file_exists('saved.json')) {
-                    $json_data = [];
-                    $json_data[$ch_id] = [];
-                    file_put_contents('saved.json', json_encode($json_data));
-                }
+                check_json_array('saved.json', $ch_id);
                 $file = file_get_contents("saved.json");
                 $saved = json_decode($file, true);
                 if ($name == "from") {
@@ -67,10 +66,8 @@ function saveme($update, $MadelineProto, $msg, $name)
                     $message = "Message $name has been saved";
                     $code = [['_' => 'messageEntityBold', 'offset' => 8,
                     'length' => strlen($name)]];
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities' => $code]
-                    );
+                    $default['message'] = $message;
+                    $default['entities'] = $code;
                 } else {
                     $saved[$ch_id] = [];
                     $saved[$ch_id]["from"] = [];
@@ -79,69 +76,65 @@ function saveme($update, $MadelineProto, $msg, $name)
                     $message = "Message $name has been saved";
                     $code = [['_' => 'messageEntityBold', 'offset' => 8,
                     'length' => strlen($name)]];
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities' => $code]
-                    );
+                    $default['message'] = $message;
+                    $default['entities'] = $code;
                 }
             } else {
                 $message = "Use /save name message to save a message for later!";
                 $code = [['_' => 'messageEntityBold', 'offset' => 10,
                     'length' => 4], ['_' => 'messageEntityBold', 'offset' => 15,
                     'length' => 7]];
+                $default['message'] = $message;
+                $default['entities'] = $code;
+            }
+            if (isset($default['message'])) {
                 $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message, 'entities' => $code]
+                    $default
                 );
             }
-            if (!isset($sentMessage)) {
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message]
-                );
+            if (isset($sentMessage)) {
+                \danog\MadelineProto\Logger::log($sentMessage);
             }
-            \danog\MadelineProto\Logger::log($sentMessage);
         }
     }
 }
 
 function getme($update, $MadelineProto, $name)
 {
-    switch ($update['update']['message']['to_id']['_']) {
-    case 'peerUser':
-        $peer = $MadelineProto->get_info(
-            $update['update']
-            ['message']['from_id']
+    if (is_peeruser($update, $MadelineProto)) {
+        $peer = cache_get_info(
+            $update,
+            $MadelineProto,
+            $update['update']['message']['from_id']
         )['bot_api_id'];
         $ch_id = $peer;
-        $cont = "true";
-        $peerUSER = "yes";
-        break;
-    case 'peerChannel':
-        $peer = $MadelineProto->
-        get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $cont = "true";
-        break;
+        $cont = true;
+        $peerUSER = true;
     }
-    if (isset($cont)) {
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $cont = true;
+        $peerUSER = false;
+    }
+    if ($cont) {
         $msg_id = $update['update']['message']['id'];
-        if (!file_exists('saved.json')) {
-            $json_data = [];
-            $json_data[$ch_id] = [];
-            file_put_contents('saved.json', json_encode($json_data));
-        }
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
+        check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");
         $saved = json_decode($file, true);
         if (array_key_exists($ch_id, $saved)) {
             foreach ($saved[$ch_id] as $i => $ii) {
                 if ($i == $name) {
                     $message = $name.":"."\r\n".$saved[$ch_id][$i];
+                    $default['message'] = $message;
                 }
             }
             if (!isset($message)) {
-                var_dump("LOL");
                 if (array_key_exists("from", $saved[$ch_id])) {
                     foreach ($saved[$ch_id]["from"] as $i => $ii) {
                         if ($i == $name) {
@@ -149,16 +142,15 @@ function getme($update, $MadelineProto, $name)
                             $replychat = $ii["chat"];
                             break;
                         }
-                        var_dump($i, $ii);
                     }
                 }
             }
             if (isset($message)) {
                 $entity = [['_' => 'messageEntityBold', 'offset' => 0,
                 'length' => strlen($name)]];
+                $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message, 'entities' => $entity]
+                    $default
                 );
             }
             if (isset($replyid)) {
@@ -176,34 +168,29 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
-    switch ($update['update']['message']['to_id']['_']) {
-    case 'peerUser':
-        $peer = $MadelineProto->get_info(
-            $update['update']
-            ['message']['from_id']
+    if (is_peeruser($update, $MadelineProto)) {
+        $peer = cache_get_info(
+            $update,
+            $MadelineProto,
+            $update['update']['message']['from_id']
         )['bot_api_id'];
         $ch_id = $peer;
-        $cont = "true";
-        $peerUSER = "yes";
-        break;
-    case 'peerChannel':
-        $peer = $MadelineProto->
-        get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $cont = "true";
-        break;
+        $cont = true;
+        $peerUSER = true;
+    }
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $cont = true;
+        $peerUSER = false;
     }
     $replyto = $update['update']['message']['id'];
     $mods = "Only mods get to save messages. You don't fit that criteria.";
-    if (isset($peerUSER) or from_admin_mod($update, $MadelineProto, $mods, true)) {
+    if ($peerUSER or from_admin_mod($update, $MadelineProto, $mods, true)) {
         if (array_key_exists("reply_to_msg_id", $update["update"]["message"])) {
             $msg_id = $update['update']['message']["reply_to_msg_id"];
-            if (!file_exists('saved.json')) {
-                $json_data = [];
-                $json_data[$ch_id] = [];
-                file_put_contents('saved.json', json_encode($json_data));
-            }
+            check_json_array('saved.json', $ch_id);
             $file = file_get_contents("saved.json");
             $saved = json_decode($file, true);
             if (array_key_exists($ch_id, $saved)) {
@@ -220,12 +207,8 @@ function savefrom($update, $MadelineProto, $name)
                 $message = "Message ".$name." has been saved";
                 $code = [['_' => 'messageEntityBold', 'offset' => 8,
                 'length' => strlen($name)]];
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message, 'entities' => $code]
-                );
-
-
+                $default['message'] = $message;
+                $default['entities'] = $code;
             } else {
                 $saved[$ch_id] = [];
                 $saved[$ch_id]["from"] = [];
@@ -236,10 +219,8 @@ function savefrom($update, $MadelineProto, $name)
                 $message = "Message ".$name." has been saved";
                 $code = [['_' => 'messageEntityBold', 'offset' => 8,
                 'length' => strlen($name)]];
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message, 'entities' => $code]
-                );
+                $default['message'] = $message;
+                $default['entities'] = $code;
             }
         } else {
             $message = "Save a message by reply with /save from name";
@@ -247,17 +228,16 @@ function savefrom($update, $MadelineProto, $name)
             'length' => 4]];
             $code[] = ['_' => 'messageEntityCode', 'offset' => 29,
             'length' => 10];
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $replyto, 'message' => $message, 'entities' => $code]
-            );
+            $default['message'] = $message;
+            $default['entities'] = $code;
         }
     }
-    if (!isset($sentMessage)) {
+    if (isset($default['message'])) {
         $sentMessage = $MadelineProto->messages->sendMessage(
-            ['peer' => $peer, 'reply_to_msg_id' =>
-            $msg_id, 'message' => $message]
+            $default
         );
     }
-    \danog\MadelineProto\Logger::log($sentMessage);
+    if (isset($sentMessage)) {
+        \danog\MadelineProto\Logger::log($sentMessage);
+    }
 }

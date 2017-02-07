@@ -1,5 +1,31 @@
 {
-"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contact", "contacts", "geo", "document", "documents", "flood"],
+"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contacts", "geo", "files", "flood"],
+"settings_template":
+    {
+    "gif":"Gifs",
+    "sticker":"Stickers",
+    "video":"Videos",
+    "arabic":"Arabic",
+    "photo":"Photos",
+    "audio":"Audio",
+    "geo":"Geo",
+    "contacts":"Contacts",
+    "files":"Files",
+    "flood":"Flood"
+    },
+"length":
+    {
+    "gif":4,
+    "sticker":8,
+    "video":6,
+    "arabic":6,
+    "photo":6,
+    "audio":14,
+    "geo":12,
+    "contacts":16,
+    "files":14,
+    "flood":8
+    },
 "lock":
     {
     "gif":"Gifs are now locked",
@@ -9,10 +35,8 @@
     "photo":"Photos are now locked",
     "audio":"Audio messages are now locked",
     "geo":"Geo messages are now locked",
-    "contact":"Contact messages are now locked",
     "contacts":"Contact messages are now locked",
-    "document":"All Document types are now locked",
-    "documents":"All Document types are now locked",
+    "files":"All File types are now locked",
     "flood":"Flooding is now locked. By default the limit is 10",
     "already":
         {
@@ -23,10 +47,8 @@
         "photo":"Photos are already locked",
         "audio":"Audio Messages are already locked",
         "geo":"Geo messages are already locked",
-        "contact":"Contact messages are already locked",
         "contacts":"Contact messages are already locked",
-        "document":"All Document types are already locked",
-        "documents":"All Document types are already locked",
+        "files":"All File types are already locked",
         "flood":"Flooding is already locked"
         }
     },
@@ -39,10 +61,8 @@
     "photo":"Photos are now unlocked",
     "audio":"Audio messages are now unlocked",
     "geo":"Geo messages are now unlocked",
-    "contact":"Contact messages are now unlocked",
     "contacts":"Contact messages are now unlocked",
-    "document":"All Document types are now unlocked",
-    "documents":"All Document types are now unlocked",
+    "files":"All File types are now unlocked",
     "flood":"Flooding is now unlocked",
     "already":
         {
@@ -53,10 +73,8 @@
         "photo":"Photos are already unlocked",
         "audio":"Audio Messages are already unlocked",
         "geo":"Geo messages are already unlocked",
-        "contact":"Contact messages are already unlocked",
         "contacts":"Contact messages are already unlocked",
-        "document":"All Document types are already unlocked",
-        "documents":"All Document types are alreday unlocked",
+        "files":"All File types are alreday unlocked",
         "flood":"Flooding is already unlocked"
         }
     }

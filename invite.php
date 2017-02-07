@@ -20,11 +20,9 @@
 
 function create_new_supergroup($update, $MadelineProto, $title, $about)
 {
-    if ($update['update']['message']['to_id']['_'] == "peerUser") {
-        $userid = $MadelineProto->get_info(
-            $update['update']
-            ['message']['from_id']
-        )['bot_api_id'];
+    if (is_peeruser($update, $MadelineProto)) {
+        $fromid = $update['update']['message']['from_id'];
+        $userid = cache_get_info($update, $MadelineProto, $fromid)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
             if (!empty($title) && !empty($about)) {
                 $channelRoleModerator = ['_' => 'channelRoleModerator', ];
@@ -34,18 +32,23 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
                     'title' => $title,
                     'about' => $about ]
                 );
-                $master =  $MadelineProto->get_info(
+                $master = cache_get_info(
+                    $update,
+                    $MadelineProto,
                     getenv('TEST_USERNAME')
-                )['bot_api_id'];
+                )
+                ['bot_api_id'];
                 var_dump($newgroup);
                 $channel_id = -100 . $newgroup['updates'][1]['channel_id'];
                 $invite_master = $MadelineProto->channels->inviteToChannel(
-                    ['channel' => $channel_id, 'users' => [$master]]
+                    ['channel' => $channel_id,
+                    'users' => [$master]]
                 );
                 \danog\MadelineProto\Logger::log($invite_master);
                 $editadmin = $MadelineProto->channels->editAdmin(
-                    ['channel' => $channel_id, 'user_id' => $master,
-                    'role' => $channelRoleModerator ]
+                    ['channel' => $channel_id,
+                    'user_id' => $master,
+                    'role' => $channelRoleModerator]
                 );
             } else {
                 $message = "You MUST provide a title and description for your ".
@@ -58,27 +61,27 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
                     ['peer' => $userid, 'reply_to_msg_id' =>
                     $msg_id, 'message' => $message, 'entities' => $entity]
                 );
-                \danog\MadelineProto\Logger::log($sentMessage);
+                if (isset($sentMessage)) {
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
             }
         }
     }
 }
 function export_new_invite($update, $MadelineProto)
 {
-    $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
         $mods = "Only mods can get us a new invite link.";
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(
-            -100 . $update['update']['message']
-            ['to_id']['channel_id']
-        )['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-        $from_id = $MadelineProto->get_info(
-            $update
-            ['update']['message']['from_id']
-        )['bot_api_id'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+            );
+        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                 try {
@@ -87,17 +90,17 @@ function export_new_invite($update, $MadelineProto)
                     );
                     $link = $exportInvite['link'];
                     $message = "The new chat link is $link";
+                    $default['message'] = $message;
                     $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message]
+                        $default
                     );
                     \danog\MadelineProto\Logger::log($sentMessage);
                 } catch (Exception $e) {
                     $message = "I am not the owner of this chat. On the bright ".
                     "side, just save the message with my /save command.";
+                    $default['message'] = $message;
                     $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message]
+                        $default
                     );
                     \danog\MadelineProto\Logger::log($sentMessage);
                 }
@@ -108,57 +111,66 @@ function export_new_invite($update, $MadelineProto)
 
 function public_toggle($update, $MadelineProto, $msg)
 {
-    $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
         $mods = "I don't listen to you.";
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(
-            -100 . $update['update']['message']
-            ['to_id']['channel_id']
-        )['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+            );
         $arr = ["on", "off"];
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                 if (!empty($msg) && in_array($msg, $arr)) {
-                    if ($msg == "on") {
-                        $MadelineProto->channels->toggleInvites(
-                            ['channel' => $peer, 'enabled' => true ]
-                        );
-                        $message = "This channel is now public.";
-                    }
-                    if ($msg == "off") {
-                        $MadelineProto->channels->toggleInvites(
-                            ['channel' => $peer, 'enabled' => false ]
-                        );
-                        $message = "This channel is now private.";
+                    try {
+                        if ($msg == "on") {
+                            $MadelineProto->channels->toggleInvites(
+                                ['channel' => $peer, 'enabled' => true ]
+                            );
+                            $message = "This channel is now public.";
+                            $default['message'] = $message;
+                        }
+                        if ($msg == "off") {
+                            $MadelineProto->channels->toggleInvites(
+                                ['channel' => $peer, 'enabled' => false ]
+                            );
+                            $message = "This channel is now private.";
+                            $default['message'] = $message;
+                        }
+                    } catch (Exception $e) {
+                        $message = "I couldn't change the public settings";
+                        $default['message'] = $message;
                     }
                 } else {
                     $message = "Use /public [on/off] to change this settings.";
+                    $default['message'] = $message;
                 }
             }
         }
-        $sentMessage = $MadelineProto->messages->sendMessage(
-            ['peer' => $peer, 'reply_to_msg_id' =>
-            $msg_id, 'message' => $message]
-        );
-        \danog\MadelineProto\Logger::log($sentMessage);
+        if (isset($default)) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }
 
 function invite_user($update, $MadelineProto, $msg_str)
 {
-    $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $mods = "Only mods can use me to invite peeps to this crib";
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-        $title = $MadelineProto->get_info(
-            -100 . $update['update']['message']
-            ['to_id']['channel_id']
-        )['Chat']['title'];
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $mods = "Only mods can use me to invite peeps to this cool crib.";
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+            );
         if (is_bot_admin($update, $MadelineProto)) {
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                 if ($msg_str) {
@@ -177,19 +189,21 @@ function invite_user($update, $MadelineProto, $msg_str)
                                 } else {
                                     $message = "I can't find a user called ".
                                     "$msg_str. Who's that?";
+                                    $default['message'] = $message;
                                 }
                             } else {
                                 $message = "I don't know anyone with the name ".
                                 $msg_str;
-                                $sentMessage = $MadelineProto->messages->sendMessage(
-                                    ['peer' => $peer, 'reply_to_msg_id' =>
-                                    $msg_id, 'message' => $message]
-                                );
+                                $default['message'] = $message;
                             }
                         }
                     }
                     if (isset($userid)) {
-                        $info = $MadelineProto->get_info($userid);
+                        $info = cache_get_info(
+                            $update,
+                            $MadelineProto,
+                            $userid
+                        );
                         try {
                             $inviteuser = $MadelineProto->channels->inviteToChannel(
                                 ['channel' => $peer, 'users' => [$userid] ]
@@ -204,12 +218,8 @@ function invite_user($update, $MadelineProto, $msg_str)
                                 'length' => strlen($username),
                                 'user_id' => $userid
                             ]];
-                            $sentMessage = $MadelineProto->messages->sendMessage(
-                                ['peer' => $peer,
-                                'reply_to_msg_id' => $msg_id,
-                                'message' => $message,
-                                'entities' => $entity]
-                            );
+                            $default['message'] = $message;
+                            $default['entities'] = $entity;
                         }
                     }
                 } else {
@@ -217,20 +227,15 @@ function invite_user($update, $MadelineProto, $msg_str)
                     "invite someone to this chat!";
                     $code = [['_' => 'messageEntityItalic', 'offset' => 12,
                     'length' => 9]];
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' =>
-                        $msg_id, 'message' => $message, 'entities' => $code]
-                    );
+                    $default['message'] = $message;
+                    $default['entities'] = $code;
                 }
             }
         }
-        if (!isset($sentMessage)) {
-            if (isset($message)) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message]
-                );
-            }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
         }
         if (isset($inviteuser)) {
             \danog\MadelineProto\Logger::log($inviteuser);

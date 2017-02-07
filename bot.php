@@ -23,7 +23,9 @@ require 'vendor/autoload.php';
 require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
 require_once 'banhammer.php';
+require_once 'cache.php';
 require_once 'check_msg.php';
+require_once 'data_parse.php';
 require_once 'id_.php';
 require_once 'invite.php';
 require_once 'lock.php';
@@ -31,6 +33,7 @@ require_once 'moderators.php';
 require_once 'promote.php';
 require_once 'save_get.php';
 require_once 'set_info.php';
+require_once 'settings.php';
 require_once 'supergroup.php';
 require_once 'time.php';
 require_once 'weather.php';
@@ -157,7 +160,7 @@ while (true) {
                     $check->start();
                     $check->join();
                     if (isset($GLOBALS['from_user_chat_photo'])) {
-                        set_chat_photo($update, $MadelineProto);
+                        set_chat_photo($update, $MadelineProto, false);
                     }
                     if (strlen($update['update']['message']['message']) !== 0) {
                         $first_char = substr(
@@ -228,6 +231,18 @@ while (true) {
                                 unset($msg_arr[0]);
                                 $msg_str = implode(" ", $msg_arr);
                                 banme($update, $MadelineProto, $msg_str);
+                                break;
+
+                            case 'settings':
+                                unset($msg_arr[0]);
+                                $msg_str = implode(" ", $msg_arr);
+                                get_settings($update, $MadelineProto);
+                                break;
+
+                            case 'setflood':
+                                unset($msg_arr[0]);
+                                $msg_str = implode(" ", $msg_arr);
+                                setflood($update, $MadelineProto, $msg_str);
                                 break;
 
                             case 'modlist':
@@ -308,7 +323,7 @@ while (true) {
                                 addadmin($update, $MadelineProto, $msg_str);
                                 break;
 
-                                case 'rmadmin':
+                            case 'rmadmin':
                                 unset($msg_arr[0]);
                                 $msg_str = implode(" ", $msg_arr);
                                 rmadmin($update, $MadelineProto, $msg_str);
@@ -471,18 +486,20 @@ while (true) {
                                         $adminid = $MadelineProto->get_info(
                                             getenv('TEST_USERNAME')
                                         )['bot_api_id'];
-                                        $get_chat_info = $MadelineProto->
-                                        get_pwr_chat(
-                                            $info['bot_api_id']
+                                        $admins = cache_get_chat_info(
+                                            $update,
+                                            $MadelineProto
                                         );
                                     foreach (
-                                        $get_chat_info['participants'] as $key) {
-                                        $id = $key['user']['id'];
-                                        if ($adminid !== $id) {
-                                            $master_present = 'false';
-                                        } else {
-                                            $master_present = 'true';
-                                            break;
+                                        $admins['participants'] as $key) {
+                                        if (array_key_exists('user', $key)) {
+                                            $id = $key['user']['id'];
+                                            if ($adminid !== $id) {
+                                                $master_present = 'false';
+                                            } else {
+                                                $master_present = 'true';
+                                                break;
+                                            }
                                         }
                                     }
 
@@ -590,18 +607,20 @@ while (true) {
                                         $adminid = $MadelineProto->get_info(
                                             getenv('TEST_USERNAME')
                                         )['bot_api_id'];
-                                        $get_chat_info = $MadelineProto->
-                                        get_pwr_chat(
-                                            $info['bot_api_id']
+                                        $admins = cache_get_chat_info(
+                                            $update,
+                                            $MadelineProto
                                         );
                                     foreach (
-                                        $get_chat_info['participants'] as $key) {
-                                        $id = $key['user']['id'];
-                                        if ($adminid !== $id) {
-                                            $master_present = 'false';
-                                        } else {
-                                            $master_present = 'true';
-                                            break;
+                                        $admins['participants'] as $key) {
+                                        if (array_key_exists('user', $key)) {
+                                            $id = $key['user']['id'];
+                                            if ($adminid !== $id) {
+                                                $master_present = 'false';
+                                            } else {
+                                                $master_present = 'true';
+                                                break;
+                                            }
                                         }
                                     }
 

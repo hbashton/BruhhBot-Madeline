@@ -17,46 +17,40 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function catch_id($update, $MadelineProto, $user) 
+function catch_id($update, $MadelineProto, $user)
 {
     $first_char = substr($user, 0, 1);
     if (is_numeric($user)) {
-        try {
-            $MadelineProto->get_info($user);
+        $user_ = cache_get_info($update, $MadelineProto, $user);
+        if ($user_) {
             if (array_key_exists(
-                'username', $MadelineProto->
-                get_info($user)['User']
+                'username', $user_['User']
             )
             ) {
-                $username = $MadelineProto->get_info($user)['User']
-                ['username'];
+                $username = $user_['User']['username'];
             } else {
-                $username = $MadelineProto->get_info($user)['User']
-                ['first_name'];
+                $username = $user_['User']['first_name'];
             }
-            $userid = $MadelineProto->get_info($user)['bot_api_id'];
+            $userid = $user_['bot_api_id'];
             return array(true, $userid, $username);
-        } catch (Exception $e) {
+        } else {
             return array(false);
         }
     }
     if (preg_match_all('/@/', $first_char, $matches)) {
-        try {
-            $MadelineProto->get_info($user);
+        $user_ = cache_get_info($update, $MadelineProto, $user);
+        if ($user_) {
             if (array_key_exists(
-                'username', $MadelineProto->
-                get_info($user)['User']
+                'username', $user_['User']
             )
             ) {
-                $username = $MadelineProto->get_info($user)['User']
-                ['username'];
+                $username = $user_['User']['username'];
             } else {
-                $username = $MadelineProto->get_info($user)['User']
-                ['first_name'];
+                $username = $user_['User']['first_name'];
             }
-            $userid = $MadelineProto->get_info($user)['bot_api_id'];
+            $userid = $user_['bot_api_id'];
             return array(true, $userid, $username);
-        } catch (Exception $e) {
+        } else {
             return array(false);
         }
     } else {
@@ -64,8 +58,7 @@ function catch_id($update, $MadelineProto, $user)
             foreach ($update['update']['message']['entities'] as $key) {
                 if (array_key_exists('user_id', $key)) {
                     $userid = $key['user_id'];
-                    $username = $MadelineProto->get_info($user)['User']
-                    ['first_name'];
+                    $username = cache_get_info($update, $MadelineProto, $user)['User']['first_name'];
                     break;
                 }
             }

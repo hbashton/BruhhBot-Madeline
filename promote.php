@@ -19,28 +19,25 @@
  */
 function promoteme($update, $MadelineProto, $msg)
 {
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
+    if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
         $mods = "Only the best get to promote people. You're not the best";
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
         if (from_admin($update, $MadelineProto, $mods, true)) {
             $id = catch_id($update, $MadelineProto, $msg);
-            $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-            $title = $MadelineProto->get_info(
-                -100 . $update['update']['message']
-                ['to_id']['channel_id']
-            )['Chat']['title'];
             if ($id[0]) {
                 $userid = $id[1];
                 $username = $id[2];
                 $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
                 5, 'length' => strlen($username), 'user_id' => $userid]];
-                if (!file_exists('promoted.json')) {
-                    $json_data = [];
-                    $json_data[$ch_id] = [];
-                    file_put_contents('promoted.json', json_encode($json_data));
-                }
+                check_json_array('promoted.json', $ch_id);
                 $file = file_get_contents("promoted.json");
                 $promoted = json_decode($file, true);
                 if (array_key_exists($ch_id, $promoted)) {
@@ -51,11 +48,15 @@ function promoteme($update, $MadelineProto, $msg)
                         $entity = ['_' => 'messageEntityBold',
                         'offset' => strlen($message) - strlen($title),
                         'length' => strlen($title) ];
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
                     } else {
                         $message = "User $username is already a moderator of $title";
                         $entity = ['_' => 'messageEntityBold',
                         'offset' => strlen($message) - strlen($title),
                         'length' => strlen($title) ];
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
                     }
                 } else {
                     $promoted[$ch_id] = [];
@@ -65,25 +66,28 @@ function promoteme($update, $MadelineProto, $msg)
                     $entity = ['_' => 'messageEntityBold',
                         'offset' => strlen($message) - strlen($title),
                         'length' => strlen($title) ];
+                    $default['message'] = $message;
+                    $default['entities'] = $entity;
                 }
             } else {
                 $message = "I don't know of anyone called ".$msg;
-
+                $default['message'] = $message;
             }
         }
         if (isset($mention)) {
             $mention[] = $entity;
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message, 'entities' => $mention]
-            );
+            $default['entities'] = $mention;
         } else {
-            if (isset($message)) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message]
-                );
+            if (isset($entity)) {
+                $mention = [];
+                $mention[] = $entity;
+                $default['entities'] = $mention;
             }
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
         }
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
@@ -93,26 +97,25 @@ function promoteme($update, $MadelineProto, $msg)
 
 function demoteme($update, $MadelineProto, $msg)
 {
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
+    if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
-        $mods = "I think admins should be the ones to do this, don't you?";
+        $mods = "Wow. Mr. I'm not admin over here is trying to DEMOTE people.";
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
         if (from_admin($update, $MadelineProto, $mods, true)) {
             $id = catch_id($update, $MadelineProto, $msg);
-            $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
-            $title = $MadelineProto->get_info(
-                -100 . $update['update']['message']
-                ['to_id']['channel_id']
-            )['Chat']['title'];
             if ($id[0]) {
                 $userid = $id[1];
                 $username = $id[2];
-                if (!file_exists('promoted.json')) {
-                    $json_data = [];
-                    $json_data[$ch_id] = [];
-                    file_put_contents('promoted.json', json_encode($json_data));
-                }
+                $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
+                5, 'length' => strlen($username), 'user_id' => $userid]];
+                check_json_array('promoted.json', $ch_id);
                 $file = file_get_contents("promoted.json");
                 $promoted = json_decode($file, true);
                 if (array_key_exists($ch_id, $promoted)) {
@@ -127,26 +130,51 @@ function demoteme($update, $MadelineProto, $msg)
                         file_put_contents('promoted.json', json_encode($promoted));
                         $message = "User $username is NO LONGER a moderator of ".
                         $title;
+                        $entity = ['_' => 'messageEntityBold',
+                        'offset' => strlen($message) - strlen($title),
+                        'length' => strlen($title) ];
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
                     } else {
                         $message = "User $username is not a moderator of ".
                         $title;
+                        $entity = ['_' => 'messageEntityBold',
+                        'offset' => strlen($message) - strlen($title),
+                        'length' => strlen($title) ];
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
                     }
                 } else {
                     $message = "User $username is not a moderator of ".
                     $title;
+                    $entity = ['_' => 'messageEntityBold',
+                        'offset' => strlen($message) - strlen($title),
+                        'length' => strlen($title) ];
+                    $default['message'] = $message;
+                    $default['entities'] = $entity;
                 }
             } else {
-                $message = "I don't know of anyone called ".$message;
+                $message = "I don't know of anyone called ".$msg;
+                $default['message'] = $message;
             }
         }
-        $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-        5, 'length' => strlen($username), 'user_id' => $userid],  ['_' => 'messageEntityBold',
-        'offset' => strlen($message) - strlen($title),
-        'length' => strlen($title) ]];
-        $sentMessage = $MadelineProto->messages->sendMessage(
-            ['peer' => $peer, 'reply_to_msg_id' =>
-            $msg_id, 'message' => $message, 'entities' => $mention]
-        );
-        \danog\MadelineProto\Logger::log($sentMessage);
+        if (isset($mention)) {
+            $mention[] = $entity;
+            $default['entities'] = $mention;
+        } else {
+            if (isset($entity)) {
+                $mention = [];
+                $mention[] = $entity;
+                $default['entities'] = $mention;
+            }
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        }
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }
