@@ -60,9 +60,6 @@ function addadmin($update, $MadelineProto, $msg)
                             $message = "$username is now an admin!!!!!";
                             $default['message'] = $message;
                             $default['entities'] = $entity;
-                            $sentMessage = $MadelineProto->messages->sendMessage(
-                                $default
-                            );
                             \danog\MadelineProto\Logger::log($editadmin);
 
                         } catch (Exception $e) {
@@ -87,7 +84,7 @@ function rmadmin($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
-        $mods = "Only mods can use me to set this chat's photo!";
+        $mods = "Only my master can humiliate someone like this";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -125,9 +122,6 @@ function rmadmin($update, $MadelineProto, $msg)
                         $message = "$username is..no longer an admin. I am sorry";
                         $default['message'] = $message;
                         $default['entities'] = $entity;
-                        $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
                     } catch (Exception $e) {
                         $message = "I am not the owner of this group, and cannot ".
                         "add or remove admins.";
@@ -161,12 +155,12 @@ function idme($update, $MadelineProto, $msg_arr)
         $noid = "The Telegram ID of $title is $ch_id";
         $cont = true;
     }
+    $msg_id = $update['update']['message']['id'];
     $default = array(
         'peer' => $peer,
         'reply_to_msg_id' => $msg_id,
         );
     if (isset($cont)) {
-        $msg_id = $update['update']['message']['id'];
         $first_char = substr($msg_arr, 0, 1);
         if (preg_match_all('/@/', $first_char, $matches)) {
             $id = catch_id($update, $MadelineProto, $msg_arr);
@@ -307,8 +301,8 @@ function modlist($update, $MadelineProto)
         $promoted = json_decode($file, true);
         if (array_key_exists($ch_id, $promoted)) {
             foreach ($promoted[$ch_id] as $i => $key) {
-                $user = $MadelineProto->cache_get_info($key)['User'];
-                $username = catch_id($update, $MadelineProto, $key);
+                $user = cache_get_info($update, $MadelineProto, $key)['User'];
+                $username = catch_id($update, $MadelineProto, $key)[2];
                 if (!isset($entity_)) {
                     $offset = strlen($message);
                     $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>

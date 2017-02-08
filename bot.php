@@ -22,6 +22,7 @@ require 'MadelineProto/vendor/autoload.php';
 require 'vendor/autoload.php';
 require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
+require_once 'add.php';
 require_once 'banhammer.php';
 require_once 'cache.php';
 require_once 'check_msg.php';
@@ -148,9 +149,6 @@ while (true) {
             case 'updateNewChannelMessage':
                 $res = json_encode($update, JSON_PRETTY_PRINT);
                 var_dump($update);
-                if (array_key_exists('message', $update['update']['message'])
-                    && is_string($update['update']['message']['message'])
-                ) {
                     $command = check_locked($update, $MadelineProto);
                     $check = new Exec($command);
                     $check->start();
@@ -159,6 +157,9 @@ while (true) {
                     $check = new Exec($command);
                     $check->start();
                     $check->join();
+                if (array_key_exists('message', $update['update']['message'])
+                    && is_string($update['update']['message']['message'])
+                ) {
                     if (isset($GLOBALS['from_user_chat_photo'])) {
                         set_chat_photo($update, $MadelineProto, false);
                     }
@@ -215,6 +216,14 @@ while (true) {
                                     ]
                                 );
                                 \danog\MadelineProto\Logger::log($sentMessage);
+                                break;
+
+                            case 'add':
+                                add_group($update, $MadelineProto);
+                                break;
+
+                            case 'rm':
+                                rm_group($update, $MadelineProto);
                                 break;
 
                             case 'adminlist':

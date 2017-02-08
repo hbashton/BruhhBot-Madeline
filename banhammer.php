@@ -34,8 +34,11 @@ function banme($update, $MadelineProto, $msg)
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                 if ($msg) {
                     if (is_numeric($msg)) {
-                        $userid = (int) $msg;
-                        $id = catch_id($update, $MadelineProto, $userid);
+                        $userid_ = (int) $msg;
+                        $id = catch_id($update, $MadelineProto, $userid_);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                        }
                     } else {
                         if (array_key_exists(
                             'entities',
@@ -145,20 +148,18 @@ function banme($update, $MadelineProto, $msg)
                                 }
                             }
                         }
-                    } else {
-                        $message = "Use /ban @username to ban someone from this chat!";
-                        $code = [['_' => 'messageEntityItalic', 'offset' => 9,
-                        'length' => 9]];
-                        $default['entities'] = $code;
-                        $default['message'] = $message;
                     }
+                } else {
+                    $message = "Use /ban @username to ban someone from this chat!";
+                    $code = [['_' => 'messageEntityItalic', 'offset' => 9,
+                    'length' => 9]];
+                    $default['entities'] = $code;
+                    $default['message'] = $message;
                 }
             }
         }
-        if (!isset($sentMessage)) {
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage($default);
-            }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage($default);
         }
         if (isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
@@ -187,8 +188,11 @@ function unbanme($update, $MadelineProto, $msg)
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                 if ($msg) {
                     if (is_numeric($msg)) {
-                        $userid = (int) $msg;
-                        $id = catch_id($update, $MadelineProto, $userid);
+                        $userid_ = (int) $msg;
+                        $id = catch_id($update, $MadelineProto, $userid_);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                        }
                     } else {
                         if (array_key_exists(
                             'entities',
@@ -283,12 +287,10 @@ function unbanme($update, $MadelineProto, $msg)
                 }
             }
         }
-        if (!isset($sentMessage)) {
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
         }
         if (isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
@@ -317,8 +319,11 @@ function kickhim($update, $MadelineProto, $msg)
             if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                 if ($msg) {
                     if (is_numeric($msg)) {
-                        $userid = (int) $msg;
-                        $id = catch_id($update, $MadelineProto, $userid);
+                        $userid_ = (int) $msg;
+                        $id = catch_id($update, $MadelineProto, $userid_);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                        }
                     } else {
                         if (array_key_exists(
                             'entities',

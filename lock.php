@@ -83,7 +83,7 @@ function lockme($update, $MadelineProto, $msg)
             $message = "Use /lock [type]";
             $default['message'] = $message;
         }
-        if (isset($default)) {
+        if (isset($default['message'])) {
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );
@@ -131,14 +131,14 @@ function unlockme($update, $MadelineProto, $msg)
                             $message = $cfg["unlock"][$msg];
                             $entity = [['_' => 'messageEntityBold',
                             'offset' => 0,
-                            'length' => strlen($msg) ]];
+                            'length' => $cfg['length'][$msg]]];
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         } else {
                             $message = $cfg["unlock"]["already"][$msg];
                             $entity = [['_' => 'messageEntityBold',
                             'offset' => 0,
-                            'length' => strlen($msg) ]];
+                            'length' => $cfg['length'][$msg]]];
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         }
@@ -151,7 +151,7 @@ function unlockme($update, $MadelineProto, $msg)
                         $message = $cfg["unlock"]["already"][$msg];
                         $entity = [['_' => 'messageEntityBold',
                             'offset' => 0,
-                            'length' => strlen($msg) ]];
+                            'length' => $cfg['length'][$msg]]];
                         $default['message'] = $message;
                         $default['entities'] = $entity;
                     }
@@ -164,7 +164,7 @@ function unlockme($update, $MadelineProto, $msg)
             $message = "Use /unlock [type]";
             $default['message'] = $message;
         }
-        if (isset($entity)) {
+        if (isset($default['message'])) {
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );
@@ -223,7 +223,7 @@ function setflood($update, $MadelineProto, $msg)
             $message = "Use /setflood integer";
             $default['message'] = $message;
         }
-        if (isset($default)) {
+        if (isset($default['message'])) {
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );

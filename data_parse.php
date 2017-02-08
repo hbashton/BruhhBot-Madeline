@@ -1,14 +1,36 @@
 <?php
 
-function check_json_array($filename, $id)
+function check_json_array($filename, $id, $layered = true)
 {
-    if (!file_exists($filename)) {
-        $json_data = [];
-        $json_data[$id] = [];
-        file_put_contents(
-            $filename,
-            json_encode($json_data)
-        );
+    if ($layered) {
+        if (!file_exists($filename)) {
+            $json_data = [];
+            $json_data[$id] = [];
+            file_put_contents(
+                $filename,
+                json_encode($json_data)
+            );
+        }
+    } else {
+        if (!file_exists($filename)) {
+            $json_data = [];
+            file_put_contents(
+                $filename,
+                json_encode($json_data)
+            );
+        }
+    }
+}
+
+function is_moderated($ch_id)
+{
+    check_json_array('chatlist.json', $ch_id, false);
+    $file = file_get_contents("chatlist.json");
+    $chatlist = json_decode($file, true);
+    if (in_array($ch_id, $chatlist)) {
+        return true;
+    } else {
+        return false;
     }
 }
 

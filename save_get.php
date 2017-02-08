@@ -187,6 +187,10 @@ function savefrom($update, $MadelineProto, $name)
     }
     $replyto = $update['update']['message']['id'];
     $mods = "Only mods get to save messages. You don't fit that criteria.";
+    $default = array(
+        'peer' => $peer,
+        'reply_to_msg_id' => $replyto,
+    );
     if ($peerUSER or from_admin_mod($update, $MadelineProto, $mods, true)) {
         if (array_key_exists("reply_to_msg_id", $update["update"]["message"])) {
             $msg_id = $update['update']['message']["reply_to_msg_id"];

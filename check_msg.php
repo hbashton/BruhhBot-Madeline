@@ -34,7 +34,6 @@ function check_locked($update, $MadelineProto)
     if (is_supergroup($update, $MadelineProto)) {
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
         $ch_id = $chat['id'];
         $msg_id = $update['update']['message']['id'];
         if (is_bot_admin($update, $MadelineProto)) {
@@ -78,14 +77,7 @@ function check_locked($update, $MadelineProto)
                         break;
                     }
                     if (!empty($type)) {
-                        if (!file_exists('locked.json')) {
-                            $json_data = [];
-                            $json_data[$ch_id] = [];
-                            file_put_contents(
-                                'locked.json',
-                                json_encode($json_data)
-                            );
-                        }
+                        check_json_array('locked.json', $ch_id);
                         $file = file_get_contents("locked.json");
                         $locked = json_decode($file, true);
                         if (array_key_exists($ch_id, $locked)) {
@@ -95,7 +87,8 @@ function check_locked($update, $MadelineProto)
                                     ['channel' => $peer,
                                     'id' => [$msg_id]]
                                 );
-                                // \danog\MadelineProto\Logger::log($delete);
+                                var_dump(true, true, true, true);
+                                \danog\MadelineProto\Logger::log($delete);
                                 $thred = new Exec($delete);
                                 $thred->start();
                                 $thred->join();
