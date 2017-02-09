@@ -123,17 +123,7 @@ while (true) {
                         case 'weather':
                             unset($msg_arr[0]);
                             $msg_str = implode(" ", $msg_arr);
-                            $message = getweather($msg_str);
-                            $peer = $MadelineProto->get_info(
-                                $update['update']
-                                ['message']['from_id']
-                            )['bot_api_id'];
-                            $sentMessage = $MadelineProto->messages->sendMessage(
-                                ['peer' => $peer, 'message' => $message, 'entities'
-                                => [['_' => 'messageEntityUnknown',
-                                'offset' => 0, 'length' => strlen($message)]]]
-                            );
-                            \danog\MadelineProto\Logger::log($sentMessage);
+                            getweather($update, $MadelineProto, $msg_str);
                             break 2;
 
                         case 'id':
@@ -202,20 +192,7 @@ while (true) {
                             case 'weather':
                                 unset($msg_arr[0]);
                                 $msg_str = implode(" ", $msg_arr);
-                                $message = getweather($msg_str);
-                                $peer = $MadelineProto->get_info(
-                                    $update['update']
-                                    ['message']['to_id']
-                                )['bot_api_id'];
-                                $sentMessage = $MadelineProto->messages->sendMessage(
-                                    ['peer' => $peer,
-                                    'message' => $message,
-                                    'entities' => [['_' => 'messageEntityUnknown',
-                                    'offset' => 0,
-                                    'length' => strlen($message)]]
-                                    ]
-                                );
-                                \danog\MadelineProto\Logger::log($sentMessage);
+                                getweather($update, $MadelineProto, $msg_str);
                                 break;
 
                             case 'add':
