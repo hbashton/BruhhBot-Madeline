@@ -23,34 +23,63 @@ define('CONST_SERVER_TIMEZONE', 'UTC');
 /* server dateformat */
 define('CONST_SERVER_DATEFORMAT', 'l, j - H:i:s');
 
-function getloc($area) 
+function getloc($update, $MadelineProto, $area)
 {
-    $response = Requests::get(
-        "https://maps.googleapis.com/maps/api/geocode/json?address="
-        . str_replace(" ", "%20", $area)
-    );
-    $status = $response->status_code;
-    // var_dump($status);
-    $headers = array('Accept' => 'application/json');
-    $responsej = json_decode($response->body, true);
-    // var_dump(json_decode($response->body, true));
-    if ($responsej['status'] == 'OK') {
-        // var_dump($responsej['results'][0]['geometry']['location']);
-        $lat = $responsej['results'][0]['geometry']['location']['lat'];
-        $lng = $responsej['results'][0]['geometry']['location']['lng'];
-        $timestamp = time();
-        $api_response = Requests::get(
-            'https://maps.googleapis.com/maps/api/timezone/json?location='
-            . $lat . ',' . $lng . '&timestamp=' . $timestamp
+    if (is_peeruser($update, $MadelineProto)) {
+        $peer = cache_get_info(
+            $update,
+            $MadelineProto,
+            $update['update']['message']['from_id']
+        )['bot_api_id'];
+        $ch_id = $peer;
+        $cont = true;
+    }
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $cont = true;
+    }
+    if ($cont) {
+        $msg_id = $update['update']['message']['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
+        $response = Requests::get(
+            "https://maps.googleapis.com/maps/api/geocode/json?address="
+            . str_replace(" ", "%20", $area)
         );
-        $api_responsej = json_decode($api_response->body, true);
-        $ctime = now($api_responsej['timeZoneId']);
-        $timezone = $api_responsej['timeZoneId'];
-        $return = 'The current time in ' . $timezone . ' is ' . $ctime;
-        $return = str_replace("_", " ", $return);
-        return($return);
-    } else {
-        return('What the actual hell is "' . $area . '"');
+        $status = $response->status_code;
+        // var_dump($status);
+        $headers = array('Accept' => 'application/json');
+        $responsej = json_decode($response->body, true);
+        // var_dump(json_decode($response->body, true));
+        if ($responsej['status'] == 'OK') {
+            // var_dump($responsej['results'][0]['geometry']['location']);
+            $lat = $responsej['results'][0]['geometry']['location']['lat'];
+            $lng = $responsej['results'][0]['geometry']['location']['lng'];
+            $timestamp = time();
+            $api_response = Requests::get(
+                'https://maps.googleapis.com/maps/api/timezone/json?location='
+                . $lat . ',' . $lng . '&timestamp=' . $timestamp
+            );
+            $api_responsej = json_decode($api_response->body, true);
+            $ctime = now($api_responsej['timeZoneId']);
+            $timezone = $api_responsej['timeZoneId'];
+            $return = 'The current time in ' . $timezone . ' is ' . $ctime;
+            $message = str_replace("_", " ", $return);
+            $default['message'] = $message;
+        } else {
+            $message = 'What the actual hell is "' . $area . '"';
+            $default['message'] = $message;
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
     }
 }
 function now($str_user_timezone,

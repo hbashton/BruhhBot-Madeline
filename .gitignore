@@ -86,7 +86,7 @@ docs_md
 
 .env
 composer.lock
-
+/who
 #json db
 *.json
 !configuration.json

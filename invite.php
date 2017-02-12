@@ -35,7 +35,7 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
                 $master = cache_get_info(
                     $update,
                     $MadelineProto,
-                    getenv('TEST_USERNAME')
+                    getenv('MASTER_USERNAME')
                 )
                 ['bot_api_id'];
                 var_dump($newgroup);
@@ -82,27 +82,29 @@ function export_new_invite($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                try {
-                    $exportInvite = $MadelineProto->channels->exportInvite(
-                        ['channel' => $peer]
-                    );
-                    $link = $exportInvite['link'];
-                    $message = "The new chat link is $link";
-                    $default['message'] = $message;
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                    \danog\MadelineProto\Logger::log($sentMessage);
-                } catch (Exception $e) {
-                    $message = "I am not the owner of this chat. On the bright ".
-                    "side, just save the message with my /save command.";
-                    $default['message'] = $message;
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                    \danog\MadelineProto\Logger::log($sentMessage);
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                    try {
+                        $exportInvite = $MadelineProto->channels->exportInvite(
+                            ['channel' => $peer]
+                        );
+                        $link = $exportInvite['link'];
+                        $message = "The new chat link is $link";
+                        $default['message'] = $message;
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                    } catch (Exception $e) {
+                        $message = "I am not the owner of this chat. On the bright ".
+                        "side, just save the message with my /save command.";
+                        $default['message'] = $message;
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                    }
                 }
             }
         }
@@ -116,36 +118,42 @@ function public_toggle($update, $MadelineProto, $msg)
         $mods = "I don't listen to you.";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
+        $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id
             );
         $arr = ["on", "off"];
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                if (!empty($msg) && in_array($msg, $arr)) {
-                    try {
-                        if ($msg == "on") {
-                            $MadelineProto->channels->toggleInvites(
-                                ['channel' => $peer, 'enabled' => true ]
-                            );
-                            $message = "This channel is now public.";
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                    if (!empty($msg) && in_array($msg, $arr)) {
+                        try {
+                            if ($msg == "on") {
+                                $MadelineProto->channels->toggleInvites(
+                                    ['channel' => $peer, 'enabled' => true ]
+                                );
+                                $message = "This group is now public. ".
+                                "Members may add users";
+                                $default['message'] = $message;
+                            }
+                            if ($msg == "off") {
+                                $MadelineProto->channels->toggleInvites(
+                                    ['channel' => $peer, 'enabled' => false ]
+                                );
+                                $message = "This group is now private. ".
+                                "Members may not add users";
+                                $default['message'] = $message;
+                            }
+                        } catch (Exception $e) {
+                            $message = "I couldn't change the public settings";
                             $default['message'] = $message;
+                            echo($e);
                         }
-                        if ($msg == "off") {
-                            $MadelineProto->channels->toggleInvites(
-                                ['channel' => $peer, 'enabled' => false ]
-                            );
-                            $message = "This channel is now private.";
-                            $default['message'] = $message;
-                        }
-                    } catch (Exception $e) {
-                        $message = "I couldn't change the public settings";
+                    } else {
+                        $message = "Use /public [on/off] to change this settings.";
                         $default['message'] = $message;
                     }
-                } else {
-                    $message = "Use /public [on/off] to change this settings.";
-                    $default['message'] = $message;
                 }
             }
         }
@@ -171,64 +179,66 @@ function invite_user($update, $MadelineProto, $msg_str)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id
             );
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                if ($msg_str) {
-                    $id = catch_id($update, $MadelineProto, $msg_str);
-                    if ($id[0]) {
-                        $userid = $id[1];
-                        $username = $id[2];
-                    } else {
-                        if (!isset($userid)) {
-                            $first_char = substr($msg_str, 0, 1);
-                            if (preg_match_all('/@/', $first_char, $matches)) {
-                                $id = catch_id($update, $MadelineProto, $msg_str);
-                                if ($id[0]) {
-                                    $userid = $id[1];
-                                    $username = $id[2];
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                    if ($msg_str) {
+                        $id = catch_id($update, $MadelineProto, $msg_str);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                            $username = $id[2];
+                        } else {
+                            if (!isset($userid)) {
+                                $first_char = substr($msg_str, 0, 1);
+                                if (preg_match_all('/@/', $first_char, $matches)) {
+                                    $id = catch_id($update, $MadelineProto, $msg_str);
+                                    if ($id[0]) {
+                                        $userid = $id[1];
+                                        $username = $id[2];
+                                    } else {
+                                        $message = "I can't find a user called ".
+                                        "$msg_str. Who's that?";
+                                        $default['message'] = $message;
+                                    }
                                 } else {
-                                    $message = "I can't find a user called ".
-                                    "$msg_str. Who's that?";
+                                    $message = "I don't know anyone with the name ".
+                                    $msg_str;
                                     $default['message'] = $message;
                                 }
-                            } else {
-                                $message = "I don't know anyone with the name ".
-                                $msg_str;
-                                $default['message'] = $message;
                             }
                         }
-                    }
-                    if (isset($userid)) {
-                        $info = cache_get_info(
-                            $update,
-                            $MadelineProto,
-                            $userid
-                        );
-                        try {
-                            $inviteuser = $MadelineProto->channels->inviteToChannel(
-                                ['channel' => $peer, 'users' => [$userid] ]
+                        if (isset($userid)) {
+                            $info = cache_get_info(
+                                $update,
+                                $MadelineProto,
+                                $userid
                             );
-                        } catch (Exception $e) {
-                            $message = "I can't add $username. Either I'm not an ".
-                            "admin or their privacy settings prevent me from ".
-                            "doing so.";
-                            $entity = [[
-                                '_' => 'inputMessageEntityMentionName',
-                                'offset' => 12,
-                                'length' => strlen($username),
-                                'user_id' => $userid
-                            ]];
-                            $default['message'] = $message;
-                            $default['entities'] = $entity;
+                            try {
+                                $inviteuser = $MadelineProto->channels->inviteToChannel(
+                                    ['channel' => $peer, 'users' => [$userid] ]
+                                );
+                            } catch (Exception $e) {
+                                $message = "I can't add $username. Either I'm not an ".
+                                "admin or their privacy settings prevent me from ".
+                                "doing so.";
+                                $entity = [[
+                                    '_' => 'inputMessageEntityMentionName',
+                                    'offset' => 12,
+                                    'length' => strlen($username),
+                                    'user_id' => $userid
+                                ]];
+                                $default['message'] = $message;
+                                $default['entities'] = $entity;
+                            }
                         }
+                    } else {
+                        $message = "Use /invite @username to ".
+                        "invite someone to this chat!";
+                        $code = [['_' => 'messageEntityItalic', 'offset' => 12,
+                        'length' => 9]];
+                        $default['message'] = $message;
+                        $default['entities'] = $code;
                     }
-                } else {
-                    $message = "Use /invite @username to ".
-                    "invite someone to this chat!";
-                    $code = [['_' => 'messageEntityItalic', 'offset' => 12,
-                    'length' => 9]];
-                    $default['message'] = $message;
-                    $default['entities'] = $code;
                 }
             }
         }

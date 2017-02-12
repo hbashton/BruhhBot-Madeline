@@ -134,7 +134,7 @@ function getweather($update, $MadelineProto, $area)
             $message = 'What the actual hell is "' . $area . '"';
             $default['message'] = $message;
         }
-        if(isset($default['message'])) {
+        if (isset($default['message'])) {
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );

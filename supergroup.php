@@ -30,51 +30,53 @@ function addadmin($update, $MadelineProto, $msg)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
             );
-        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_master($update, $MadelineProto, $mods, true)) {
-                $id = catch_id($update, $MadelineProto, $msg);
-                if ($id[0]) {
-                    $userid = $id[1];
-                    $username = $id[2];
-                } else {
-                    $message = "I can't find a user called ".
-                    "$msg. Who's that?";
-                    $default['message'] = $message;
-                }
-                if (isset($userid)) {
-                        $channelRoleModerator = [
-                            '_' => 'channelRoleModerator',
-                        ];
-                        try {
-                            $editadmin = $MadelineProto->channels->editAdmin(
-                                ['channel' => $peer, 'user_id' => $userid,
-                                'role' => $channelRoleModerator ]
-                            );
-                            $entity = [[
-                                '_' => 'inputMessageEntityMentionName',
-                                'offset' => 0,
-                                'length' => strlen($username),
-                                'user_id' => $userid
-                            ]];
-                            $message = "$username is now an admin!!!!!";
-                            $default['message'] = $message;
-                            $default['entities'] = $entity;
-                            \danog\MadelineProto\Logger::log($editadmin);
+        if (is_moderated($ch_id)) {
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_master($update, $MadelineProto, $mods, true)) {
+                    $id = catch_id($update, $MadelineProto, $msg);
+                    if ($id[0]) {
+                        $userid = $id[1];
+                        $username = $id[2];
+                    } else {
+                        $message = "I can't find a user called ".
+                        "$msg. Who's that?";
+                        $default['message'] = $message;
+                    }
+                    if (isset($userid)) {
+                            $channelRoleModerator = [
+                                '_' => 'channelRoleModerator',
+                            ];
+                            try {
+                                $editadmin = $MadelineProto->channels->editAdmin(
+                                    ['channel' => $peer, 'user_id' => $userid,
+                                    'role' => $channelRoleModerator ]
+                                );
+                                $entity = [[
+                                    '_' => 'inputMessageEntityMentionName',
+                                    'offset' => 0,
+                                    'length' => strlen($username),
+                                    'user_id' => $userid
+                                ]];
+                                $message = "$username is now an admin!!!!!";
+                                $default['message'] = $message;
+                                $default['entities'] = $entity;
+                                \danog\MadelineProto\Logger::log($editadmin);
 
-                        } catch (Exception $e) {
-                            $message = "I am not the owner of this chat, and ".
-                            "cannot add any admins";
-                            $default['message'] = $message;
-                        }
-                }
-                if (isset($default['message'])) {
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                }
-                if (isset($sentMessage)) {
-                    \danog\MadelineProto\Logger::log($sentMessage);
+                            } catch (Exception $e) {
+                                $message = "I am not the owner of this chat, and ".
+                                "cannot add any admins";
+                                $default['message'] = $message;
+                            }
+                    }
+                    if (isset($default['message'])) {
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                    }
+                    if (isset($sentMessage)) {
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                    }
                 }
             }
         }
@@ -93,45 +95,48 @@ function rmadmin($update, $MadelineProto, $msg)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
             );
-        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_master($update, $MadelineProto, $mods, true)) {
-                $id = catch_id($update, $MadelineProto, $msg);
-                if ($id[0]) {
-                    $userid = $id[1];
-                    $username = $id[2];
-                } else {
-                    $message = "I can't find a user called ".
-                    "$msg. Who's that?";
-                    $default['message'] = $message;
-                }
-                if (isset($userid)) {
-                    try {
-                        $channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
-                        $editadmin = $MadelineProto->channels->editAdmin(
-                            ['channel' => $peer, 'user_id' => $userid,
-                            'role' => $channelRoleEmpty ]
-                        );
-                        \danog\MadelineProto\Logger::log($editadmin);
-                        $entity = [[
-                                '_' => 'inputMessageEntityMentionName',
-                                'offset' => 0,
-                                'length' => strlen($username),
-                                'user_id' => $userid
-                            ]];
-                        $message = "$username is..no longer an admin. I am sorry";
-                        $default['message'] = $message;
-                        $default['entities'] = $entity;
-                    } catch (Exception $e) {
-                        $message = "I am not the owner of this group, and cannot ".
-                        "add or remove admins.";
+        if (is_moderated($ch_id)) {
+
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_master($update, $MadelineProto, $mods, true)) {
+                    $id = catch_id($update, $MadelineProto, $msg);
+                    if ($id[0]) {
+                        $userid = $id[1];
+                        $username = $id[2];
+                    } else {
+                        $message = "I can't find a user called ".
+                        "$msg. Who's that?";
                         $default['message'] = $message;
                     }
-                }
-                if (isset($default['message'])) {
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
+                    if (isset($userid)) {
+                        try {
+                            $channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
+                            $editadmin = $MadelineProto->channels->editAdmin(
+                                ['channel' => $peer, 'user_id' => $userid,
+                                'role' => $channelRoleEmpty ]
+                            );
+                            \danog\MadelineProto\Logger::log($editadmin);
+                            $entity = [[
+                                    '_' => 'inputMessageEntityMentionName',
+                                    'offset' => 0,
+                                    'length' => strlen($username),
+                                    'user_id' => $userid
+                                ]];
+                            $message = "$username is..no longer an admin. I am sorry";
+                            $default['message'] = $message;
+                            $default['entities'] = $entity;
+                        } catch (Exception $e) {
+                            $message = "I am not the owner of this group, and cannot ".
+                            "add or remove admins.";
+                            $default['message'] = $message;
+                        }
+                    }
+                    if (isset($default['message'])) {
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                    }
                 }
                 if (isset($sentMessage)) {
                     \danog\MadelineProto\Logger::log($sentMessage);
@@ -188,6 +193,14 @@ function idme($update, $MadelineProto, $msg_arr)
                     }
                 }
             }
+            if (is_numeric($msg_arr)) {
+                $id = catch_id($update, $MadelineProto, $msg_arr);
+                if ($id[0]) {
+                    $userid = $id[1];
+                    $username = $id[2];
+                    $default['message'] = "The username of $userid is $username";
+                }
+            }
             if (!isset($userid)) {
                 $message = "I can't find a user called $msg_arr. Who's that?";
                 $default['message'] = $message;
@@ -216,7 +229,6 @@ function adminlist($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
-        $mods = "Only mods can use me to set this chat's photo!";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -227,8 +239,8 @@ function adminlist($update, $MadelineProto)
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         $message = "Admins for $title"."\r\n";
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 11,
-        'length' => strlen($title) ];
+        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
+        'length' => strlen($message) ];
         $admins = cache_get_chat_info($update, $MadelineProto);
         foreach ($admins['participants'] as $key) {
             if (array_key_exists('user', $key)) {
@@ -283,7 +295,7 @@ function adminlist($update, $MadelineProto)
 function modlist($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+    if (is_supergroup($update, $MadelineProto)) {
         $mods = "Only mods can use me to kick butts!";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
@@ -293,51 +305,53 @@ function modlist($update, $MadelineProto)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id
         );
-        $message = "Moderators for $title:"."\r\n";
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
-        'length' => 15 + strlen($title) ];
-        check_json_array('promoted.json', $ch_id);
-        $file = file_get_contents("promoted.json");
-        $promoted = json_decode($file, true);
-        if (array_key_exists($ch_id, $promoted)) {
-            foreach ($promoted[$ch_id] as $i => $key) {
-                $user = cache_get_info($update, $MadelineProto, $key)['User'];
-                $username = catch_id($update, $MadelineProto, $key)[2];
-                if (!isset($entity_)) {
-                    $offset = strlen($message);
-                    $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                    $offset, 'length' => strlen($username), 'user_id' =>
-                    $key]];
-                    $length = $offset + strlen($username) + 2;
-                    $message = $message.$username."\r\n";
-                } else {
-                    $entity_[] = ['_' =>
-                    'inputMessageEntityMentionName', 'offset' => $length,
-                    'length' => strlen($username), 'user_id' => $key];
-                    $length = $length + 2 + strlen($username);
-                    $message = $message.$username."\r\n";
+        if (is_moderated($ch_id)) {
+            $message = "Moderators for $title:"."\r\n";
+            $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
+            'length' => 15 + strlen($title) ];
+            check_json_array('promoted.json', $ch_id);
+            $file = file_get_contents("promoted.json");
+            $promoted = json_decode($file, true);
+            if (array_key_exists($ch_id, $promoted)) {
+                foreach ($promoted[$ch_id] as $i => $key) {
+                    $user = cache_get_info($update, $MadelineProto, $key)['User'];
+                    $username = catch_id($update, $MadelineProto, $key)[2];
+                    if (!isset($entity_)) {
+                        $offset = strlen($message);
+                        $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
+                        $offset, 'length' => strlen($username), 'user_id' =>
+                        $key]];
+                        $length = $offset + strlen($username) + 2;
+                        $message = $message.$username."\r\n";
+                    } else {
+                        $entity_[] = ['_' =>
+                        'inputMessageEntityMentionName', 'offset' => $length,
+                        'length' => strlen($username), 'user_id' => $key];
+                        $length = $length + 2 + strlen($username);
+                        $message = $message.$username."\r\n";
+                    }
                 }
             }
-        }
-        if (!isset($entity_)) {
-            $entity = [['_' => 'messageEntityBold', 'offset' => 28,
-            'length' => strlen($title) ]];
-            $message = "There are no moderators for ".$title;
-            $default['message'] = $message;
-            $default['entities'] = $entity;
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                $default
-            );
-        }
-        if (!isset($sentMessage)) {
-            $entity = $entity_;
-            $entity[] = $messageEntityBold;
-            unset($entity_);
-            $default['message'] = $message;
-            $default['entities'] = $entity;
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                $default
-            );
+            if (!isset($entity_)) {
+                $entity = [['_' => 'messageEntityBold', 'offset' => 28,
+                'length' => strlen($title) ]];
+                $message = "There are no moderators for ".$title;
+                $default['message'] = $message;
+                $default['entities'] = $entity;
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
+            if (!isset($sentMessage)) {
+                $entity = $entity_;
+                $entity[] = $messageEntityBold;
+                unset($entity_);
+                $default['message'] = $message;
+                $default['entities'] = $entity;
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
         }
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
@@ -348,7 +362,7 @@ function modlist($update, $MadelineProto)
 function pinmessage($update, $MadelineProto, $silent)
 {
     $msg_id = $update['update']['message']['id'];
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+    if (is_supergroup($update, $MadelineProto)) {
         $mods = "I can pin messages! But YOU can't make me!!! ;)";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
@@ -357,41 +371,149 @@ function pinmessage($update, $MadelineProto, $silent)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id
         );
-        if (is_bot_admin($update, $MadelineProto, true)) {
-            if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                if (array_key_exists(
-                    "reply_to_msg_id",
-                    $update['update']['message']
-                )
-                ) {
-                    try {
-                    $pin_id = $update['update']['message']['reply_to_msg_id'];
-                    $pin = $MadelineProto->
-                    channels->updatePinnedMessage(
-                        ['silent' => $silent,
-                        'channel' => $peer,
-                        'id' => $pin_id ]
-                    );
-                    $message = "Message successfully pinned!";
-                    $default['message'] = $message;
-                    \danog\MadelineProto\Logger::log($pin);
-                    } catch (Exception $e) {
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto, true)) {
+                if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                    if (array_key_exists(
+                        "reply_to_msg_id",
+                        $update['update']['message']
+                    )
+                    ) {
+                        try {
+                        $pin_id = $update['update']['message']['reply_to_msg_id'];
+                        $pin = $MadelineProto->
+                        channels->updatePinnedMessage(
+                            ['silent' => $silent,
+                            'channel' => $peer,
+                            'id' => $pin_id ]
+                        );
+                        $message = "Message successfully pinned!";
+                        $default['message'] = $message;
+                        \danog\MadelineProto\Logger::log($pin);
+                        } catch (Exception $e) {
+                        }
+                    } else {
+                        $entity = [['_' => 'messageEntityCode', 'offset' => 37,
+                        'length' => 6 ], ['_' => 'messageEntityCode', 'offset' => 75,
+                        'length' => 12 ]];
+                        $message = "Pin a message by replying to it with \r\n/pin\r\n".
+                        "to pin it silently, reply with /pin silent";
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
                     }
-                } else {
-                    $entity = [['_' => 'messageEntityCode', 'offset' => 37,
-                    'length' => 4 ], ['_' => 'messageEntityCode', 'offset' => 73,
-                    'length' => 14 ]];
-                    $message = "Pin a message by replying to it with \r\n/pin\r\n".
-                    "to pin it silently, reply with /pin silent";
-                    $default['message'] = $message;
-                    $default['entities'] = $entity;
+                }
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
                 }
             }
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-                \danog\MadelineProto\Logger::log($sentMessage);
+        }
+    }
+}
+
+function delmessage($update, $MadelineProto)
+{
+    $msg_id = $update['update']['message']['id'];
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+        );
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto, true)) {
+                if (from_admin_mod($update, $MadelineProto)) {
+                    if (array_key_exists(
+                        "reply_to_msg_id",
+                        $update['update']['message']
+                    )
+                    ) {
+                        try {
+                        $del_id = $update['update']['message']['reply_to_msg_id'];
+                        $delete = $MadelineProto->channels->deleteMessages(
+                            ['channel' => $peer,
+                            'id' => [$del_id]]
+                        );
+                        \danog\MadelineProto\Logger::log($delete);
+                        $del_id = $msg_id - 1;
+                        $delete = $MadelineProto->channels->deleteMessages(
+                            ['channel' => $peer,
+                            'id' => [$msg_id]]
+                        );
+                        \danog\MadelineProto\Logger::log($delete);
+                        } catch (Exception $e) {
+                        }
+                    } else {
+                        $entity = [['_' => 'messageEntityCode', 'offset' => 40,
+                        'length' => 6 ]];
+                        $message = "Delete a message by replying to it with \r\n/del";
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
+                    }
+                }
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
+            }
+        }
+    }
+}
+
+function delmessage_user($update, $MadelineProto)
+{
+    $msg_id = $update['update']['message']['id'];
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+        );
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto, true)) {
+                if (from_admin_mod($update, $MadelineProto)) {
+                    if (array_key_exists(
+                        "reply_to_msg_id",
+                        $update['update']['message']
+                    )
+                    ) {
+                        try {
+                        $del_id = $update['update']['message']['reply_to_msg_id'];
+                        $delete = $MadelineProto->channels->deleteMessages(
+                            ['channel' => $peer,
+                            'id' => [$del_id]]
+                        );
+                        \danog\MadelineProto\Logger::log($delete);
+                        $del_id = $msg_id - 1;
+                        $delete = $MadelineProto->channels->deleteMessages(
+                            ['channel' => $peer,
+                            'id' => [$msg_id]]
+                        );
+                        \danog\MadelineProto\Logger::log($delete);
+                        } catch (Exception $e) {
+                        }
+                    } else {
+                        $entity = [['_' => 'messageEntityCode', 'offset' => 40,
+                        'length' => 6 ]];
+                        $message = "Delete a message by replying to it with \r\n/del";
+                        $default['message'] = $message;
+                        $default['entities'] = $entity;
+                    }
+                }
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
             }
         }
     }

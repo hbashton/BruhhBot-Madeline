@@ -1,6 +1,6 @@
 <?php
 
-function check_json_array($filename, $id, $layered = true)
+function check_json_array($filename, $id = "", $layered = true)
 {
     if ($layered) {
         if (!file_exists($filename)) {
@@ -19,6 +19,13 @@ function check_json_array($filename, $id, $layered = true)
                 json_encode($json_data)
             );
         }
+    }
+}
+
+function check_mkdir($foldername)
+{
+    if (!file_exists($foldername)) {
+        mkdir($foldername, 0700);
     }
 }
 
@@ -69,4 +76,30 @@ function parse_chat_data($update, $MadelineProto)
             'id' => $ch_id);
         return($chat_array);
     }
+}
+
+function create_style($type, $offset, $length)
+{
+    switch ($type) {
+    case 'bold':
+        $style = 'messageEntityBold';
+        break;
+    case 'italic':
+        $style = 'messageEntityItalic';
+        break;
+    case 'code':
+        $style = 'messageEntityCode';
+        break;
+    }
+    return([['_' => $style, 'offset' => $offset,
+            'length' => $length ]]);
+}
+
+function create_mention($offset, $username, $userid)
+{
+    return([[
+        '_' => 'inputMessageEntityMentionName',
+        'offset' => $offset,
+        'length' => strlen($username),
+        'user_id' => $userid]]);
 }

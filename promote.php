@@ -30,48 +30,50 @@ function promoteme($update, $MadelineProto, $msg)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
             );
-        if (from_admin($update, $MadelineProto, $mods, true)) {
-            $id = catch_id($update, $MadelineProto, $msg);
-            if ($id[0]) {
-                $userid = $id[1];
-                $username = $id[2];
-                $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                5, 'length' => strlen($username), 'user_id' => $userid]];
-                check_json_array('promoted.json', $ch_id);
-                $file = file_get_contents("promoted.json");
-                $promoted = json_decode($file, true);
-                if (array_key_exists($ch_id, $promoted)) {
-                    if (!in_array($userid, $promoted[$ch_id])) {
+        if (is_moderated($ch_id)) {
+            if (from_admin($update, $MadelineProto, $mods, true)) {
+                $id = catch_id($update, $MadelineProto, $msg);
+                if ($id[0]) {
+                    $userid = $id[1];
+                    $username = $id[2];
+                    $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
+                    5, 'length' => strlen($username), 'user_id' => $userid]];
+                    check_json_array('promoted.json', $ch_id);
+                    $file = file_get_contents("promoted.json");
+                    $promoted = json_decode($file, true);
+                    if (array_key_exists($ch_id, $promoted)) {
+                        if (!in_array($userid, $promoted[$ch_id])) {
+                            array_push($promoted[$ch_id], $userid);
+                            file_put_contents('promoted.json', json_encode($promoted));
+                            $message = "User $username is now a moderator of $title";
+                            $entity = ['_' => 'messageEntityBold',
+                            'offset' => strlen($message) - strlen($title),
+                            'length' => strlen($title) ];
+                            $default['message'] = $message;
+                            $default['entities'] = $entity;
+                        } else {
+                            $message = "User $username is already a moderator of $title";
+                            $entity = ['_' => 'messageEntityBold',
+                            'offset' => strlen($message) - strlen($title),
+                            'length' => strlen($title) ];
+                            $default['message'] = $message;
+                            $default['entities'] = $entity;
+                        }
+                    } else {
+                        $promoted[$ch_id] = [];
                         array_push($promoted[$ch_id], $userid);
                         file_put_contents('promoted.json', json_encode($promoted));
-                        $message = "User $username is now a moderator of $title";
+                        $message = "User ".$username." is now a moderator of ".$title;
                         $entity = ['_' => 'messageEntityBold',
-                        'offset' => strlen($message) - strlen($title),
-                        'length' => strlen($title) ];
-                        $default['message'] = $message;
-                        $default['entities'] = $entity;
-                    } else {
-                        $message = "User $username is already a moderator of $title";
-                        $entity = ['_' => 'messageEntityBold',
-                        'offset' => strlen($message) - strlen($title),
-                        'length' => strlen($title) ];
+                            'offset' => strlen($message) - strlen($title),
+                            'length' => strlen($title) ];
                         $default['message'] = $message;
                         $default['entities'] = $entity;
                     }
                 } else {
-                    $promoted[$ch_id] = [];
-                    array_push($promoted[$ch_id], $userid);
-                    file_put_contents('promoted.json', json_encode($promoted));
-                    $message = "User ".$username." is now a moderator of ".$title;
-                    $entity = ['_' => 'messageEntityBold',
-                        'offset' => strlen($message) - strlen($title),
-                        'length' => strlen($title) ];
+                    $message = "I don't know of anyone called ".$msg;
                     $default['message'] = $message;
-                    $default['entities'] = $entity;
                 }
-            } else {
-                $message = "I don't know of anyone called ".$msg;
-                $default['message'] = $message;
             }
         }
         if (isset($mention)) {

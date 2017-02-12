@@ -58,7 +58,7 @@ function catch_id($update, $MadelineProto, $user)
             foreach ($update['update']['message']['entities'] as $key) {
                 if (array_key_exists('user_id', $key)) {
                     $userid = $key['user_id'];
-                    $username = cache_get_info($update, $MadelineProto, $user)['User']['first_name'];
+                    $username = cache_get_info($update, $MadelineProto, $userid)['User']['first_name'];
                     break;
                 }
             }

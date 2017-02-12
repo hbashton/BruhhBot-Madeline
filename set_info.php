@@ -32,73 +32,75 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
             'reply_to_msg_id' => $msg_id,
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_admin_mod(
-                $update,
-                $MadelineProto,
-                $mods,
-                $wait
-            )
-            ) {
-                if (isset($GLOBALS['from_user_chat_photo'])) {
-                    if ($GLOBALS['from_user_chat_photo'] == $from_id) {
-                        if (array_key_exists(
-                            "media",
-                            $update['update']['message']
-                        )
-                        ) {
-                            $mediatype = $update['update']['message']['media']['_'];
-                            if ($mediatype == "messageMediaPhoto") {
-                                $hash = $update
-                                ['update']['message']['media']['photo']
-                                ['access_hash'];
-                                $id = $update
-                                ['update']['message']['media']['photo']['id'];
-                                $inputPhoto = [
-                                    '_' => 'inputPhoto',
-                                    'id' => $id,
-                                    'access_hash' => $hash];
-                                $inputChatPhoto = [
-                                    '_' => 'inputChatPhoto',
-                                    'id' => $inputPhoto];
-                                try {
-                                    $changePhoto = $MadelineProto->
-                                    channels->editPhoto(
-                                        ['channel' => $ch_id,
-                                        'photo' => $inputChatPhoto]
-                                    );
-                                    \danog\MadelineProto\Logger::log(
-                                        $changePhoto
-                                    );
-                                    $message = "Thanks! I've updated the photo".
-                                    " for $title";
-                                    $default['message'] = $message;
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod(
+                    $update,
+                    $MadelineProto,
+                    $mods,
+                    $wait
+                )
+                ) {
+                    if (isset($GLOBALS['from_user_chat_photo'])) {
+                        if ($GLOBALS['from_user_chat_photo'] == $from_id) {
+                            if (array_key_exists(
+                                "media",
+                                $update['update']['message']
+                            )
+                            ) {
+                                $mediatype = $update['update']['message']['media']['_'];
+                                if ($mediatype == "messageMediaPhoto") {
+                                    $hash = $update
+                                    ['update']['message']['media']['photo']
+                                    ['access_hash'];
+                                    $id = $update
+                                    ['update']['message']['media']['photo']['id'];
+                                    $inputPhoto = [
+                                        '_' => 'inputPhoto',
+                                        'id' => $id,
+                                        'access_hash' => $hash];
+                                    $inputChatPhoto = [
+                                        '_' => 'inputChatPhoto',
+                                        'id' => $inputPhoto];
+                                    try {
+                                        $changePhoto = $MadelineProto->
+                                        channels->editPhoto(
+                                            ['channel' => $ch_id,
+                                            'photo' => $inputChatPhoto]
+                                        );
+                                        \danog\MadelineProto\Logger::log(
+                                            $changePhoto
+                                        );
+                                        $message = "Thanks! I've updated the photo".
+                                        " for $title";
+                                        $default['message'] = $message;
 
-                                } catch (Exception $e) {
-                                    $message = "I am not the owner of this ".
-                                    "chat, and cannot change the photo.";
+                                    } catch (Exception $e) {
+                                        $message = "I am not an admin of this ".
+                                        "chat, and cannot change the photo.";
+                                        $default['message'] = $message;
+                                    }
+                                    unset($GLOBALS['from_user_chat_photo']);
+                                } else {
+                                    $message = "The message you sent was not a photo! ".
+                                    "Sorry, but the chat photo was not changed";
                                     $default['message'] = $message;
+                                    unset($GLOBALS['from_user_chat_photo']);
                                 }
-                                unset($GLOBALS['from_user_chat_photo']);
                             } else {
                                 $message = "The message you sent was not a photo! ".
                                 "Sorry, but the chat photo was not changed";
                                 $default['message'] = $message;
                                 unset($GLOBALS['from_user_chat_photo']);
                             }
-                        } else {
-                            $message = "The message you sent was not a photo! ".
-                            "Sorry, but the chat photo was not changed";
-                            $default['message'] = $message;
-                            unset($GLOBALS['from_user_chat_photo']);
                         }
+                    } else {
+                        global $from_user_chat_photo;
+                        $from_user_chat_photo = $fromid;
+                        $message = "Just send the new photo and I'll get right to ".
+                        "changing it!";
+                        $default['message'] = $message;
                     }
-                } else {
-                    global $from_user_chat_photo;
-                    $from_user_chat_photo = $fromid;
-                    $message = "Just send the new photo and I'll get right to ".
-                    "changing it!";
-                    $default['message'] = $message;
                 }
             }
         }
@@ -127,34 +129,36 @@ function set_chat_title($update, $MadelineProto, $msg_str)
             'reply_to_msg_id' => $msg_id,
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        if (is_bot_admin($update, $MadelineProto)) {
-            if (from_admin_mod(
-                $update,
-                $MadelineProto,
-                $mods,
-                true
-            )
-            ) {
-                if (!empty($msg_str)) {
-                    try {
-                        $editTitle = $MadelineProto->channels->editTitle(
-                            ['channel' => $ch_id, 'title' => $msg_str ]
-                        );
-                        \danog\MadelineProto\Logger::log($editTitle);
-                        $message = "Chat Title successfully changed to $msg_str";
-                        $entity = [['_' => 'messageEntityBold',
-                            'offset' => strlen($message) - strlen($msg_str),
-                            'length' => strlen($msg_str)]];
-                        $default['message'] = $message;
-                        $default['entities'] = $entity;
-                    } catch (Exception $e) {
-                        $message = "I am not the owner of this chat, and cannot ".
-                        "change the title.";
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod(
+                    $update,
+                    $MadelineProto,
+                    $mods,
+                    true
+                )
+                ) {
+                    if (!empty($msg_str)) {
+                        try {
+                            $editTitle = $MadelineProto->channels->editTitle(
+                                ['channel' => $ch_id, 'title' => $msg_str ]
+                            );
+                            \danog\MadelineProto\Logger::log($editTitle);
+                            $message = "Chat Title successfully changed to $msg_str";
+                            $entity = [['_' => 'messageEntityBold',
+                                'offset' => strlen($message) - strlen($msg_str),
+                                'length' => strlen($msg_str)]];
+                            $default['message'] = $message;
+                            $default['entities'] = $entity;
+                        } catch (Exception $e) {
+                            $message = "I am not an admin of this chat, and cannot ".
+                            "change the title.";
+                            $default['message'] = $message;
+                        }
+                    } else {
+                        $message = "You can't make the title empty silly";
                         $default['message'] = $message;
                     }
-                } else {
-                    $message = "You can't make the title empty silly";
-                    $default['message'] = $message;
                 }
             }
         }
