@@ -62,6 +62,14 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                         );
                                         $message = "User $username banned ".
                                         "from $title";
+                                        $len = strlen($message) - strlen($title);
+                                        $entity = create_style(
+                                            'bold',
+                                            $len,
+                                            $title,
+                                            false
+                                        );
+                                        $mention[] = $entity;
                                         $default['message'] = $message;
                                         $default['entities'] = $mention;
                                         try {
@@ -97,16 +105,27 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                         'banlist.json',
                                         json_encode($banlist)
                                     );
-                                    $message = "User ".$username." banned from ".$title;
+                                    $message = "User $username banned from $title";
+                                    $len = strlen($message) - strlen($title);
+                                    $entity = create_style(
+                                        'bold',
+                                        $len,
+                                        $title,
+                                        false
+                                    );
+                                    $mention[] = $entity;
                                     $default['message'] = $message;
                                     $default['entities'] = $mention;
                                 }
                             }
+                        } else {
+                            $message = "I don't know a $msg";
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = "Use /ban @username to ban someone from this ".
                         "chat!";
-                        $code = create_style('code', 9, 9);
+                        $code = create_style('italic', 9, 9);
                         $default['entities'] = $code;
                         $default['message'] = $message;
                     }
@@ -167,6 +186,14 @@ function unbanme($update, $MadelineProto, $msg)
                                         json_encode($banlist)
                                     );
                                     $message = "User $username unbanned from $title";
+                                    $len = strlen($message) - strlen($title);
+                                    $entity = create_style(
+                                        'bold',
+                                        $len,
+                                        $title,
+                                        false
+                                    );
+                                    $mention[] = $entity;
                                     $default['message'] = $message;
                                     $default['entities'] = $mention;
                                     try {
@@ -179,7 +206,7 @@ function unbanme($update, $MadelineProto, $msg)
                                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                                     }
                                 } else {
-                                    $message = "User ".$username." is not banned!";
+                                    $message = "User $username is not banned!";
                                     $default['message'] = $message;
                                     $default['entities'] = $mention;
                                 }
@@ -188,6 +215,9 @@ function unbanme($update, $MadelineProto, $msg)
                                 $default['message'] = $message;
                                 $default['entities'] = $mention;
                             }
+                        } else {
+                            $message = "I don't know a $msg";
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = "Use /unban @username to unban someone from this ".
@@ -262,6 +292,14 @@ function kickhim($update, $MadelineProto, $msg)
                                         'kicked' => false]
                                     );
                                     $message = "User $username kicked from $title";
+                                    $len = strlen($message) - strlen($title);
+                                    $entity = create_style(
+                                        'bold',
+                                        $len,
+                                        $title,
+                                        false
+                                    );
+                                    $mention[] = $entity;
                                     $default['message'] = $message;
                                     $default['entities'] = $mention;
                                 } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -272,11 +310,14 @@ function kickhim($update, $MadelineProto, $msg)
                                 }
 
                             }
+                        } else {
+                            $message = "I don't know a $msg";
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = "Use /kick @username to kick someone from this ".
                         "chat!";
-                        $code = create_styl('code', 9, 9);
+                        $code = create_style('code', 9, 9);
                         $default['message'] = $message;
                         $default['entities'] = $code;
                     }
@@ -330,6 +371,14 @@ function kickme($update, $MadelineProto)
                             'kicked' => false]
                         );
                         $message = "User $username kicked from $title";
+                        $len = strlen($message) - strlen($title);
+                        $entity = create_style(
+                            'bold',
+                            $len,
+                            $title,
+                            false
+                        );
+                        $mention[] = $entity;
                         $default['message'] = $message;
                         $default['entities'] = $mention;
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -341,12 +390,10 @@ function kickme($update, $MadelineProto)
                 }
             }
         }
-        if (!isset($sentMessage)) {
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
         }
         if (isset($kick)) {
             \danog\MadelineProto\Logger::log($kick);
@@ -371,9 +418,8 @@ function getbanlist($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id
         );
         if (is_moderated($ch_id)) {
-            $message = "Banned Users for $title:"."\r\n";
-            $len = 17 + strlen($title);
-            $messageEntityBold = create_style('bold', 0, $len);
+            $message = "Banned Users for $title:\r\n";
+            $style = create_style('bold', 0, $message, false);
             check_json_array('banlist.json', $ch_id);
             $file = file_get_contents("banlist.json");
             $banlist = json_decode($file, true);
@@ -381,25 +427,20 @@ function getbanlist($update, $MadelineProto)
                 foreach ($banlist[$ch_id] as $i => $key) {
                     $user = cache_get_info($update, $MadelineProto, (int) $key);
                     $username = catch_id($update, $MadelineProto, $key)[2];
-                    if (!isset($entity_)) {
+                    if (!isset($entity)) {
                         $offset = strlen($message);
-                        $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                        $offset, 'length' => strlen($username), 'user_id' =>
-                        $key]];
+                        $entity = create_mention($offset, $username, $key);
                         $length = $offset + strlen($username) + strlen($key) + 5;
-                        $message = $message."$username [$key]"."\r\n";
+                        $message = $message."$username [$key]\r\n";
                     } else {
-                        $entity_[] = ['_' =>
-                        'inputMessageEntityMentionName', 'offset' => $length,
-                        'length' => strlen($username), 'user_id' => $key];
-                        $length = $length + 5 + strlen($username) + strlen($key);
-                        $message = $message."$username [$key]"."\r\n";
+                        $entity[] = create_mention($length, $username, $key, false);
+                        $length = $length + strlen($username) + strlen($key) + 5;
+                        $message = $message."$username [$key]\r\n";
                     }
                 }
             }
-            if (!isset($entity_)) {
-                $entity = [['_' => 'messageEntityBold', 'offset' => 30,
-                'length' => strlen($title) ]];
+            if (!isset($entity)) {
+                $entity = create_style('bold', 30, $title);
                 $message = "There are no banned users for ".$title;
                 $default['message'] = $message;
                 $default['entities'] = $entity;
@@ -408,9 +449,7 @@ function getbanlist($update, $MadelineProto)
                 );
             }
             if (!isset($sentMessage)) {
-                $entity = $entity_;
-                $entity[] = $messageEntityBold;
-                unset($entity_);
+                $entity[] = $style;
                 $default['message'] = $message;
                 $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(
@@ -440,60 +479,16 @@ function unbanall($update, $MadelineProto, $msg)
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
                     if ($msg) {
-                        if (is_numeric($msg)) {
-                            $userid_ = (int) $msg;
-                            $id = catch_id($update, $MadelineProto, $userid_);
-                            if ($id[0]) {
-                                $userid = $id[1];
-                            }
-                        } else {
-                            if (array_key_exists(
-                                'entities',
-                                $update['update']['message']
-                            )
-                            ) {
-                                foreach ($update['update']['message']['entities']
-                                    as $key
-                                ) {
-                                    if (array_key_exists('user_id', $key)) {
-                                        $userid = $key['user_id'];
-                                        $id = catch_id($update, $MadelineProto, $userid);
-                                        break;
-                                    } else {
-                                        $message = "I don't know anyone with the name ".
-                                        $msg;
-                                        $default['message'] = $message;
-                                    }
-                                }
-                            }
-                            if (!isset($userid)) {
-                                $first_char = substr($msg, 0, 1);
-                                if (preg_match_all('/@/', $first_char, $matches)) {
-                                    $id = catch_id($update, $MadelineProto, $msg);
-                                    if ($id[0]) {
-                                        $userid = $id[1];
-                                    } else {
-                                        $message = "I can't find a user called ".
-                                        "$msg. Who's that?";
-                                        $default['message'] = $message;
-                                    }
-                                } else {
-                                    $message = "I don't know anyone with the name ".
-                                    $msg;
-                                    $default['message'] = $message;
-                                }
-                            }
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
                         }
                         if (isset($userid)) {
                             $username = $id[2];
                             check_json_array('gbanlist.json', false, false);
                             $file = file_get_contents("gbanlist.json");
                             $gbanlist = json_decode($file, true);
-                            $mention = [[
-                            '_' => 'inputMessageEntityMentionName',
-                            'offset' => 5,
-                            'length' => strlen($username),
-                            'user_id' => $userid]];
+                            $mention = create_mention(5, $username, $userid);
                             if (in_array($userid, $gbanlist)) {
                                 if (($key = array_search(
                                     $userid,
@@ -520,17 +515,19 @@ function unbanall($update, $MadelineProto, $msg)
                                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                                 }
                             } else {
-                                $message = "User ".$username." is not globally".
+                                $message = "User $username is not globally".
                                 "banned. I already like them";
                                 $default['message'] = $message;
                                 $default['entities'] = $mention;
                             }
+                        } else {
+                            $message = "I don't know a $msg";
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = "Use /unbanall @username to unban someone from ".
                         "all my groups!";
-                        $code = [['_' => 'messageEntityItalic', 'offset' => 14,
-                        'length' => 9]];
+                        $code = create_style('italic', 14, 9);
                         $default['message'] = $message;
                         $default['entities'] = $code;
                     }
@@ -567,53 +564,9 @@ function banall($update, $MadelineProto, $msg, $send = true)
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
                     if ($msg) {
-                        if (is_numeric($msg)) {
-                            var_dump(true);
-                            $userid_ = (int) $msg;
-                            $id = catch_id($update, $MadelineProto, $userid_);
-                            if ($id[0]) {
-                                $userid = $id[1];
-                            }
-                        } else {
-                            if (array_key_exists(
-                                'entities',
-                                $update['update']['message']
-                            )
-                            ) {
-                                foreach ($update['update']['message']['entities']
-                                    as $key
-                                ) {
-                                    if (array_key_exists('user_id', $key)) {
-                                        $userid = $key['user_id'];
-                                        $id = catch_id(
-                                            $update,
-                                            $MadelineProto,
-                                            $userid
-                                        );
-                                        break;
-                                    } else {
-                                        $message = "I don't know anyone with the name ".
-                                        $msg;
-                                    }
-                                }
-                            }
-                            if (!isset($userid)) {
-                                $first_char = substr($msg, 0, 1);
-                                if (preg_match_all('/@/', $first_char, $matches)) {
-                                    $id = catch_id($update, $MadelineProto, $msg);
-                                    if ($id[0]) {
-                                        $userid = $id[1];
-                                    } else {
-                                        $message = "I can't find a user called ".
-                                        "$msg. Who's that?";
-                                        $default['message'] = $message;
-                                    }
-                                } else {
-                                    $message = "I don't know anyone with the name ".
-                                    $msg;
-                                    $default['message'] = $message;
-                                }
-                            }
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
                         }
                         if (isset($userid)) {
                             $banmod = "You can't ban mods?!?!";
@@ -625,24 +578,12 @@ function banall($update, $MadelineProto, $msg, $send = true)
                                 true
                             )
                             ) {
-                                $info = cache_get_info(
-                                    $update,
-                                    $MadelineProto,
-                                    $userid
-                                );
-                                if (!$info) {
-                                    $message = "$userid is not a valid ID";
-                                    $default['message'] = $message;
-                                } else {
+                                if (isset($userid)) {
                                     $username = $id[2];
                                     check_json_array('gbanlist.json', false, false);
                                     $file = file_get_contents("gbanlist.json");
                                     $gbanlist = json_decode($file, true);
-                                    $mention = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 5,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid]];
+                                    $mention = create_mention(5, $username, $userid);
                                     if (!in_array($userid, $gbanlist)) {
                                         array_push($gbanlist, $userid);
                                         file_put_contents(
@@ -666,19 +607,24 @@ function banall($update, $MadelineProto, $msg, $send = true)
                                         ) {
                                         }
                                     } else {
-                                        $message = "User ".$username." already ".
+                                        $message = "User $username already ".
                                         "globally banned";
                                         $default['message'] = $message;
                                         $default['entities'] = $mention;
                                     }
+                                } else {
+                                    $message = "I don't know a $msg";
+                                    $default['message'] = $message;
                                 }
                             }
+                        } else {
+                            $message = "I don't know a $msg";
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = "Use /banall @username to ban someone from ".
                         "all my groups!";
-                        $code = [['_' => 'messageEntityItalic', 'offset' => 12,
-                        'length' => 12]];
+                        $code = create_style('italic', 12, 12);
                         $default['entities'] = $code;
                         $default['message'] = $message;
                     }
@@ -710,34 +656,27 @@ function getgbanlist($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id
         );
         if (is_moderated($ch_id)) {
-            $message = "PEOPLE I DO NOT LIKE:"."\r\n";
-            $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
-            'length' => strlen($message) ];
+            $message = "PEOPLE I DO NOT LIKE:\r\n";
+            $style = create_style('bold', 0, $message, false);
             check_json_array('gbanlist.json', false, false);
             $file = file_get_contents("gbanlist.json");
             $gbanlist = json_decode($file, true);
             foreach ($gbanlist as $i => $key) {
-                var_dump($key);
                 $user = cache_get_info($update, $MadelineProto, (int) $key);
                 $username = catch_id($update, $MadelineProto, $key)[2];
-                if (!isset($entity_)) {
+                if (!isset($entity)) {
                     $offset = strlen($message);
-                    $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                    $offset, 'length' => strlen($username), 'user_id' =>
-                    $key]];
-                    $length = $offset + strlen($username) + 2;
-                    $message = $message.$username."\r\n";
+                    $entity = create_mention($offset, $username, $key);
+                    $length = $offset + strlen($username) + strlen($key) + 5;
+                    $message = $message."$username [$key]"."\r\n";
                 } else {
-                    $entity_[] = ['_' =>
-                    'inputMessageEntityMentionName', 'offset' => $length,
-                    'length' => strlen($username), 'user_id' => $key];
-                    $length = $length + 2 + strlen($username);
-                    $message = $message.$username."\r\n";
+                    $entity[] = create_mention($length, $username, $key, false);
+                    $length = $length + 5 + strlen($username) + strlen($key);
+                    $message = $message."$username [$key]"."\r\n";
                 }
             }
-            if (!isset($entity_)) {
-                $entity = [['_' => 'messageEntityBold', 'offset' => 43,
-                'length' => 8 ]];
+            if (!isset($entity)) {
+                $entity = create_style('bold', 43, 8);
                 $message = "There are no users globally banned! I like everyone!";
                 $default['message'] = $message;
                 $default['entities'] = $entity;
@@ -746,9 +685,7 @@ function getgbanlist($update, $MadelineProto)
                 );
             }
             if (!isset($sentMessage)) {
-                $entity = $entity_;
-                $entity[] = $messageEntityBold;
-                unset($entity_);
+                $entity[] = $style;
                 $default['message'] = $message;
                 $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(

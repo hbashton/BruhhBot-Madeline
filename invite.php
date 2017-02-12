@@ -21,9 +21,13 @@
 function create_new_supergroup($update, $MadelineProto, $title, $about)
 {
     if (is_peeruser($update, $MadelineProto)) {
-        $fromid = $update['update']['message']['from_id'];
-        $userid = cache_get_info($update, $MadelineProto, $fromid)['bot_api_id'];
+        $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
+            $msg_id = $update['update']['message']['id'];
+            $default = array(
+            'peer' => $userid,
+            'reply_to_msg_id' => $msg_id,
+            );
             if (!empty($title) && !empty($about)) {
                 $channelRoleModerator = ['_' => 'channelRoleModerator', ];
                 $newgroup = $MadelineProto->channels->createChannel(
@@ -38,7 +42,6 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
                     getenv('MASTER_USERNAME')
                 )
                 ['bot_api_id'];
-                var_dump($newgroup);
                 $channel_id = -100 . $newgroup['updates'][1]['channel_id'];
                 $invite_master = $MadelineProto->channels->inviteToChannel(
                     ['channel' => $channel_id,
@@ -53,13 +56,11 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
             } else {
                 $message = "You MUST provide a title and description for your ".
                 "new group /newgroup title description";
-                $entity = [['_' => 'messageEntityCode',
-                            'offset' => 70,
-                            'length' => 17]];
-                $msg_id = $update['update']['message']['id'];
+                $entity = create_style('code', 70, 17);
+                $default['message'] = $message;
+                $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $userid, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message, 'entities' => $entity]
+                    $default
                 );
                 if (isset($sentMessage)) {
                     \danog\MadelineProto\Logger::log($sentMessage);
@@ -81,7 +82,6 @@ function export_new_invite($update, $MadelineProto)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id
             );
-        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
@@ -148,7 +148,6 @@ function public_toggle($update, $MadelineProto, $msg)
                         } catch (Exception $e) {
                             $message = "I couldn't change the public settings";
                             $default['message'] = $message;
-                            echo($e);
                         }
                     } else {
                         $message = "Use /public [on/off] to change this settings.";
@@ -166,7 +165,7 @@ function public_toggle($update, $MadelineProto, $msg)
     }
 }
 
-function invite_user($update, $MadelineProto, $msg_str)
+function invite_user($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
@@ -182,37 +181,13 @@ function invite_user($update, $MadelineProto, $msg_str)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                    if ($msg_str) {
-                        $id = catch_id($update, $MadelineProto, $msg_str);
+                    if ($msg) {
+                        $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
                             $username = $id[2];
-                        } else {
-                            if (!isset($userid)) {
-                                $first_char = substr($msg_str, 0, 1);
-                                if (preg_match_all('/@/', $first_char, $matches)) {
-                                    $id = catch_id($update, $MadelineProto, $msg_str);
-                                    if ($id[0]) {
-                                        $userid = $id[1];
-                                        $username = $id[2];
-                                    } else {
-                                        $message = "I can't find a user called ".
-                                        "$msg_str. Who's that?";
-                                        $default['message'] = $message;
-                                    }
-                                } else {
-                                    $message = "I don't know anyone with the name ".
-                                    $msg_str;
-                                    $default['message'] = $message;
-                                }
-                            }
                         }
                         if (isset($userid)) {
-                            $info = cache_get_info(
-                                $update,
-                                $MadelineProto,
-                                $userid
-                            );
                             try {
                                 $inviteuser = $MadelineProto->channels->inviteToChannel(
                                     ['channel' => $peer, 'users' => [$userid] ]
@@ -221,21 +196,19 @@ function invite_user($update, $MadelineProto, $msg_str)
                                 $message = "I can't add $username. Either I'm not an ".
                                 "admin or their privacy settings prevent me from ".
                                 "doing so.";
-                                $entity = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 12,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid
-                                ]];
+                                $entity = create_mention(12, $username, $userid);
                                 $default['message'] = $message;
                                 $default['entities'] = $entity;
                             }
+                        } else {
+                            $message = "I don't know anyone with the name ".
+                            $msg;
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = "Use /invite @username to ".
                         "invite someone to this chat!";
-                        $code = [['_' => 'messageEntityItalic', 'offset' => 12,
-                        'length' => 9]];
+                        $code = create_style('italic', 12, 9);
                         $default['message'] = $message;
                         $default['entities'] = $code;
                     }

@@ -41,8 +41,10 @@ require_once 'time.php';
 require_once 'threading.php';
 require_once 'weather.php';
 require_once 'who_functions.php';
-$MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-Requests::register_autoloader();
+if (file_exists('session.madeline')) {
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+    Requests::register_autoloader();
+}
 if (file_exists('.env')) {
     $dotenv = new Dotenv\Dotenv(__DIR__);
     $dotenv->load();
@@ -54,7 +56,7 @@ if (isset($argv[1])) {
 }
 $settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
 
-if ($MadelineProto === false) {
+if (!isset($MadelineProto)) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $checkedPhone = $MadelineProto->auth->checkPhone(
         [

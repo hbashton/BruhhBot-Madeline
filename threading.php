@@ -17,29 +17,29 @@ class NewMessage extends Thread {
                     ['message'][0], 0, 1
                 );
                 if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
-                    $msg_str = substr(
+                    $msg = substr(
                         $update['update']['message']
                         ['message'], 1
                     );
                         $msg_id = $update['update']['message']['id'];
-                        $msg_arr = explode(' ', trim($msg_str));
+                        $msg_arr = explode(' ', trim($msg));
                         switch ($msg_arr[0]) {
                     case 'time':
                         unset($msg_arr[0]);
-                        $msg_str = implode(" ", $msg_arr);
-                        getloc($update, $MadelineProto, $msg_str);
+                        $msg = implode(" ", $msg_arr);
+                        getloc($update, $MadelineProto, $msg);
                         break;
 
                     case 'weather':
                         unset($msg_arr[0]);
-                        $msg_str = implode(" ", $msg_arr);
-                        getweather($update, $MadelineProto, $msg_str);
+                        $msg = implode(" ", $msg_arr);
+                        getweather($update, $MadelineProto, $msg);
                         break;
 
                     case 'id':
                         unset($msg_arr[0]);
-                        $msg_str = implode(" ", $msg_arr);
-                        idme($update, $MadelineProto, $msg_str);
+                        $msg = implode(" ", $msg_arr);
+                        idme($update, $MadelineProto, $msg);
                         break;
                         }
                 }
@@ -66,6 +66,9 @@ class NewChannelMessage extends Thread {
                 $command = new CheckMuted($update, $MadelineProto);
                 $command->start();
                 $command->join();
+                if ($command->muted) {
+                    return;
+                }
                 $chat = parse_chat_data($update, $MadelineProto);
                 $peer = $chat['peer'];
                 $ch_id = $chat['id'];
@@ -143,29 +146,29 @@ class NewChannelMessage extends Thread {
                         0, 1
                     );
                     if (preg_match_all('/#/', $first_char, $matches)) {
-                            $msg_str = substr(
+                            $msg = substr(
                                 $update['update']['message']['message'], 1
                             );
-                            $msg_arr = explode(' ', trim($msg_str));
+                            $msg_arr = explode(' ', trim($msg));
                             getme($update, $MadelineProto, $msg_arr[0]);
                     }
                     if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
-                            $msg_str = substr(
+                            $msg = substr(
                                 $update['update']['message']['message'], 1
                             );
                             $msg_id = $update['update']['message']['id'];
-                            $msg_arr = explode(' ', trim($msg_str));
+                            $msg_arr = explode(' ', trim($msg));
                             switch ($msg_arr[0]) {
                         case 'time':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            getloc($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            getloc($update, $MadelineProto, $msg);
                             break;
 
                         case 'weather':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            getweather($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            getweather($update, $MadelineProto, $msg);
                             break;
 
                         case 'add':
@@ -182,8 +185,8 @@ class NewChannelMessage extends Thread {
 
                         case 'kick':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            kickhim($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            kickhim($update, $MadelineProto, $msg);
                             break;
 
                         case 'kickme':
@@ -196,52 +199,48 @@ class NewChannelMessage extends Thread {
 
                         case 'ban':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            banme($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            banme($update, $MadelineProto, $msg);
                             break;
 
                         case 'banall':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            banall($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            banall($update, $MadelineProto, $msg);
                             break;
 
                         case 'mute':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            if ($msg_str == "all") {
+                            $msg = implode(" ", $msg_arr);
+                            if ($msg == "all") {
                                 muteall($update, $MadelineProto);
                             } else {
-                                muteme($update, $MadelineProto, $msg_str);
+                                muteme($update, $MadelineProto, $msg);
                             }
                             break;
 
                         case 'unmute':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            if ($msg_str == "all") {
+                            $msg = implode(" ", $msg_arr);
+                            if ($msg == "all") {
                                 unmuteall($update, $MadelineProto);
                             } else {
-                                unmuteme($update, $MadelineProto, $msg_str);
+                                unmuteme($update, $MadelineProto, $msg);
                             }
                             break;
 
                         case 'mutelist':
-                            unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
                             getmutelist($update, $MadelineProto);
                             break;
 
                         case 'settings':
-                            unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
                             get_settings($update, $MadelineProto);
                             break;
 
                         case 'setflood':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            setflood($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            setflood($update, $MadelineProto, $msg);
                             break;
 
                         case 'modlist':
@@ -274,26 +273,26 @@ class NewChannelMessage extends Thread {
 
                         case 'unban':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            unbanme($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            unbanme($update, $MadelineProto, $msg);
                             break;
 
                         case 'unbanall':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            unbanall($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            unbanall($update, $MadelineProto, $msg);
                             break;
 
                         case 'promote':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            promoteme($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            promoteme($update, $MadelineProto, $msg);
                             break;
 
                         case 'demote':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            demoteme($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            demoteme($update, $MadelineProto, $msg);
                             break;
 
                         case 'save':
@@ -304,14 +303,14 @@ class NewChannelMessage extends Thread {
                                     $name = "";
                             }
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            saveme($update, $MadelineProto, $msg_str, $name);
+                            $msg = implode(" ", $msg_arr);
+                            saveme($update, $MadelineProto, $msg, $name);
                             break;
 
                         case 'pin':
                             if (isset($msg_arr[1])) {
-                                $msg_str = $msg_arr[1];
-                                if ($msg_str = "silent") {
+                                $msg = $msg_arr[1];
+                                if ($msg = "silent") {
                                     $silent = true;
                                 } else {
                                     $silent = false;
@@ -324,8 +323,8 @@ class NewChannelMessage extends Thread {
 
                         case 'id':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            idme($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            idme($update, $MadelineProto, $msg);
                             break;
 
                         case 'setphoto':
@@ -334,32 +333,32 @@ class NewChannelMessage extends Thread {
 
                         case 'public':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            public_toggle($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            public_toggle($update, $MadelineProto, $msg);
                             break;
 
                         case 'invite':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            invite_user($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            invite_user($update, $MadelineProto, $msg);
                             break;
 
                         case 'addadmin':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            addadmin($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            addadmin($update, $MadelineProto, $msg);
                             break;
 
                         case 'rmadmin':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            rmadmin($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            rmadmin($update, $MadelineProto, $msg);
                             break;
 
                         case 'setname':
                             unset($msg_arr[0]);
-                            $msg_str = implode(" ", $msg_arr);
-                            set_chat_title($update, $MadelineProto, $msg_str);
+                            $msg = implode(" ", $msg_arr);
+                            set_chat_title($update, $MadelineProto, $msg);
                             break;
 
                         case 'newlink':
@@ -432,7 +431,6 @@ class NewChannelMessageAction extends Thread {
         $MadelineProto = $this->MadelineProto;
         switch ($update['update']['message']['action']['_']) {
         case 'messageActionChatAddUser':
-            var_dump(true, true, true, true, true);
             NewChatAddUser($update, $MadelineProto);
         break;
         case 'messageActionChatJoinedByLink':
@@ -521,11 +519,8 @@ function NewChatAddUser($update, $MadelineProto)
                 API->datacenter->authorization['user']['id'];
             if ($mention !== $bot_id && empty($default['message'])) {
                     $message = "Hi $username, welcome to $title";
-                    $default['entities'] =
-                    [['_' => 'inputMessageEntityMentionName',
-                    'offset' => 3,
-                    'length' => strlen($username),
-                    'user_id' => $mention]];
+                    $entity = create_mention(3, $username, $mention);
+                    $default['entities'] = $entity;
                     $default['message'] = $message;
                     $sentMessage = $MadelineProto->
                     messages->sendMessage($default);
@@ -549,13 +544,13 @@ function NewChatAddUser($update, $MadelineProto)
                             $id = $key['user']['id'];
                         }
                         if ($adminid !== $id) {
-                            $master_present = 'false';
+                            $master_present = false;
                         } else {
-                            $master_present = 'true';
+                            $master_present = true;
                             break;
                         }
                     }
-                    if ($master_present == 'false') {
+                    if ($master_present) {
                         $leave = $MadelineProto->
                         channels->leaveChannel(
                             ['channel' => $ch_id]
@@ -643,11 +638,8 @@ function NewChatJoinedByLink($update, $MadelineProto)
                 API->datacenter->authorization['user']['id'];
             if ($mention !== $bot_id && empty($default['message'])) {
                     $message = "Hi $username, welcome to $title";
-                    $default['entities'] =
-                    [['_' => 'inputMessageEntityMentionName',
-                    'offset' => 3,
-                    'length' => strlen($username),
-                    'user_id' => $mention]];
+                    $entity = create_mention(3, $username, $mention);
+                    $default['entities'] = $entity;
                     $default['message'] = $message;
                     $sentMessage = $MadelineProto->
                     messages->sendMessage($default);
@@ -671,14 +663,14 @@ function NewChatJoinedByLink($update, $MadelineProto)
                             $id = $key['user']['id'];
                         }
                         if ($adminid !== $id) {
-                            $master_present = 'false';
+                            $master_present = false;
                         } else {
-                            $master_present = 'true';
+                            $master_present = true;
                             break;
                         }
                     }
                 }
-                if ($master_present == 'false') {
+                if ($master_present) {
                     $leave = $MadelineProto->
                     channels->leaveChannel(
                         ['channel' => $ch_id]
@@ -704,27 +696,24 @@ function NewChatDeleteUser($update, $MadelineProto)
             $username = $id[2];
             $mention = $id[1];
         }
+        $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
-        $msg_id = $update['update']['message']['id'];
         $ch_id = $chat['id'];
         if (is_moderated($ch_id)) {
             $bot_id = $MadelineProto->
             API->datacenter->authorization['user']['id'];
             if ($mention !== $bot_id && empty($default['message'])) {
-                $userid_ = $update
+                $userid = $update
                 ['update']['message']['action']['user_id'];
+                $entity = create_mention(8, $username, $mention);
                 $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'entities' => [['_' =>
-                'inputMessageEntityMentionName',
-                'offset' => 8,
-                'length' => strlen($username),
-                'user_id' => $mention]]
+                'entities' => $entity
                 );
-                $id = catch_id($update, $MadelineProto, $userid_);
+                $id = catch_id($update, $MadelineProto, $userid);
                 if ($id[0]) {
                     $username = $id[2];
                     $mention = $id[1];
@@ -741,15 +730,17 @@ function NewChatDeleteUser($update, $MadelineProto)
                     );
                     \danog\MadelineProto\Logger::log($leave);
                 } else {
-                    $message = "Goodbye $username ".":((((";
-                    $default['message'] = $message;
-                    $sentMessage = $MadelineProto->
-                    messages->sendMessage(
-                        $default
-                    );
-                    \danog\MadelineProto\Logger::log(
-                        $sentMessage
-                    );
+                    try {
+                        $message = "Goodbye $username :((((";
+                        $default['message'] = $message;
+                        $sentMessage = $MadelineProto->
+                        messages->sendMessage(
+                            $default
+                        );
+                        \danog\MadelineProto\Logger::log(
+                            $sentMessage
+                        );
+                    } catch (Exception $e) {}
                 }
             }
         }
@@ -793,6 +784,9 @@ class CheckMuted extends Thread {
                                     $thred->start();
                                     $thred->join();
                                 } catch (Exception $e) {}
+                                $this->muted = true;
+                            } else {
+                                $this->muted = false;
                             }
                         }
                     }

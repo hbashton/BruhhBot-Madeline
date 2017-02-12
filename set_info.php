@@ -115,7 +115,7 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
     }
 }
 
-function set_chat_title($update, $MadelineProto, $msg_str)
+function set_chat_title($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
@@ -138,16 +138,15 @@ function set_chat_title($update, $MadelineProto, $msg_str)
                     true
                 )
                 ) {
-                    if (!empty($msg_str)) {
+                    if (!empty($msg)) {
                         try {
                             $editTitle = $MadelineProto->channels->editTitle(
-                                ['channel' => $ch_id, 'title' => $msg_str ]
+                                ['channel' => $ch_id, 'title' => $msg ]
                             );
                             \danog\MadelineProto\Logger::log($editTitle);
-                            $message = "Chat Title successfully changed to $msg_str";
-                            $entity = [['_' => 'messageEntityBold',
-                                'offset' => strlen($message) - strlen($msg_str),
-                                'length' => strlen($msg_str)]];
+                            $message = "Chat Title successfully changed to $msg";
+                            $len = strlen($message) - strlen($msg);
+                            $entity = create_style('bold', $len, $msg);
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         } catch (Exception $e) {

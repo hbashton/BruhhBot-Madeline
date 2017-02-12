@@ -22,16 +22,12 @@ function add_group($update, $MadelineProto)
                 file_put_contents('chatlist.json', json_encode($chatlist));
                 $message = "$title has been added to my records!".
                 " You may now use my full functionality";
-                $entity = [['_' => 'messageEntityBold',
-                'offset' => 0,
-                'length' => strlen($title) ]];
+                $entity = create_style('bold', 0, $title);
                 $default['message'] = $message;
                 $default['entities'] = $entity;
             } else {
                 $message = "$title is already in my records :)";
-                $entity = [['_' => 'messageEntityBold',
-                'offset' => 0,
-                'length' => strlen($title) ]];
+                $entity = create_style('bold', 0, $title);
                 $default['message'] = $message;
                 $default['entities'] = $entity;
             }
@@ -74,16 +70,12 @@ function rm_group($update, $MadelineProto)
                 }
                 file_put_contents('chatlist.json', json_encode($chatlist));
                 $message = "$title has been removed from my records";
-                $entity = [['_' => 'messageEntityBold',
-                'offset' => 0,
-                'length' => strlen($title) ]];
+                $entity = create_style('bold', 0, $title);
                 $default['message'] = $message;
                 $default['entities'] = $entity;
             } else {
                 $message = "$title is not currently in my records.";
-                $entity = [['_' => 'messageEntityBold',
-                'offset' => 0,
-                'length' => strlen($title) ]];
+                $entity = create_style('bold', 0, $title);
                 $default['message'] = $message;
                 $default['entities'] = $entity;
             }

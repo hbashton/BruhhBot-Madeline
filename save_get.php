@@ -64,28 +64,25 @@ function saveme($update, $MadelineProto, $msg, $name)
                     $saved[$ch_id][$name] = $msg;
                     file_put_contents('saved.json', json_encode($saved));
                     $message = "Message $name has been saved";
-                    $code = [['_' => 'messageEntityBold', 'offset' => 8,
-                    'length' => strlen($name)]];
+                    $entity = create_style('code', 8, $name);
                     $default['message'] = $message;
-                    $default['entities'] = $code;
+                    $default['entities'] = $entity;
                 } else {
                     $saved[$ch_id] = [];
                     $saved[$ch_id]["from"] = [];
                     $saved[$ch_id][$name] = $msg;
                     file_put_contents('saved.json', json_encode($saved));
                     $message = "Message $name has been saved";
-                    $code = [['_' => 'messageEntityBold', 'offset' => 8,
-                    'length' => strlen($name)]];
+                    $entity = create_style('code', 8, $name);
                     $default['message'] = $message;
-                    $default['entities'] = $code;
+                    $default['entities'] = $entity;
                 }
             } else {
                 $message = "Use /save name message to save a message for later!";
-                $code = [['_' => 'messageEntityBold', 'offset' => 10,
-                    'length' => 4], ['_' => 'messageEntityBold', 'offset' => 15,
-                    'length' => 7]];
+                $entity = create_style('bold', 10, 4);
+                $entity[] = create_style('bold', 15, 7);
                 $default['message'] = $message;
-                $default['entities'] = $code;
+                $default['entities'] = $entity;
             }
             if (isset($default['message'])) {
                 $sentMessage = $MadelineProto->messages->sendMessage(
@@ -130,7 +127,7 @@ function getme($update, $MadelineProto, $name)
         if (array_key_exists($ch_id, $saved)) {
             foreach ($saved[$ch_id] as $i => $ii) {
                 if ($i == $name) {
-                    $message = $name.":"."\r\n".$saved[$ch_id][$i];
+                    $message = "$name:\r\n".$saved[$ch_id][$i];
                     $default['message'] = $message;
                 }
             }
@@ -146,8 +143,7 @@ function getme($update, $MadelineProto, $name)
                 }
             }
             if (isset($message)) {
-                $entity = [['_' => 'messageEntityBold', 'offset' => 0,
-                'length' => strlen($name)]];
+                $entity = create_style('bold', 0, $name);
                 $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
@@ -209,10 +205,9 @@ function savefrom($update, $MadelineProto, $name)
                 }
                 file_put_contents('saved.json', json_encode($saved));
                 $message = "Message ".$name." has been saved";
-                $code = [['_' => 'messageEntityBold', 'offset' => 8,
-                'length' => strlen($name)]];
+                $style = create_style('bold', 8, $name);
                 $default['message'] = $message;
-                $default['entities'] = $code;
+                $default['entities'] = $style;
             } else {
                 $saved[$ch_id] = [];
                 $saved[$ch_id]["from"] = [];
@@ -221,17 +216,14 @@ function savefrom($update, $MadelineProto, $name)
                 $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
                 file_put_contents('saved.json', json_encode($saved));
                 $message = "Message ".$name." has been saved";
-                $code = [['_' => 'messageEntityBold', 'offset' => 8,
-                'length' => strlen($name)]];
+                $style = create_style('bold', 8, $name);
                 $default['message'] = $message;
-                $default['entities'] = $code;
+                $default['entities'] = $style;
             }
         } else {
             $message = "Save a message by reply with /save from name";
-            $code = [['_' => 'messageEntityCode', 'offset' => 40,
-            'length' => 4]];
-            $code[] = ['_' => 'messageEntityCode', 'offset' => 29,
-            'length' => 10];
+            $code = create_style('code', 40, 4);
+            $code[] = create_style('code', 29, 10);
             $default['message'] = $message;
             $default['entities'] = $code;
         }

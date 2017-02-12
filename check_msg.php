@@ -147,11 +147,7 @@ function check_flood($update, $MadelineProto)
                                         );
                                         $message = "Flooding is not allowed here ".
                                         $username;
-                                        $mention = [[
-                                            '_' => 'inputMessageEntityMentionName',
-                                            'offset' => 29,
-                                            'length' => strlen($username),
-                                            'user_id' => $fromid]];
+                                        $mention = create_mention(29, $username, $fromid);
                                         if (isset($message)) {
                                             $sentMessage = $MadelineProto->
                                             messages->sendMessage(

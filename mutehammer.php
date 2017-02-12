@@ -34,55 +34,12 @@ function muteme($update, $MadelineProto, $msg, $send = true)
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                     if ($msg) {
-                        if (is_numeric($msg)) {
-                            $userid_ = (int) $msg;
-                            $id = catch_id($update, $MadelineProto, $userid_);
-                            if ($id[0]) {
-                                $userid = $id[1];
-                            }
-                        } else {
-                            if (array_key_exists(
-                                'entities',
-                                $update['update']['message']
-                            )
-                            ) {
-                                foreach ($update['update']['message']['entities']
-                                    as $key
-                                ) {
-                                    if (array_key_exists('user_id', $key)) {
-                                        $userid = $key['user_id'];
-                                        $id = catch_id(
-                                            $update,
-                                            $MadelineProto,
-                                            $userid
-                                        );
-                                        break;
-                                    } else {
-                                        $message = "I don't know anyone with the name ".
-                                        $msg;
-                                    }
-                                }
-                            }
-                            if (!isset($userid)) {
-                                $first_char = substr($msg, 0, 1);
-                                if (preg_match_all('/@/', $first_char, $matches)) {
-                                    $id = catch_id($update, $MadelineProto, $msg);
-                                    if ($id[0]) {
-                                        $userid = $id[1];
-                                    } else {
-                                        $message = "I can't find a user called ".
-                                        "$msg. Who's that?";
-                                        $default['message'] = $message;
-                                    }
-                                } else {
-                                    $message = "I don't know anyone with the name ".
-                                    $msg;
-                                    $default['message'] = $message;
-                                }
-                            }
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
                         }
                         if (isset($userid)) {
-                            $banmod = "You can't mute your superiors";
+                            $banmod = "You can't mute Moderators";
                             if (!is_admin_mod(
                                 $update,
                                 $MadelineProto,
@@ -97,18 +54,14 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                     $userid
                                 );
                                 if (!$info) {
-                                    $message = "$userid is not a valid ID";
+                                    $message = "$userid is not a person I know of";
                                     $default['message'] = $message;
                                 } else {
                                     $username = $id[2];
                                     check_json_array('mutelist.json', $ch_id);
                                     $file = file_get_contents("mutelist.json");
                                     $mutelist = json_decode($file, true);
-                                    $mention = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 5,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid]];
+                                    $mention = create_mention(5, $username, $userid);
                                     if (array_key_exists($ch_id, $mutelist)) {
                                         if (!in_array($userid, $mutelist[$ch_id])) {
                                             array_push($mutelist[$ch_id], $userid);
@@ -116,11 +69,13 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                                 'mutelist.json',
                                                 json_encode($mutelist)
                                             );
-                                            $message = "User $username has been muted";
+                                            $message = "User $username has been ".
+                                            "stripped of their right to speak freely";
                                             $default['message'] = $message;
                                             $default['entities'] = $mention;
                                         } else {
-                                            $message = "User ".$username." already shut up";
+                                            $message = "User $username is already ".
+                                            "quiet";
                                             $default['message'] = $message;
                                             $default['entities'] = $mention;
 
@@ -132,7 +87,7 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                             'mutelist.json',
                                             json_encode($mutelist)
                                         );
-                                        $message = "User ".$username." has been muted";
+                                        $message = "User $username has been muted";
                                         $default['message'] = $message;
                                         $default['entities'] = $mention;
                                     }
@@ -141,8 +96,7 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                         }
                     } else {
                         $message = "Use /mute @username to make someone shut up";
-                        $code = [['_' => 'messageEntityCode', 'offset' => 4,
-                        'length' => 15]];
+                        $code = create_style('code', 4, 15);
                         $default['entities'] = $code;
                         $default['message'] = $message;
                     }
@@ -176,60 +130,16 @@ function unmuteme($update, $MadelineProto, $msg)
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                     if ($msg) {
-                        if (is_numeric($msg)) {
-                            $userid_ = (int) $msg;
-                            $id = catch_id($update, $MadelineProto, $userid_);
-                            if ($id[0]) {
-                                $userid = $id[1];
-                            }
-                        } else {
-                            if (array_key_exists(
-                                'entities',
-                                $update['update']['message']
-                            )
-                            ) {
-                                foreach ($update['update']['message']['entities']
-                                    as $key
-                                ) {
-                                    if (array_key_exists('user_id', $key)) {
-                                        $userid = $key['user_id'];
-                                        $id = catch_id($update, $MadelineProto, $userid);
-                                        break;
-                                    } else {
-                                        $message = "I don't know anyone with the name ".
-                                        $msg;
-                                        $default['message'] = $message;
-                                    }
-                                }
-                            }
-                            if (!isset($userid)) {
-                                $first_char = substr($msg, 0, 1);
-                                if (preg_match_all('/@/', $first_char, $matches)) {
-                                    $id = catch_id($update, $MadelineProto, $msg);
-                                    if ($id[0]) {
-                                        $userid = $id[1];
-                                    } else {
-                                        $message = "I can't find a user called ".
-                                        "$msg. Who's that?";
-                                        $default['message'] = $message;
-                                    }
-                                } else {
-                                    $message = "I don't know anyone with the name ".
-                                    $msg;
-                                    $default['message'] = $message;
-                                }
-                            }
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
                         }
                         if (isset($userid)) {
                             $username = $id[2];
                             check_json_array('mutelist.json', $ch_id);
                             $file = file_get_contents("mutelist.json");
                             $mutelist = json_decode($file, true);
-                            $mention = [[
-                            '_' => 'inputMessageEntityMentionName',
-                            'offset' => 5,
-                            'length' => strlen($username),
-                            'user_id' => $userid]];
+                            $mention = create_mention(5, $username, $userid);
                             if (array_key_exists($ch_id, $mutelist)) {
                                 if (in_array($userid, $mutelist[$ch_id])) {
                                     if (($key = array_search(
@@ -243,16 +153,27 @@ function unmuteme($update, $MadelineProto, $msg)
                                         'mutelist.json',
                                         json_encode($mutelist)
                                     );
-                                    $message = "User $username has been unmuted";
+                                    $message = "User $username has regained their ".
+                                    "right of free speach....as long as they speak ".
+                                    "kindly of the Dictator.";
+                                    $len = strlen($message) - 8;
+                                    $entity = create_style(
+                                        'bold',
+                                        $len,
+                                        $title,
+                                        false
+                                    );
+                                    $mention[] = $entity;
                                     $default['message'] = $message;
                                     $default['entities'] = $mention;
                                 } else {
-                                    $message = "User ".$username." can already talk.";
+                                    $message = "User $username can already speak ".
+                                    "freely";
                                     $default['message'] = $message;
                                     $default['entities'] = $mention;
                                 }
                             } else {
-                                $message = "User $username can already talk";
+                                $message = "User $username can already speak freely";
                                 $default['message'] = $message;
                                 $default['entities'] = $mention;
                             }
@@ -260,8 +181,7 @@ function unmuteme($update, $MadelineProto, $msg)
                     } else {
                         $message = "Use /unmute @username to unban someone from this ".
                         "chat!";
-                        $code = [['_' => 'messageEntityCode', 'offset' => 4,
-                        'length' => 17]];
+                        $code = create_style('code', 4, 17);
                         $default['message'] = $message;
                         $default['entities'] = $code;
                     }
@@ -293,9 +213,7 @@ function muteall($update, $MadelineProto, $send = true)
             'reply_to_msg_id' => $msg_id,
             );
         $userid = "all";
-        $mention = [['_' => 'messageEntityBold',
-        'offset' => 0,
-        'length' => 8]];
+        $style = create_style('bold', 0, 8);
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
@@ -304,12 +222,7 @@ function muteall($update, $MadelineProto, $send = true)
                     $mutelist = json_decode($file, true);
                     if (array_key_exists($ch_id, $mutelist)) {
                         if (!in_array($userid, $mutelist[$ch_id])) {
-                            $mention = [['_' => 'messageEntityBold',
-                            'offset' => 0,
-                            'length' => 8]];
-                            $mention[] = ['_' => 'messageEntityBold',
-                            'offset' => 58,
-                            'length' => 13];
+                            $style[] = create_style('bold', 58, 13, false);
                             array_push($mutelist[$ch_id], $userid);
                             file_put_contents(
                                 'mutelist.json',
@@ -318,18 +231,13 @@ function muteall($update, $MadelineProto, $send = true)
                             $message = "Everyone has lost the right of free ".
                             "speech.\r\nThis is now a dictatorship.";
                             $default['message'] = $message;
-                            $default['entities'] = $mention;
+                            $default['entities'] = $style;
                         } else {
-                            $mention = [['_' => 'messageEntityBold',
-                            'offset' => 17,
-                            'length' => 8],
-                            ['_' => 'messageEntityBold',
-                            'offset' => 27,
-                            'length' => 8]];
+                            $style = create_style('bold', 17, 8);
                             $message = "I am the current dictator. ".
                             "Everyone has already lost their right to talk.";
                             $default['message'] = $message;
-                            $default['entities'] = $mention;
+                            $default['entities'] = $style;
                         }
                     } else {
                         $mutelist[$ch_id] = [];
@@ -338,10 +246,11 @@ function muteall($update, $MadelineProto, $send = true)
                             'mutelist.json',
                              json_encode($mutelist)
                         );
+                        $style[] = create_style('bold', 58, 13, false);
                         $message = "Everyone has lost the right of free ".
                         "speech.\r\nThis is now a dictatorship.";
                         $default['message'] = $message;
-                        $default['entities'] = $mention;
+                        $default['entities'] = $style;
                     }
                 }
             }
@@ -375,9 +284,7 @@ function unmuteall($update, $MadelineProto)
                     check_json_array('mutelist.json', $ch_id);
                     $file = file_get_contents("mutelist.json");
                     $mutelist = json_decode($file, true);
-                    $mention = [['_' => 'messageEntityBold',
-                    'offset' => 0,
-                    'length' => 12]];
+                    $style = create_style('bold', 0, 12);
                     if (array_key_exists($ch_id, $mutelist)) {
                         if (in_array($userid, $mutelist[$ch_id])) {
                             if (($key = array_search(
@@ -391,34 +298,27 @@ function unmuteall($update, $MadelineProto)
                                 'mutelist.json',
                                 json_encode($mutelist)
                             );
-                            $mention[] =
-                            ['_' => 'messageEntityBold',
-                            'offset' => 54,
-                            'length' => 8];
+                            $style[] = create_style('bold', 54, 8, false);
                             $message = "The dictator has been ousted from ".
                             "power by a militia. ".
                             "Everyone now has the right of free speech";
                             $default['message'] = $message;
-                            $default['entities'] = $mention;
+                            $default['entities'] = $style;
                         } else {
-                            $mention[] = ['_' => 'messageEntityBold',
-                            'offset' => 41,
-                            'length' => 8];
+                            $style[] = create_style('bold', 41, 9, false);
                             $message = "The dictator is nowhere to be ".
                             "found, and everyone already has the right to ".
                             "speak freely.";
                             $default['message'] = $message;
-                            $default['entities'] = $mention;
+                            $default['entities'] = $style;
                         }
                     } else {
-                        $mention[] = ['_' => 'messageEntityBold',
-                        'offset' => 41,
-                        'length' => 8];
+                        $style[] = create_style('bold', 41, 9, false);
                         $message = "The dictator is nowhere to be ".
                         "found, and everyone already has the right to ".
                         "speak freely.";
                         $default['message'] = $message;
-                        $default['entities'] = $mention;
+                        $default['entities'] = $style;
                     }
                 }
             }
@@ -448,46 +348,38 @@ function getmutelist($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id
         );
         if (is_moderated($ch_id)) {
-            $message = "Muted Users for $title:"."\r\n";
-            $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
-            'length' => 16 + strlen($title) ];
+            $message = "Muted Users for $title:\r\n";
+            $style = create_style('bold', 0, $message, false);
             check_json_array('mutelist.json', $ch_id);
             $file = file_get_contents("mutelist.json");
             $mutelist = json_decode($file, true);
             if (array_key_exists($ch_id, $mutelist)) {
                 if (!in_array('all', $mutelist[$ch_id])) {
                     foreach ($mutelist[$ch_id] as $i => $key) {
-                        $user = cache_get_info($update, $MadelineProto, (int) $key);
                         $username = catch_id($update, $MadelineProto, $key)[2];
-                        if (!isset($entity_)) {
+                        if (!isset($entity)) {
                             $offset = strlen($message);
-                            $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                            $offset, 'length' => strlen($username), 'user_id' =>
-                            $key]];
-                            $length = $offset + strlen($username) + 2;
-                            $message = $message.$username."\r\n";
+                            $entity = create_mention($offset, $username, $key);
+                            $length = $offset + strlen($username) + strlen($key) + 5;
+                            $message = $message."$username [$key]"."\r\n";
                         } else {
-                            $entity_[] = ['_' =>
-                            'inputMessageEntityMentionName', 'offset' => $length,
-                            'length' => strlen($username), 'user_id' => $key];
-                            $length = $length + 2 + strlen($username);
-                            $message = $message.$username."\r\n";
+                            $entity[] = create_mention($length, $username, $key, false);
+                            $length = $length + 5 + strlen($username) + strlen($key);
+                            $message = $message."$username [$key]"."\r\n";
                         }
                     }
                 } else {
-                    $entity_ = [['_' => 'messageEntityBold', 'offset' => 0,
-                    'length' => 12]];
+                    $entity = create_style('bold', 0, 12);
                     $default['message'] = "The Dictator reigns supreme.";
-                    $default['entities'] = $entity_;
+                    $default['entities'] = $entity;
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
                     );
                 }
             }
-            if (!isset($entity_)) {
-                $entity = [['_' => 'messageEntityBold', 'offset' => 30,
-                'length' => strlen($title) ]];
-                $message = "There are no muted users for ".$title;
+            if (!isset($entity)) {
+                $entity = create_style('bold', 30, $title);
+                $message = "There are no muted users for $title";
                 $default['message'] = $message;
                 $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(
@@ -495,9 +387,7 @@ function getmutelist($update, $MadelineProto)
                 );
             }
             if (!isset($sentMessage)) {
-                $entity = $entity_;
-                $entity[] = $messageEntityBold;
-                unset($entity_);
+                $entity[] = $style;
                 $default['message'] = $message;
                 $default['entities'] = $entity;
                 $sentMessage = $MadelineProto->messages->sendMessage(

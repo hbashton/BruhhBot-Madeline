@@ -26,48 +26,33 @@ function get_settings($update, $MadelineProto)
                         if (!empty($message)) {
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": Yes\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 5,
-                                'length' => 3,
-                            ];
+                            $len = strlen($message) - 5;
+                            $entity[] = create_style('code', $len, 3, false);
                         } else {
                             $message = "Lock ".$cfg['settings_template'][$key].
                             ": Yes\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 5,
-                                'length' => 3,
-                                ];
+                            $len = strlen($message) - 5;
+                            $entity[] = create_style('code', $len, 3, false);
                         }
                     } else {
                         if (!empty($message)) {
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": No\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 5,
-                                'length' => 3,
-                                ];
+                            $len = strlen($message) - 5;
+                            $entity[] = create_style('code', $len, 3, false);
                         } else {
                             $message = "Lock ".$cfg['settings_template'][$key].
                             ": No\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 5,
-                                'length' => 3,
-                                ];
+                            $len = strlen($message) - 5;
+                            $entity[] = create_style('code', $len, 3, false);
                         }
                     }
                 }
                 if (in_array("flood", $locked[$ch_id])) {
                     $message = $message."Floodlimit: ".$locked[$ch_id]['floodlimit'];
-                    $entity[] = [
-                        '_' => 'messageEntityCode',
-                        'offset' =>
-                        strlen($message) - strlen($locked[$ch_id]['floodlimit']),
-                        'length' => strlen($locked[$ch_id]['floodlimit']),
-                        ];
+                    $len = strlen($message) - strlen($locked[$ch_id]['floodlimit']);
+                    $len2 = strlen($locked[$ch_id]['floodlimit']);
+                    $entity[] = create_style('code', $len, $len2, false);
                 }
             } else {
                 $locked[$ch_id] = [];
@@ -77,49 +62,34 @@ function get_settings($update, $MadelineProto)
                         if (!empty($message)) {
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": Yes\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 4,
-                                'length' => 3,
-                            ];
+                            $len = strlen($message) - 4;
+                            $entity[] = create_style('code', $len, 3, false);
 
                         } else {
                             $message = "Lock ".$cfg['settings_template'][$key].
                             ": Yes\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 4,
-                                'length' => 3,
-                                ];
+                            $len = strlen($message) - 4;
+                            $entity[] = create_style('code', $len, 3, false);
                         }
                     } else {
                         if (!empty($message)) {
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": No\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 3,
-                                'length' => 2,
-                                ];
+                            $len = strlen($message) - 3;
+                            $entity[] = create_style('code', $len, 2, false);
                         } else {
                             $message = "Lock ".$cfg['settings_template'][$key].
                             ": No\r\n";
-                            $entity[] = [
-                                '_' => 'messageEntityCode',
-                                'offset' => strlen($message) - 3,
-                                'length' => 2,
-                                ];
+                            $len = strlen($message) - 3;
+                            $entity[] = create_style('code', $len, 2, false);
                         }
                     }
                 }
                 if (in_array("flood", $locked[$ch_id])) {
                     $message = $message."Floodlimit: ".$locked[$ch_id]['floodlimit'];
-                    $entity[] = [
-                        '_' => 'messageEntityCode',
-                        'offset' =>
-                        strlen($message) - strlen($locked[$ch_id]['floodlimit']),
-                        'length' => strlen($locked[$ch_id]['floodlimit']),
-                        ];
+                    $len = strlen($message) - strlen($locked[$ch_id]['floodlimit']);
+                    $len2 = strlen($locked[$ch_id]['floodlimit']);
+                    $entity[] = create_style('code', $len, $len2, false);
                 }
             }
             if (isset($entity)) {

@@ -31,7 +31,6 @@ function addadmin($update, $MadelineProto, $msg)
             'reply_to_msg_id' => $msg_id,
             );
         if (is_moderated($ch_id)) {
-            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto, $mods, true)) {
                     $id = catch_id($update, $MadelineProto, $msg);
@@ -52,13 +51,10 @@ function addadmin($update, $MadelineProto, $msg)
                                     ['channel' => $peer, 'user_id' => $userid,
                                     'role' => $channelRoleModerator ]
                                 );
-                                $entity = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 0,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid
-                                ]];
-                                $message = "$username is now an admin!!!!!";
+                                $entity = create_mention(0, $username, $userid);
+                                $message = "$username is now an admin of $title";
+                                $len = strlen($message) - strlen($title);
+                                $entity[] = create_style('bold', $len, $title, false);
                                 $default['message'] = $message;
                                 $default['entities'] = $entity;
                                 \danog\MadelineProto\Logger::log($editadmin);
@@ -96,8 +92,6 @@ function rmadmin($update, $MadelineProto, $msg)
             'reply_to_msg_id' => $msg_id,
             );
         if (is_moderated($ch_id)) {
-
-            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto, $mods, true)) {
                     $id = catch_id($update, $MadelineProto, $msg);
@@ -117,13 +111,11 @@ function rmadmin($update, $MadelineProto, $msg)
                                 'role' => $channelRoleEmpty ]
                             );
                             \danog\MadelineProto\Logger::log($editadmin);
-                            $entity = [[
-                                    '_' => 'inputMessageEntityMentionName',
-                                    'offset' => 0,
-                                    'length' => strlen($username),
-                                    'user_id' => $userid
-                                ]];
-                            $message = "$username is..no longer an admin. I am sorry";
+                            $entity = create_mention(0, $username, $userid);
+                            $message = "$username is no longer an admin of $title.".
+                            " I am sorry";
+                            $len = strlen($message) - strlen($title) - 12;
+                            $entity[] = create_style('bold', $len, $title, false);
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         } catch (Exception $e) {
@@ -145,7 +137,7 @@ function rmadmin($update, $MadelineProto, $msg)
         }
     }
 }
-function idme($update, $MadelineProto, $msg_arr)
+function idme($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
@@ -166,51 +158,20 @@ function idme($update, $MadelineProto, $msg_arr)
         'reply_to_msg_id' => $msg_id,
         );
     if (isset($cont)) {
-        $first_char = substr($msg_arr, 0, 1);
-        if (preg_match_all('/@/', $first_char, $matches)) {
-            $id = catch_id($update, $MadelineProto, $msg_arr);
+        if (!empty($msg)) {
+            $id = catch_id($update, $MadelineProto, $msg);
             if ($id[0]) {
                 $username = $id[2];
                 $userid = $id[1];
+                $mention = create_mention(19, $username, $userid);
                 $message = "The Telegram ID of $username is $userid";
                 $default['message'] = $message;
-            } else {
-                $message = "I can't find a user called $msg_arr. Who's that?";
+            }
+            if (!isset($message)) {
+                $message = "I can't find a user called $msg. Who's that?";
                 $default['message'] = $message;
             }
         } else {
-            if (array_key_exists('entities', $update['update']['message'])) {
-                foreach ($update['update']['message']['entities'] as $key) {
-                    if (array_key_exists('user_id', $key)) {
-                        $userid = $key['user_id'];
-                        $message = "The Telegram ID of $msg_arr is $userid";
-                        $default['message'] = $message;
-                        break;
-                    } else {
-                        $message = "I can't find a user called $msg_arr. ".
-                        "Who's that?";
-                        $default['message'] = $message;
-                    }
-                }
-            }
-            if (is_numeric($msg_arr)) {
-                $id = catch_id($update, $MadelineProto, $msg_arr);
-                if ($id[0]) {
-                    $userid = $id[1];
-                    $username = $id[2];
-                    $default['message'] = "The username of $userid is $username";
-                }
-            }
-            if (!isset($userid)) {
-                $message = "I can't find a user called $msg_arr. Who's that?";
-                $default['message'] = $message;
-            }
-        }
-        if (!isset($message)) {
-            $message = "I can't find a user called $msg_arr. Who's that?";
-            $default['message'] = $message;
-        }
-        if (empty($msg_arr)) {
             $message = $noid;
             $default['message'] = $message;
         }
@@ -237,10 +198,8 @@ function adminlist($update, $MadelineProto)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
             );
-        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        $message = "Admins for $title"."\r\n";
-        $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
-        'length' => strlen($message) ];
+        $message = "Admins for $title:\r\n";
+        $style = create_style('bold', 0, $message, false);
         $admins = cache_get_chat_info($update, $MadelineProto);
         foreach ($admins['participants'] as $key) {
             if (array_key_exists('user', $key)) {
@@ -250,7 +209,7 @@ function adminlist($update, $MadelineProto)
                     $id = $key['bot']['id'];
                 }
             }
-            $adminname = catch_id($update, $MadelineProto, $id)[2];
+            $username = catch_id($update, $MadelineProto, $id)[2];
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator") {
@@ -262,29 +221,23 @@ function adminlist($update, $MadelineProto)
                 $mod = false;
             }
             if ($mod) {
-                if (!isset($entity_)) {
+                if (!isset($entity)) {
                     $offset = strlen($message);
-                    $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                    $offset, 'length' => strlen($adminname), 'user_id' =>
-                    $id]];
-                    $length = $offset + strlen($adminname) + 2;
-                    $message = $message.$adminname."\r\n";
+                    $entity = create_mention($offset, $username, $id);
+                    $length = $offset + strlen($username) + strlen($id) + 5;
+                    $message = $message."$username [$id]\r\n";
                 } else {
-                    $entity_[] = ['_' =>
-                    'inputMessageEntityMentionName', 'offset' => $length,
-                    'length' => strlen($adminname), 'user_id' => $id];
-                    $length = $length + 2 + strlen($adminname);
-                    $message = $message.$adminname."\r\n";
+                    $entity[] = create_mention($length, $username, $id, false);
+                    $length = $length + strlen($username) + strlen($id) + 5;
+                    $message = $message."$username [$id]\r\n";
                 }
             }
         }
-        $entity = $entity_;
-        $entity[] = $messageEntityBold;
-        unset($entity_);
+        $entity[] = $style;
+        $default['message'] = $message;
+        $default['entities'] = $entity;
         $sentMessage = $MadelineProto->messages->sendMessage(
-            ['peer' => $peer, 'reply_to_msg_id' =>
-            $msg_id, 'message' => $message,
-            'entities' => $entity]
+            $default
         );
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
@@ -306,35 +259,30 @@ function modlist($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id
         );
         if (is_moderated($ch_id)) {
-            $message = "Moderators for $title:"."\r\n";
-            $messageEntityBold = ['_' => 'messageEntityBold', 'offset' => 0,
-            'length' => 15 + strlen($title) ];
+            $message = "Moderators for $title:\r\n";
+            $style = create_style('bold', 0, $message, false);
             check_json_array('promoted.json', $ch_id);
             $file = file_get_contents("promoted.json");
             $promoted = json_decode($file, true);
             if (array_key_exists($ch_id, $promoted)) {
                 foreach ($promoted[$ch_id] as $i => $key) {
-                    $user = cache_get_info($update, $MadelineProto, $key)['User'];
                     $username = catch_id($update, $MadelineProto, $key)[2];
-                    if (!isset($entity_)) {
+                    if (!isset($entity)) {
                         $offset = strlen($message);
-                        $entity_ = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                        $offset, 'length' => strlen($username), 'user_id' =>
-                        $key]];
-                        $length = $offset + strlen($username) + 2;
-                        $message = $message.$username."\r\n";
+                        $entity = create_mention($offset, $username, $key);
+                        $length = $offset + strlen($username) + strlen($key) + 5;
+                        $message = $message."$username [$key]\r\n";
                     } else {
-                        $entity_[] = ['_' =>
-                        'inputMessageEntityMentionName', 'offset' => $length,
-                        'length' => strlen($username), 'user_id' => $key];
-                        $length = $length + 2 + strlen($username);
-                        $message = $message.$username."\r\n";
+                        $entity[] = create_mention($length, $username, $key, false);
+                        $length = $length + strlen($username) + strlen($key) + 5;
+                        $message = $message."$username [$key]\r\n";
                     }
                 }
+                $default['message'] = $message;
+                $default['entities'] = $entity;
             }
-            if (!isset($entity_)) {
-                $entity = [['_' => 'messageEntityBold', 'offset' => 28,
-                'length' => strlen($title) ]];
+            if (!isset($entity)) {
+                $entity = create_style('bold', 28, $title);
                 $message = "There are no moderators for ".$title;
                 $default['message'] = $message;
                 $default['entities'] = $entity;
@@ -342,16 +290,11 @@ function modlist($update, $MadelineProto)
                     $default
                 );
             }
-            if (!isset($sentMessage)) {
-                $entity = $entity_;
-                $entity[] = $messageEntityBold;
-                unset($entity_);
-                $default['message'] = $message;
-                $default['entities'] = $entity;
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
         }
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
@@ -393,9 +336,8 @@ function pinmessage($update, $MadelineProto, $silent)
                         } catch (Exception $e) {
                         }
                     } else {
-                        $entity = [['_' => 'messageEntityCode', 'offset' => 37,
-                        'length' => 6 ], ['_' => 'messageEntityCode', 'offset' => 75,
-                        'length' => 12 ]];
+                        $entity = create_style('code', 37, 6);
+                        $entity[] = create_style('code', 75, 12, false);
                         $message = "Pin a message by replying to it with \r\n/pin\r\n".
                         "to pin it silently, reply with /pin silent";
                         $default['message'] = $message;
@@ -448,8 +390,7 @@ function delmessage($update, $MadelineProto)
                         } catch (Exception $e) {
                         }
                     } else {
-                        $entity = [['_' => 'messageEntityCode', 'offset' => 40,
-                        'length' => 6 ]];
+                        $entity = create_style('code', 40, 6);
                         $message = "Delete a message by replying to it with \r\n/del";
                         $default['message'] = $message;
                         $default['entities'] = $entity;

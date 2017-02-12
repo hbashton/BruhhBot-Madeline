@@ -48,16 +48,12 @@ function lockme($update, $MadelineProto, $msg)
                                 array_push($locked[$ch_id], $msg);
                                 file_put_contents('locked.json', json_encode($locked));
                                 $message = $cfg["lock"][$msg];
-                                $entity = [['_' => 'messageEntityBold',
-                                'offset' => 0,
-                                'length' => $cfg['length'][$msg] ]];
+                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
                                 $default['entities'] = $entity;
                             } else {
                                 $message = $cfg["lock"]["already"][$msg];
-                                $entity = [['_' => 'messageEntityBold',
-                                'offset' => 0,
-                                'length' => $cfg['length'][$msg] ]];
+                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
                                 $default['entities'] = $entity;
                             }
@@ -69,9 +65,7 @@ function lockme($update, $MadelineProto, $msg)
                             array_push($locked[$ch_id], $msg);
                             file_put_contents('locked.json', json_encode($locked));
                             $message = $cfg["lock"][$msg];
-                            $entity = [['_' => 'messageEntityBold',
-                                'offset' => 0,
-                                'length' => $cfg['length'][$msg] ]];
+                            $entity = create_style('bold', 0, $cfg['length'][$msg]);
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         }
@@ -132,16 +126,12 @@ function unlockme($update, $MadelineProto, $msg)
                                 }
                                 file_put_contents('locked.json', json_encode($locked));
                                 $message = $cfg["unlock"][$msg];
-                                $entity = [['_' => 'messageEntityBold',
-                                'offset' => 0,
-                                'length' => $cfg['length'][$msg]]];
+                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
                                 $default['entities'] = $entity;
                             } else {
                                 $message = $cfg["unlock"]["already"][$msg];
-                                $entity = [['_' => 'messageEntityBold',
-                                'offset' => 0,
-                                'length' => $cfg['length'][$msg]]];
+                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
                                 $default['entities'] = $entity;
                             }
@@ -152,9 +142,7 @@ function unlockme($update, $MadelineProto, $msg)
                             }
                             file_put_contents('locked.json', json_encode($locked));
                             $message = $cfg["unlock"]["already"][$msg];
-                            $entity = [['_' => 'messageEntityBold',
-                                'offset' => 0,
-                                'length' => $cfg['length'][$msg]]];
+                            $entity = create_style('bold', 0, $cfg['length'][$msg]);
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         }
@@ -203,9 +191,8 @@ function setflood($update, $MadelineProto, $msg)
                             $locked[$ch_id]['floodlimit'] = (int) $msg;
                             file_put_contents('locked.json', json_encode($locked));
                             $message = "Flood has been set to $msg";
-                            $entity = [['_' => 'messageEntityBold',
-                            'offset' => strlen($message) - strlen($msg),
-                            'length' => strlen($msg) ]];
+                            $len = strlen($message) - strlen($msg);
+                            $entity = create_style('bold', $len, $msg);
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         } else {
@@ -213,9 +200,8 @@ function setflood($update, $MadelineProto, $msg)
                             $locked[$ch_id]['floodlimit'] = (int) $msg;
                             file_put_contents('locked.json', json_encode($locked));
                             $message = "Flood has been set to $msg";
-                            $entity = [['_' => 'messageEntityBold',
-                            'offset' => strlen($message) - strlen($msg),
-                            'length' => strlen($msg) ]];
+                            $len = strlen($message) - strlen($msg);
+                            $entity = create_style('bold', $len, $msg);
                             $default['message'] = $message;
                             $default['entities'] = $entity;
                         }

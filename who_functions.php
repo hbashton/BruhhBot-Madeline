@@ -15,7 +15,7 @@ function wholist($update, $MadelineProto)
         if (from_admin($update, $MadelineProto)
             or from_master($update, $MadelineProto)
         ) {
-            $message = "Users in $title"."\r\n";
+            $message = "Users in $title\r\n";
             $admins = cache_get_chat_info($update, $MadelineProto);
             foreach ($admins['participants'] as $key) {
                 if (array_key_exists('user', $key)) {

@@ -73,20 +73,20 @@ function from_admin($update, $MadelineProto, $str = "", $send = false)
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator") {
-                    $mod = "true";
+                    $mod = true;
                     break;
                 } else {
-                    $mod = "false";
+                    $mod = false;
                     break;
                 }
             } else {
-                $mod = "false";
+                $mod = false;
                 break;
             }
         }
-        $mod = "false";
+        $mod = false;
     }
-    if ($mod == "true" or from_master($update, $MadelineProto)) {
+    if ($mod or from_master($update, $MadelineProto)) {
         return true;
     } else {
         if ($send) {
@@ -119,20 +119,20 @@ function is_admin($update, $MadelineProto, $userid, $send = false)
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator") {
-                    $mod = "true";
+                    $mod = true;
                     break;
                 } else {
-                    $mod = "false";
+                    $mod = false;
                     break;
                 }
             } else {
-                $mod = "false";
+                $mod = false;
                 break;
             }
         }
-        $mod = "false";
+        $mod = false;
     }
-    if ($mod == "true" or is_master($MadelineProto, $userid)) {
+    if ($mod or is_master($MadelineProto, $userid)) {
         return true;
     } else {
         if ($send) {
@@ -168,20 +168,20 @@ function is_bot_admin($update, $MadelineProto, $send = false)
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator") {
-                    $mod = "true";
+                    $mod = true;
                     break;
                 } else {
-                    $mod = "false";
+                    $mod = false;
                     break;
                 }
             } else {
-                $mod = "false";
+                $mod = false;
                 break;
             }
         }
-        $mod = "false";
+        $mod = false;
     }
-    if ($mod == "true") {
+    if ($mod) {
         return true;
     } else {
         if ($send) {
@@ -213,11 +213,11 @@ function from_mod($update, $MadelineProto)
     $promoted = json_decode($file, true);
     if (array_key_exists($ch_id, $promoted)) {
         if (in_array($userid, $promoted[$ch_id])) {
-            $mod = "true";
+            $mod = true;
         } else {
-            $mod = "false";
+            $mod = false;
         }
-        if ($mod == "true" or from_master($update, $MadelineProto)) {
+        if ($mod or from_master($update, $MadelineProto)) {
             return true;
         } else {
             return false;
@@ -239,11 +239,11 @@ function is_mod($update, $MadelineProto, $userid)
     $promoted = json_decode($file, true);
     if (array_key_exists($ch_id, $promoted)) {
         if (in_array($userid, $promoted[$ch_id])) {
-            $mod = "true";
+            $mod = true;
         } else {
-            $mod = "false";
+            $mod = false;
         }
-        if ($mod == "true" or is_master($MadelineProto, $userid)) {
+        if ($mod or is_master($MadelineProto, $userid)) {
             return true;
         } else {
             return false;

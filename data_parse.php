@@ -78,7 +78,7 @@ function parse_chat_data($update, $MadelineProto)
     }
 }
 
-function create_style($type, $offset, $length)
+function create_style($type, $offset, $length, $full = true)
 {
     switch ($type) {
     case 'bold':
@@ -91,15 +91,31 @@ function create_style($type, $offset, $length)
         $style = 'messageEntityCode';
         break;
     }
-    return([['_' => $style, 'offset' => $offset,
-            'length' => $length ]]);
+    if (!is_numeric($length)) {
+        $length = strlen($length);
+    }
+    if ($full) {
+        return([['_' => $style, 'offset' => $offset,
+                'length' => $length ]]);
+    } else {
+        return(['_' => $style, 'offset' => $offset,
+                'length' => $length ]);
+    }
 }
 
-function create_mention($offset, $username, $userid)
+function create_mention($offset, $username, $userid, $full = true)
 {
-    return([[
-        '_' => 'inputMessageEntityMentionName',
-        'offset' => $offset,
-        'length' => strlen($username),
-        'user_id' => $userid]]);
+    if ($full) {
+        return([[
+            '_' => 'inputMessageEntityMentionName',
+            'offset' => $offset,
+            'length' => strlen($username),
+            'user_id' => $userid]]);
+    } else {
+        return([
+            '_' => 'inputMessageEntityMentionName',
+            'offset' => $offset,
+            'length' => strlen($username),
+            'user_id' => $userid]);
+    }
 }

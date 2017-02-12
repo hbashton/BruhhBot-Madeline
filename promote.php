@@ -36,8 +36,7 @@ function promoteme($update, $MadelineProto, $msg)
                 if ($id[0]) {
                     $userid = $id[1];
                     $username = $id[2];
-                    $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                    5, 'length' => strlen($username), 'user_id' => $userid]];
+                    $mention = create_mention(5, $username, $userid);
                     check_json_array('promoted.json', $ch_id);
                     $file = file_get_contents("promoted.json");
                     $promoted = json_decode($file, true);
@@ -46,44 +45,34 @@ function promoteme($update, $MadelineProto, $msg)
                             array_push($promoted[$ch_id], $userid);
                             file_put_contents('promoted.json', json_encode($promoted));
                             $message = "User $username is now a moderator of $title";
-                            $entity = ['_' => 'messageEntityBold',
-                            'offset' => strlen($message) - strlen($title),
-                            'length' => strlen($title) ];
+                            $len = strlen($message) - strlen($title);
+                            $entity = create_style('bold', $len, $title, false);
+                            $mention[] = $entity;
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
+                            $default['entities'] = $mention;
                         } else {
                             $message = "User $username is already a moderator of $title";
-                            $entity = ['_' => 'messageEntityBold',
-                            'offset' => strlen($message) - strlen($title),
-                            'length' => strlen($title) ];
+                            $len = strlen($message) - strlen($title);
+                            $entity = create_style('bold', $len, $title, false);
+                            $mention[] = $entity;
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
+                            $default['entities'] = $mention;
                         }
                     } else {
                         $promoted[$ch_id] = [];
                         array_push($promoted[$ch_id], $userid);
                         file_put_contents('promoted.json', json_encode($promoted));
-                        $message = "User ".$username." is now a moderator of ".$title;
-                        $entity = ['_' => 'messageEntityBold',
-                            'offset' => strlen($message) - strlen($title),
-                            'length' => strlen($title) ];
+                        $message = "User $username is now a moderator of $title";
+                        $len = strlen($message) - strlen($title);
+                        $entity = create_style('bold', $len, $title, false);
+                        $mention[] = $entity;
                         $default['message'] = $message;
-                        $default['entities'] = $entity;
+                        $default['entities'] = $mention;
                     }
                 } else {
                     $message = "I don't know of anyone called ".$msg;
                     $default['message'] = $message;
                 }
-            }
-        }
-        if (isset($mention)) {
-            $mention[] = $entity;
-            $default['entities'] = $mention;
-        } else {
-            if (isset($entity)) {
-                $mention = [];
-                $mention[] = $entity;
-                $default['entities'] = $mention;
             }
         }
         if (isset($default['message'])) {
@@ -115,8 +104,7 @@ function demoteme($update, $MadelineProto, $msg)
             if ($id[0]) {
                 $userid = $id[1];
                 $username = $id[2];
-                $mention = [['_' => 'inputMessageEntityMentionName', 'offset' =>
-                5, 'length' => strlen($username), 'user_id' => $userid]];
+                $mention = create_mention(5, $username, $userid);
                 check_json_array('promoted.json', $ch_id);
                 $file = file_get_contents("promoted.json");
                 $promoted = json_decode($file, true);
@@ -132,42 +120,32 @@ function demoteme($update, $MadelineProto, $msg)
                         file_put_contents('promoted.json', json_encode($promoted));
                         $message = "User $username is NO LONGER a moderator of ".
                         $title;
-                        $entity = ['_' => 'messageEntityBold',
-                        'offset' => strlen($message) - strlen($title),
-                        'length' => strlen($title) ];
+                        $len = strlen($message) - strlen($title);
+                        $entity = create_style('bold', $len, $title, false);
+                        $mention[] = $entity;
                         $default['message'] = $message;
-                        $default['entities'] = $entity;
+                        $default['entities'] = $mention;
                     } else {
-                        $message = "User $username is not a moderator of ".
+                        $message = "User $username is not currently a moderator of ".
                         $title;
-                        $entity = ['_' => 'messageEntityBold',
-                        'offset' => strlen($message) - strlen($title),
-                        'length' => strlen($title) ];
+                        $len = strlen($message) - strlen($title);
+                        $entity = create_style('bold', $len, $title, false);
+                        $mention[] = $entity;
                         $default['message'] = $message;
-                        $default['entities'] = $entity;
+                        $default['entities'] = $mention;
                     }
                 } else {
-                    $message = "User $username is not a moderator of ".
+                    $message = "User $username is not currently a moderator of ".
                     $title;
-                    $entity = ['_' => 'messageEntityBold',
-                        'offset' => strlen($message) - strlen($title),
-                        'length' => strlen($title) ];
+                    $len = strlen($message) - strlen($title);
+                    $entity = create_style('bold', $len, $title, false);
+                    $mention[] = $entity;
                     $default['message'] = $message;
-                    $default['entities'] = $entity;
+                    $default['entities'] = $mention;
                 }
             } else {
                 $message = "I don't know of anyone called ".$msg;
                 $default['message'] = $message;
-            }
-        }
-        if (isset($mention)) {
-            $mention[] = $entity;
-            $default['entities'] = $mention;
-        } else {
-            if (isset($entity)) {
-                $mention = [];
-                $mention[] = $entity;
-                $default['entities'] = $mention;
             }
         }
         if (isset($default['message'])) {

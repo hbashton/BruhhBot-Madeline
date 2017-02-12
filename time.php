@@ -61,13 +61,13 @@ function getloc($update, $MadelineProto, $area)
             $lng = $responsej['results'][0]['geometry']['location']['lng'];
             $timestamp = time();
             $api_response = Requests::get(
-                'https://maps.googleapis.com/maps/api/timezone/json?location='
-                . $lat . ',' . $lng . '&timestamp=' . $timestamp
+                "https://maps.googleapis.com/maps/api/timezone/json?location=".
+                "$lat,$lng&timestamp=$timestamp"
             );
             $api_responsej = json_decode($api_response->body, true);
             $ctime = now($api_responsej['timeZoneId']);
             $timezone = $api_responsej['timeZoneId'];
-            $return = 'The current time in ' . $timezone . ' is ' . $ctime;
+            $return = "The current time in $timezone is $ctime";
             $message = str_replace("_", " ", $return);
             $default['message'] = $message;
         } else {
