@@ -39,6 +39,7 @@ require_once 'settings.php';
 require_once 'supergroup.php';
 require_once 'time.php';
 require_once 'threading.php';
+require_once 'user_data.php';
 require_once 'weather.php';
 require_once 'who_functions.php';
 if (file_exists('session.madeline')) {

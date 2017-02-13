@@ -46,14 +46,22 @@ function saveme($update, $MadelineProto, $msg, $name)
         if ($peerUSER
             or from_admin_mod($update, $MadelineProto, $mods, true)
         ) {
-            if (!empty($name) && !empty($msg)) {
+            if ($name) {
+                if ($name == "from") {
+                    if ($msg) {
+                        savefrom($update, $MadelineProto, $msg);
+                        return;
+                    } else {
+                        savefrom($update, $MadelineProto, false);
+                        return;
+                    }
+                }
+            }
+            if ($name && $msg) {
+                var_dump("lol");
                 check_json_array('saved.json', $ch_id);
                 $file = file_get_contents("saved.json");
                 $saved = json_decode($file, true);
-                if ($name == "from") {
-                    savefrom($update, $MadelineProto, $msg);
-                    return;
-                }
                 if (array_key_exists($ch_id, $saved)) {
                     if (!array_key_exists("from", $saved[$ch_id])) {
                         $saved[$ch_id]["from"] = [];
@@ -79,8 +87,8 @@ function saveme($update, $MadelineProto, $msg, $name)
                 }
             } else {
                 $message = "Use /save name message to save a message for later!";
-                $entity = create_style('bold', 10, 4);
-                $entity[] = create_style('bold', 15, 7);
+                $entity = create_style('code', 10, 4);
+                $entity[] = create_style('code', 15, 7, false);
                 $default['message'] = $message;
                 $default['entities'] = $entity;
             }
@@ -223,7 +231,7 @@ function savefrom($update, $MadelineProto, $name)
         } else {
             $message = "Save a message by reply with /save from name";
             $code = create_style('code', 40, 4);
-            $code[] = create_style('code', 29, 10);
+            $code[] = create_style('code', 29, 10, false);
             $default['message'] = $message;
             $default['entities'] = $code;
         }
@@ -235,5 +243,149 @@ function savefrom($update, $MadelineProto, $name)
     }
     if (isset($sentMessage)) {
         \danog\MadelineProto\Logger::log($sentMessage);
+    }
+}
+
+function saved_get($update, $MadelineProto)
+{
+    if (is_peeruser($update, $MadelineProto)) {
+        $peer = cache_get_info(
+            $update,
+            $MadelineProto,
+            $update['update']['message']['from_id']
+        )['bot_api_id'];
+        $ch_id = $peer;
+        $title = "this chat";
+        $cont = true;
+        $peerUSER = true;
+    }
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $cont = true;
+        $peerUSER = false;
+    }
+    if ($cont) {
+        $msg_id = $update['update']['message']['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
+        check_json_array('saved.json', $ch_id);
+        $file = file_get_contents("saved.json");
+        $saved = json_decode($file, true);
+        if (array_key_exists($ch_id, $saved)) {
+            foreach ($saved[$ch_id] as $i => $ii) {
+                if (!isset($message)) {
+                    $message = "Saved messages for $title:\r\n$i\r\n";
+                } else {
+                    $message = "$message$i\r\n";
+                }
+            }
+            if (array_key_exists("from", $saved[$ch_id])) {
+                foreach ($saved[$ch_id]["from"] as $i => $ii) {
+                    if (!isset($message)) {
+                        $message = "Saved messages for $title:\r\n$i\r\n";
+                    } else {
+                        $message = "$message$i\r\n";
+                    }
+                }
+            }
+            if (isset($message)) {
+                $len = 19 + $title;
+                $entity = create_style('bold', 0, $len);
+                $default['message'] = $message;
+                $default['entities'] = $entity;
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
+        }
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
+    }
+}
+
+function save_clear($update, $MadelineProto, $msg) {
+    if (is_peeruser($update, $MadelineProto)) {
+        $peer = cache_get_info(
+            $update,
+            $MadelineProto,
+            $update['update']['message']['from_id']
+        )['bot_api_id'];
+        $ch_id = $peer;
+        $cont = true;
+        $peerUSER = true;
+    }
+    if (is_supergroup($update, $MadelineProto)) {
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $cont = true;
+        $peerUSER = false;
+    }
+    if ($cont) {
+        $msg_id = $update['update']['message']['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            );
+        $mods = "Why the hell would we let a normal user clear saved messages?";
+        if ($peerUSER
+            or from_admin_mod($update, $MadelineProto, $mods, true)
+        ) {
+            if ($msg) {
+                check_json_array('saved.json', $ch_id);
+                $file = file_get_contents("saved.json");
+                $saved = json_decode($file, true);
+                if (array_key_exists($ch_id, $saved)) {
+                    if (!array_key_exists("from", $saved[$ch_id])) {
+                        $saved[$ch_id]["from"] = [];
+                    }
+                    if (array_key_exists($msg, $saved[$ch_id]["from"])) {
+                        unset($saved[$ch_id]["from"][$msg]);
+                        $message = "$msg was successfully cleared";
+                        $default['message'] = $message;
+                        $entity = create_style('code', 0, $msg);
+                        $default['entities'] = $entity;
+                        file_put_contents('saved.json', json_encode($saved));
+                    } elseif (array_key_exists($msg, $saved[$ch_id])) {
+                        unset($saved[$ch_id][$msg]);
+                        $message = "$msg was successfully cleared";
+                        $default['message'] = $message;
+                        $entity = create_style('code', 0, $msg);
+                        $default['entities'] = $entity;
+                        file_put_contents('saved.json', json_encode($saved));
+                    } else {
+                        $message = "$msg is not a saved message";
+                        $default['message'] = $message;
+                        $entity = create_style('code', 0, $msg);
+                        $default['entities'] = $entity;
+                    }
+                } else {
+                    $message = "$msg is not a saved message";
+                    $default['message'] = $message;
+                    $entity = create_style('code', 0, $msg);
+                    $default['entities'] = $entity;
+                }
+            } else {
+                $message = "Use /save clear message to clear the contents of a message";
+                $entity = create_style('code', 10, 5);
+                $entity[] = create_style('code', 16, 7, false);
+                $default['message'] = $message;
+                $default['entities'] = $entity;
+            }
+            if (isset($default['message'])) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
+            if (isset($sentMessage)) {
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+        }
     }
 }

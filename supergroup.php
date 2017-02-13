@@ -407,7 +407,7 @@ function delmessage($update, $MadelineProto)
     }
 }
 
-function delmessage_user($update, $MadelineProto)
+function delmessage_user($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
@@ -421,30 +421,39 @@ function delmessage_user($update, $MadelineProto)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto, true)) {
                 if (from_admin_mod($update, $MadelineProto)) {
-                    if (array_key_exists(
-                        "reply_to_msg_id",
-                        $update['update']['message']
-                    )
-                    ) {
-                        try {
-                        $del_id = $update['update']['message']['reply_to_msg_id'];
-                        $delete = $MadelineProto->channels->deleteMessages(
-                            ['channel' => $peer,
-                            'id' => [$del_id]]
-                        );
-                        \danog\MadelineProto\Logger::log($delete);
-                        $del_id = $msg_id - 1;
-                        $delete = $MadelineProto->channels->deleteMessages(
-                            ['channel' => $peer,
-                            'id' => [$msg_id]]
-                        );
-                        \danog\MadelineProto\Logger::log($delete);
-                        } catch (Exception $e) {
+                    if ($msg) {
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                            $username = $id[2];
+                        } else {
+                            $message = "I can't find a user called ".
+                            "$msg. Who's that?";
+                            $default['message'] = $message;
+                        }
+                        if (isset($userid)) {
+                            if (!is_admin_mod($update, $MadelineProto, $userid)) {
+                                try {
+                                    $delete = $MadelineProto->channels->deleteUserHistory(
+                                        ['channel' => $peer,
+                                        'user_id' => $userid]
+                                    );
+                                    \danog\MadelineProto\Logger::log($delete);
+                                    $message = "The message history of $username ".
+                                    "has been wiped from this chat";
+                                    $mention = create_mention(23, $username, $userid);
+                                    $default['message'] = $message;
+                                    $default['entities'] = $mention;
+                                } catch (Exception $e) {}
+                            } else {
+                                $message = "You can't erase the msg history of a moderator";
+                                $default['message'] = $message;
+                            }
                         }
                     } else {
-                        $entity = [['_' => 'messageEntityCode', 'offset' => 40,
-                        'length' => 6 ]];
-                        $message = "Delete a message by replying to it with \r\n/del";
+                        $entity = create_style('code', 4, 14);
+                        $message = "Use /del @username to delete the message ".
+                        "history of a user";
                         $default['message'] = $message;
                         $default['entities'] = $entity;
                     }

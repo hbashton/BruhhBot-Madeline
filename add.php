@@ -12,6 +12,7 @@ function add_group($update, $MadelineProto)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html',
             );
         if (from_admin($update, $MadelineProto, $mods, true)) {
             check_json_array('chatlist.json', $ch_id, false);
@@ -20,11 +21,9 @@ function add_group($update, $MadelineProto)
             if (!in_array($ch_id, $chatlist)) {
                 array_push($chatlist, $ch_id);
                 file_put_contents('chatlist.json', json_encode($chatlist));
-                $message = "$title has been added to my records!".
+                $message = "<b>$title</b> has been added to my records!".
                 " You may now use my full functionality";
-                $entity = create_style('bold', 0, $title);
                 $default['message'] = $message;
-                $default['entities'] = $entity;
             } else {
                 $message = "$title is already in my records :)";
                 $entity = create_style('bold', 0, $title);
