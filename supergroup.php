@@ -185,7 +185,7 @@ function idme($update, $MadelineProto, $msg)
             if ($id[0]) {
                 $username = $id[2];
                 $userid = $id[1];
-                $mention = create_mention(19, $username, $userid);
+                $mention = html_mention($username, $userid);
                 $str = $responses['idme']['idmessage'];
                 $repl = array(
                     "mention" => $mention,

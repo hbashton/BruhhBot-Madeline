@@ -339,7 +339,7 @@ function kickme($update, $MadelineProto)
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
-        $title = html_bold($chat['title']);
+        $title = $chat['title'];
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,

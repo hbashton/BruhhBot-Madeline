@@ -129,7 +129,7 @@ function getme($update, $MadelineProto, $name)
         $cont = true;
         $peerUSER = false;
     }
-    if ($cont) {
+    if (!$update['update']['message']['out'] && $cont) {
         $msg_id = $update['update']['message']['id'];
         $default = array(
             'peer' => $peer,
@@ -313,6 +313,11 @@ function saved_get($update, $MadelineProto)
             }
             if (isset($message)) {
                 $default['message'] = $message;
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            } else {
+                $default['message'] = "There are no saved messages for <b>$title</b>";
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
                 );

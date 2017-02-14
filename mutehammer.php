@@ -354,13 +354,9 @@ function getmutelist($update, $MadelineProto)
                             $message = $message."$mention - $key\r\n";
                         }
                     }
-                    $default['message'] = $message;
                 } else {
                     $message = $responses['getmutelist']['dictatorship'];
                     $default['message'] = $message;
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
                 }
             }
             if (!isset($message)) {
@@ -370,9 +366,8 @@ function getmutelist($update, $MadelineProto)
                 );
                 $message = $engine->render($str, $repl);
                 $default['message'] = $message;
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
+            } else {
+                $default['message'] = $message;
             }
         }
         if (isset($default['message'])) {
