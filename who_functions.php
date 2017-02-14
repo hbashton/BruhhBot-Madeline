@@ -170,7 +170,7 @@ function whoban($update, $MadelineProto, $wait = true)
                             }
                         } else {
                             $message = "The message you sent was not a document!".
-                            "Try again ";
+                            " Try again ";
                             $default['message'] = $message;
                             unset($GLOBALS['wait_for_whoban']);
                         }
@@ -267,7 +267,7 @@ function whobanall($update, $MadelineProto, $wait = true)
                             }
                         } else {
                             $message = "The message you sent was not a document! ".
-                            "Try again ";
+                            " Try again ";
                             $default['message'] = $message;
                             unset($GLOBALS['wait_for_whobanall']);
                         }

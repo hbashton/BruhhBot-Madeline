@@ -44,7 +44,7 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                 )
                 ) {
                     if (isset($GLOBALS['from_user_chat_photo'])) {
-                        if ($GLOBALS['from_user_chat_photo'] == $from_id) {
+                        if ($GLOBALS['from_user_chat_photo'] == $fromid) {
                             if (array_key_exists(
                                 "media",
                                 $update['update']['message']

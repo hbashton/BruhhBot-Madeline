@@ -61,6 +61,7 @@ function saveme($update, $MadelineProto, $msg, $name)
             }
             if (strlen($msg) < 2000) {
                 if ($name && $msg) {
+                    $name = cb($name);
                     var_dump(strlen($msg));
                     $codename = "<code>$name</code>";
                     check_json_array('saved.json', $ch_id);
@@ -130,6 +131,7 @@ function getme($update, $MadelineProto, $name)
         $peerUSER = false;
     }
     if (!$update['update']['message']['out'] && $cont) {
+        $name = cb($name);
         $msg_id = $update['update']['message']['id'];
         $default = array(
             'peer' => $peer,
@@ -210,6 +212,7 @@ function savefrom($update, $MadelineProto, $name)
     if ($peerUSER or from_admin_mod($update, $MadelineProto, $mods, true)) {
         if ($name !== "from") {
             if (array_key_exists("reply_to_msg_id", $update["update"]["message"])) {
+                $name = cb($name);
                 $msg_id = $update['update']['message']["reply_to_msg_id"];
                 check_json_array('saved.json', $ch_id);
                 $file = file_get_contents("saved.json");
@@ -296,18 +299,22 @@ function saved_get($update, $MadelineProto)
             foreach ($saved[$ch_id] as $i => $ii) {
                 if ($i !== "from") {
                     if (!isset($message)) {
-                        $message = "<b>Saved messages for $title:</b>\r\n<code>$i</code>\r\n";
+                        $name = cb($i);
+                        $message = "<b>Saved messages for $title:</b>\r\n<code>$name</code>\r\n";
                     } else {
-                        $message = "$message<code>$i</code>\r\n";
+                        $name = cb($i);
+                        $message = "$message<code>$name</code>\r\n";
                     }
                 }
             }
             if (array_key_exists("from", $saved[$ch_id])) {
                 foreach ($saved[$ch_id]["from"] as $i => $ii) {
                     if (!isset($message)) {
-                        $message = "<b>Saved messages for $title:</b>\r\n$i\r\n";
+                        $name = cb($i);
+                        $message = "<b>Saved messages for $title:</b>\r\n$name\r\n";
                     } else {
-                        $message = "$message<code>$i</code>\r\n";
+                        $name = cb($i);
+                        $message = "$message<code>$name</code>\r\n";
                     }
                 }
             }
@@ -360,6 +367,7 @@ function save_clear($update, $MadelineProto, $msg) {
                 or from_admin_mod($update, $MadelineProto, $mods, true)
             ) {
                 if ($msg) {
+                    $msg = cb($msg);
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
                     $saved = json_decode($file, true);
