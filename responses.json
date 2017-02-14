@@ -1,0 +1,252 @@
+{
+    "add_group":
+    {
+        "mods":"Can you ask an admin to use this command?",
+        "added":"<b>{title}</b> has been added to my records! You may now use my full functionality",
+        "already":"<b>{title}</b> is already in my records :)"
+    },
+    "rm_group":
+    {
+        "mods":"Can you ask an admin to use this command?",
+        "removed":"<b>{title}</b> has been removed from my records",
+        "not_there":"<b>{title}</b> is not currently in my records."
+    },
+    "banme":
+    {
+        "mods":"Only mods can use me to kick butts!",
+        "banmod":"You can't ban mods?!?!",
+        "banned":"{mention} banned from <b>{title}</b>",
+        "already":"User {mention} already banned",
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>/ban @username</code> to ban someone from this chat!"
+    },
+    "unbanme":
+    {
+        "mods":"Only mods can use me to unban peeps!",
+        "unbanned":"{mention} unbanned from {title}",
+        "already":"User {mention} is not banned, no reason to unban them!",
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>/unban @username</code> to unban someone from this chat!"
+    },
+    "kickhim":
+    {
+        "mods":"Only mods can use me to kick butts!",
+        "kickmod":"You can't kick mods -____-",
+        "kicked":"{mention} kicked from <b>{title}</b>",
+        "already":"User {mention} isn't here, or I can't kick them",
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>/kick @username</code> to kick someone from this chat!"
+    },
+    "kickme":
+    {
+        "kicked":"{mention} kicked from <b>{title}</b>"
+    },
+    "getbanlist":
+    {
+        "header":"<b>Banned Users for {title}:</b>\r\n",
+        "none":"There are no banned users for <b>{title}</b>"
+    },
+    "unbanall":
+    {
+        "unbanned":"User {mention} has been given another chance!",
+        "already":"I'm already fond of {mention}, so they're not banned :)",
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>/unbanall @username</code> to unban someone from all my groups!"
+    },
+    "banall":
+    {
+        "banmod":"You can't ban mods :/",
+        "banned":"User {mention} has been globally banned! I do NOT like them anymore ;-;",
+        "already":"I already hate {mention}",
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>/banall @username</code> to ban someone from all my groups!"
+    },
+    "getgbanlist":
+    {
+        "header":"<b>LIST OF REALLY BAD PEOPLE:</b>\r\n",
+        "none":"There are <b>no</b> users globally banned! I love everyone #peace"
+    },
+    "check_flood":
+    {
+        "kick":"Flooding is not allowed here {mention}"
+    },
+    "create_new_supergroup":
+    {
+        "missing_info":"You MUST provide a title and description for your new group. <code>/newgroup title description</code>"
+    },
+    "export_new_invite":
+    {
+        "mods":"Only mods can get us a new invite link.",
+        "link":"The new invite link is {link}",
+        "exception":"I am not the owner of this chat. On the bright side, just save the invite link with my <code>/save</code> command."
+    },
+    "public_toggle":
+    {
+        "mods":"I don't listen to you. #rekd",
+        "on":"This group is now public. Members may add users",
+        "off":"This group is now private. Only the group owner can add users",
+        "exception":"I couldn't change the group settings",
+        "help":"Use /public [on/off] to change this settings."
+    },
+    "invite_user":
+    {
+        "mods":"Only mods can use me to invite peeps to this cool crib.",
+        "exception":"I can't add {mention}. Either I'm not an admin or their privacy settings prevent me from doing so.",
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>/invite @username</code> to invite someone to this chat!"
+    },
+    "addadmin":
+    {
+        "idk":"I don't know a {msg}, who's that?",
+        "success":"{mention} is now an admin of <b>{title}</b>",
+        "exception":"I am not the owner of this chat, and cannot add any admins"
+    },
+    "rmadmin":
+    {
+        "idk":"I don't know a {msg}, who's that?",
+        "success":"{mention} is no longer an admin of <b>{title}</b>",
+        "exception":"I am not the owner of this chat, and cannot remove any admins"
+    },
+    "idme":
+    {
+        "peeruser":"Your Telegram ID is {peer}",
+        "supergroup":"The Telegram ID of <b>{title}</b> is {ch_id}",
+        "idmessage":"The Telegram ID of {mention} is {userid}",
+        "idk":"I don't know a {msg}, who's that?"
+    },
+    "adminlist":
+    {
+        "header":"<b>Admins for {title}:</b>\r\n",
+        "none":"There are Admins for <b>{title}</b>"
+    },
+    "modlist":
+    {
+        "header":"<b>Moderators for {title}:</b>\r\n",
+        "none":"There are no Moderators for <b>{title}</b>"
+    },
+    "pinmessage":
+    {
+        "mods":"I can pin messages! But YOU can't make me!!! ;)",
+        "success":"Message successfully pinned!",
+        "help":"Pin a message by replying to it with \r\n<code>/pin</code>\r\nto pin it silently, reply with <code>/pin silent</code>"
+    },
+    "delmessage":
+    {
+        "help":"Delete a message by replying to it with\r\n<code>/del</code>"
+    },
+    "delmessage_user":
+    {
+        "idk":"I don't know a {msg}, who's that?",
+        "success":"The message history of {mention} has been wiped from this chat",
+        "mod":"You can't erase the message history of a moderator",
+        "help":"Use <code>/del @username</code> to delete the message history of a user"
+    },
+    "leave_setting":
+    {
+        "on":"If I am added to a group, and you are not present, I will leave automatically.",
+        "off":"Regardless of your presence, I will allow myself to be added to any group",
+        "already_on":"I will already leave if you're not there",
+        "already_off":"I will allow myself to be added to any group",
+        "help":"To make me leave a group when you're not there, <code>/leave on</code>, otherwise, <code>/leave off</code>",
+        "fuck_off":"FUCK OFF"
+    },
+    "lockme":
+    {
+        "mods":"Only the powers that be may use this command!",
+        "invalid":"{msg} is not a valid lock type",
+        "help":"Use <code>/lock [type]</code>"
+    },
+    "unlockme":
+    {
+        "mods":"Only the powers that be may use this command!",
+        "invalid":"{msg} is not a valid lock type",
+        "help":"Use <code>/unlock [type]</code>"
+    },
+    "setflood":
+    {
+        "mods":"The floodgates only respond to mods",
+        "success":"Flood has been set to {msg}",
+        "invalid":"{msg} is not a numeric value",
+        "help":"Use <code>/setflood</code> [integer]"
+    },
+    "muteme":
+    {
+        "mods":"You ain't shutting anyone up",
+        "mutemod":"You can't mute Moderators",
+        "idk":"I don't know a {msg}, who's that?",
+        "success":"User {mention} has been stripped of their right to speak freely",
+        "already":"{mention} is already quiet",
+        "help":"Use <code>/mute @username</code> to make someone shut up"
+    },
+    "unmuteme":
+    {
+        "mods":"Hey! I'm the one in charge here!",
+        "success":"User {mention} has regained their right of free speach....as long as they speak kindly of the <b>Dictator</b>.",
+        "already":"User {mention} can already speak freely",
+        "help":"Use <code>/unmute @username</code> to unmute someone in this chat!"
+    },
+    "muteall":
+    {
+        "mods":"You ain't shutting anyone up!",
+        "success":"<b>Everyone</b> has lost the right of free speech.\r\nThis is now a <b>dictatorship.</b>",
+        "already":"Everyone has already lost their right to talk. I am the current Dictator"
+    },
+    "unmuteall":
+    {
+        "mods":"No one is gonna listen to you!",
+        "success":"<b>The dictator</b> has been ousted from power by a militia. <b>Everyone</b> now has the right of free speech",
+        "already": "<b>The dictator</b> is nowhere to be found, and <b>everyone</b> already has the right to speak freely."
+    },
+    "getmutelist":
+    {
+        "header":"<b>Muted Users for {title}:</b>\r\n",
+        "dictatorship":"The Dictator reigns supreme.",
+        "none":"There are no muted users for <b>{title}</b>"
+    },
+    "promoteme":
+    {
+        "mods":"Only the best get to promote people. You're not the best",
+        "success":"User {mention} is now a moderator of <b>{title}</b>",
+        "already":"User {mention} is already a moderator of <b>{title}</b>",
+        "idk":"I don't know a {msg}, who's that?"
+    },
+    "demoteme":
+    {
+        "mods":"Wow. Mr. I'm not admin over here is trying to <b>DEMOTE</b> people.",
+        "success":"User {mention} is NO LONGER a moderator of <b>{title}</b>",
+        "fail":"User {mention} is not currently a moderator of <b>{title}</b>",
+        "idk":"I don't know a {msg}, who's that?"
+    },
+    "set_chat_photo":
+    {
+        "mods":"Only mods can use me to set this chat's photo!",
+        "success":"Thanks! I've updated the photo for <b>{title}</b>",
+        "exception":"I could not change the photo",
+        "sorry":"The message you sent was not a photo! Sorry, but the chat photo was not changed",
+        "ready":"Just send the new photo and I'll get right to changing it!"
+    },
+    "set_chat_title":
+    {
+        "mods":"Only mods can change this chat's name!",
+        "success":"Chat Title successfully changed to {msg}",
+        "fail":"I could not change the title.",
+        "help":"Use <code>/setname title</code> to change the chat name"
+    },
+    "gettime":
+    {
+        "success":"The current time in {timezone} is {ctime}",
+        "fail":"What the actual hell is '{area}'??"
+    },
+    "saveme":
+    {
+        "mods":"Only mods get to save messages. You don't fit that criteria.",
+        "success":"Message <code>{name}</code> has been saved",
+        "help":"Use <code>/save name message</code> to save a message for later!"
+    },
+    "savefrom":
+    {
+        "mods":"Only mods get to save messages. You don't fit that criteria.",
+        "success":"Message <code>{name}</code> has been saved",
+        "help":"Save a message by reply with <code>/save from name</code>"
+    }
+}

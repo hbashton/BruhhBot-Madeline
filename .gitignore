@@ -90,3 +90,4 @@ composer.lock
 #json db
 *.json
 !configuration.json
+!responses.json
