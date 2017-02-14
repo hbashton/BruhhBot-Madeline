@@ -47,6 +47,12 @@ class NewMessage extends Thread {
                             $msg = implode(" ", $msg_arr);
                             get_user_stats($update, $MadelineProto, $msg);
                         break;
+
+                        case 'leave':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            leave_setting($update, $MadelineProto, $msg);
+                        break;
                     }
                 }
                 if (array_key_exists("fwd_from", $update['update']['message'])) {
@@ -580,12 +586,17 @@ function NewChatAddUser($update, $MadelineProto)
                             break;
                         }
                     }
-                    if ($master_present) {
-                        $leave = $MadelineProto->
-                        channels->leaveChannel(
-                            ['channel' => $ch_id]
-                        );
-                        \danog\MadelineProto\Logger::log($leave);
+                    if (!$master_present) {
+                        check_json_array('leave.json', false, false);
+                        $file = file_get_contents("leave.json");
+                        $leave_ = json_decode($file, true);
+                        if (in_array('on', $leave_)) {
+                            $leave = $MadelineProto->
+                            channels->leaveChannel(
+                                ['channel' => $ch_id]
+                            );
+                            \danog\MadelineProto\Logger::log($leave);
+                        }
                     }
                 }
             }
@@ -700,12 +711,17 @@ function NewChatJoinedByLink($update, $MadelineProto)
                         }
                     }
                 }
-                if ($master_present) {
-                    $leave = $MadelineProto->
-                    channels->leaveChannel(
-                        ['channel' => $ch_id]
-                    );
-                    \danog\MadelineProto\Logger::log($leave);
+                if (!$master_present) {
+                    check_json_array('leave.json', false, false);
+                    $file = file_get_contents("leave.json");
+                    $leave_ = json_decode($file, true);
+                    if (in_array('on', $leave_)) {
+                        $leave = $MadelineProto->
+                        channels->leaveChannel(
+                            ['channel' => $ch_id]
+                        );
+                        \danog\MadelineProto\Logger::log($leave);
+                    }
                 }
             }
         }

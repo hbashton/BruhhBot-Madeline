@@ -19,7 +19,8 @@
         "rmccue/requests": ">=1.0",
         "cmfcmf/openweathermap-php-api": "dev-master",
         "spatie/emoji": "dev-master",
-        "krakjoe/pthreads-polyfill": "dev-master"
+        "krakjoe/pthreads-polyfill": "dev-master",
+        "nicmart/string-template": "~0.1"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"

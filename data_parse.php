@@ -110,14 +110,16 @@ function user_specific_data($update, $MadelineProto, $user)
                 $chat = cache_get_info($update, $MadelineProto, $value);
                 $title = $chat["Chat"]["title"];
                 $id = $chat['Chat']['id'];
-                $title_id = array(
-                    'title' => $title,
-                    'id' => $id);
-                if (!isset($ban_array)) {
-                    $ban_array = [];
-                    $ban_array[] = $title_id;
-                } else {
-                    $ban_array[] = $title_id;
+                if (!is_null($title) && !is_null($id)) {
+                    $title_id = array(
+                        'title' => $title,
+                        'id' => $id);
+                    if (!isset($ban_array)) {
+                        $ban_array = [];
+                        $ban_array[] = $title_id;
+                    } else {
+                        $ban_array[] = $title_id;
+                    }
                 }
             }
         }
@@ -227,5 +229,37 @@ function create_mention($offset, $username, $userid, $full = true)
             'offset' => $offset,
             'length' => strlen($username),
             'user_id' => $userid]);
+    }
+}
+
+function html_mention($username, $userid) {
+    $mention = "<a href=\"mention:$userid\">$username</a>";
+    return($mention);
+}
+
+function html_bold($text) {
+    $bold = "<b>$text</b>";
+    return($bold);
+}
+
+class Template_String {
+
+    public static function sprintf($format, array $args = array()) {
+        $arg_nums = array_slice(array_flip(array_keys(array(0 => 0) + $args)), 1);
+
+        for ($pos = 0; preg_match('/(?<=%)\(([a-zA-Z_][\w\s]*)\)/', $format, $match, PREG_OFFSET_CAPTURE, $pos);) {
+            $arg_pos = $match[0][1];
+            $arg_len = strlen($match[0][0]);
+            $arg_key = $match[1][0];
+
+            if (! array_key_exists($arg_key, $arg_nums)) {
+                user_error("sprintfn(): Missing argument '${arg_key}'", E_USER_WARNING);
+                return false;
+            }
+            $format = substr_replace($format, $replace = $arg_nums[$arg_key] . '$', $arg_pos, $arg_len);
+            $pos = $arg_pos + strlen($replace); // skip to end of replacement for next iteration
+        }
+
+        return vsprintf($format, array_values($args));
     }
 }

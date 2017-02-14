@@ -85,6 +85,9 @@ if (!isset($MadelineProto)) {
         'session.madeline'
     );
 }
+$responses_file = file_get_contents("responses.json");
+$responses = json_decode($responses_file, true);
+$engine = new StringTemplate\Engine;
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(
@@ -104,7 +107,6 @@ while (true) {
             }
             $NewMessage = new NewMessage($update, $MadelineProto);
             $NewMessage->start();
-            $NewMessage->join();
             break;
 
         case 'updateNewChannelMessage':
@@ -115,19 +117,15 @@ while (true) {
             $command = check_locked($update, $MadelineProto);
             $check = new Exec($command);
             $check->start();
-            $check->join();
             $command = check_flood($update, $MadelineProto);
             $check = new Exec($command);
             $check->start();
-            $check->join();
             $NewChannelMessage = new NewChannelMessage($update, $MadelineProto);
             $NewChannelMessage->start();
-            $NewChannelMessage->join();
             if (array_key_exists('action', $update['update']['message'])) {
                 $NewChannelMessageAction =
                     new NewChannelMessageAction($update, $MadelineProto);
                 $NewChannelMessageAction->start();
-                $NewChannelMessageAction->join();
             }
         }
     }

@@ -23,7 +23,7 @@ define('CONST_SERVER_TIMEZONE', 'UTC');
 /* server dateformat */
 define('CONST_SERVER_DATEFORMAT', 'l, j - H:i:s');
 
-function getloc($update, $MadelineProto, $area)
+function gettime($update, $MadelineProto, $area)
 {
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
@@ -67,11 +67,20 @@ function getloc($update, $MadelineProto, $area)
             $api_responsej = json_decode($api_response->body, true);
             $ctime = now($api_responsej['timeZoneId']);
             $timezone = $api_responsej['timeZoneId'];
-            $return = "The current time in $timezone is $ctime";
-            $message = str_replace("_", " ", $return);
+            $str = $responses['gettime']['success'];
+            $repl = array(
+                "timezone" => $timezone,
+                "ctime" => $ctime
+            );
+            $message = $engine->render($str, $repl);
+            $message = str_replace("_", " ", $message);
             $default['message'] = $message;
         } else {
-            $message = 'What the actual hell is "' . $area . '"';
+            $str = $responses['gettime']['fail'];
+            $repl = array(
+                "area" => $area
+            );
+            $message = $engine->render($str, $repl);;
             $default['message'] = $message;
         }
         if (isset($default['message'])) {

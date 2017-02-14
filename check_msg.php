@@ -107,6 +107,7 @@ function check_locked($update, $MadelineProto)
 function check_flood($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
+        global $responses, $engine;
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
@@ -145,15 +146,19 @@ function check_flood($update, $MadelineProto)
                                             'user_id' => $fromid,
                                             'kicked' => true]
                                         );
-                                        $message = "Flooding is not allowed here ".
-                                        $username;
-                                        $mention = create_mention(29, $username, $fromid);
+                                        $mention = html_mention($username, $fromid);
+                                        $str = $responses['check_flood']['kick'];
+                                        $repl = array(
+                                            "mention" => $mention
+                                        );
+                                        $message = $engine->render($str, $repl);
                                         if (isset($message)) {
                                             $sentMessage = $MadelineProto->
                                             messages->sendMessage(
                                                 ['peer' => $peer,
                                                 'reply_to_msg_id' => $msg_id,
-                                                'message' => $message]
+                                                'message' => $message,
+                                                'parse_mode' => 'html']
                                             );
                                         }
                                         if (isset($kick)) {

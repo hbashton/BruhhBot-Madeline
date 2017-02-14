@@ -21,8 +21,9 @@
 function set_chat_photo($update, $MadelineProto, $wait = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
+        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = "Only mods can use me to set this chat's photo!";
+        $mods = $responses['set_chat_photo']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -30,6 +31,7 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_moderated($ch_id)) {
@@ -71,25 +73,25 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                                         \danog\MadelineProto\Logger::log(
                                             $changePhoto
                                         );
-                                        $message = "Thanks! I've updated the photo".
-                                        " for $title";
+                                        $str = $responses['set_chat_photo']['success'];
+                                        $repl = array(
+                                            "title" => $title
+                                        );
+                                        $message = $engine->render($str, $repl);
                                         $default['message'] = $message;
 
                                     } catch (Exception $e) {
-                                        $message = "I am not an admin of this ".
-                                        "chat, and cannot change the photo.";
+                                        $message = $responses['set_chat_photo']['exception'];
                                         $default['message'] = $message;
                                     }
                                     unset($GLOBALS['from_user_chat_photo']);
                                 } else {
-                                    $message = "The message you sent was not a photo! ".
-                                    "Sorry, but the chat photo was not changed";
+                                    $message = $responses['set_chat_photo']['sorry'];
                                     $default['message'] = $message;
                                     unset($GLOBALS['from_user_chat_photo']);
                                 }
                             } else {
-                                $message = "The message you sent was not a photo! ".
-                                "Sorry, but the chat photo was not changed";
+                                $message = $responses['set_chat_photo']['sorry'];
                                 $default['message'] = $message;
                                 unset($GLOBALS['from_user_chat_photo']);
                             }
@@ -97,8 +99,7 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                     } else {
                         global $from_user_chat_photo;
                         $from_user_chat_photo = $fromid;
-                        $message = "Just send the new photo and I'll get right to ".
-                        "changing it!";
+                        $message = $responses['set_chat_photo']['ready'];
                         $default['message'] = $message;
                     }
                 }
@@ -118,8 +119,9 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
 function set_chat_title($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
+        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = "Only mods can change this chat's name!";
+        $mods = $responses['set_chat_title']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -127,6 +129,7 @@ function set_chat_title($update, $MadelineProto, $msg)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_moderated($ch_id)) {
@@ -138,24 +141,24 @@ function set_chat_title($update, $MadelineProto, $msg)
                     true
                 )
                 ) {
-                    if (!empty($msg)) {
+                    if ($msg) {
                         try {
                             $editTitle = $MadelineProto->channels->editTitle(
                                 ['channel' => $ch_id, 'title' => $msg ]
                             );
                             \danog\MadelineProto\Logger::log($editTitle);
-                            $message = "Chat Title successfully changed to $msg";
-                            $len = strlen($message) - strlen($msg);
-                            $entity = create_style('bold', $len, $msg);
+                            $str = $responses['set_chat_title']['success'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
                         } catch (Exception $e) {
-                            $message = "I am not an admin of this chat, and cannot ".
-                            "change the title.";
+                            $message = $responses['set_chat_title']['fail'];
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = "You can't make the title empty silly";
+                        $message = $responses['set_chat_title']['help'];
                         $default['message'] = $message;
                     }
                 }

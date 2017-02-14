@@ -21,8 +21,9 @@
 function lockme($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
+        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = "Only the powers that be may use this command!";
+        $mods = $responses['lockme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -30,6 +31,7 @@ function lockme($update, $MadelineProto, $msg)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         if (is_moderated($ch_id)) {
             $coniguration = file_get_contents("configuration.json");
@@ -48,14 +50,10 @@ function lockme($update, $MadelineProto, $msg)
                                 array_push($locked[$ch_id], $msg);
                                 file_put_contents('locked.json', json_encode($locked));
                                 $message = $cfg["lock"][$msg];
-                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
-                                $default['entities'] = $entity;
                             } else {
                                 $message = $cfg["lock"]["already"][$msg];
-                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
-                                $default['entities'] = $entity;
                             }
                         } else {
                             $locked[$ch_id] = [];
@@ -65,17 +63,19 @@ function lockme($update, $MadelineProto, $msg)
                             array_push($locked[$ch_id], $msg);
                             file_put_contents('locked.json', json_encode($locked));
                             $message = $cfg["lock"][$msg];
-                            $entity = create_style('bold', 0, $cfg['length'][$msg]);
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
                         }
                     }
                 } else {
-                    $message = "$msg is not a valid lock type";
+                    $str = $responses['lockme']['invalid'];
+                    $repl = array(
+                        "msg" => $msg
+                    );
+                    $message = $engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = "Use /lock [type]";
+                $message = $responses['lockme']['help'];
                 $default['message'] = $message;
             }
         }
@@ -93,8 +93,9 @@ function lockme($update, $MadelineProto, $msg)
 function unlockme($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
+        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = "Only the powers that be may use this command!";
+        $mods = $responses['unlockme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -102,6 +103,7 @@ function unlockme($update, $MadelineProto, $msg)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         if (is_moderated($ch_id)) {
             $coniguration = file_get_contents("configuration.json");
@@ -126,14 +128,10 @@ function unlockme($update, $MadelineProto, $msg)
                                 }
                                 file_put_contents('locked.json', json_encode($locked));
                                 $message = $cfg["unlock"][$msg];
-                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
-                                $default['entities'] = $entity;
                             } else {
                                 $message = $cfg["unlock"]["already"][$msg];
-                                $entity = create_style('bold', 0, $cfg['length'][$msg]);
                                 $default['message'] = $message;
-                                $default['entities'] = $entity;
                             }
                         } else {
                             $locked[$ch_id] = [];
@@ -142,17 +140,23 @@ function unlockme($update, $MadelineProto, $msg)
                             }
                             file_put_contents('locked.json', json_encode($locked));
                             $message = $cfg["unlock"]["already"][$msg];
-                            $entity = create_style('bold', 0, $cfg['length'][$msg]);
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
                         }
                     }
                 } else {
-                    $message = "$msg is not a valid lock type";
+                    $str = $responses['unlockme']['invalid'];
+                    $repl = array(
+                        "msg" => $msg
+                    );
+                    $message = $engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = "Use /unlock [type]";
+                $str = $responses['unlockme']['help'];
+                $repl = array(
+                    "msg" => $msg
+                );
+                $message = $engine->render($str, $repl);
                 $default['message'] = $message;
             }
         }
@@ -171,7 +175,7 @@ function setflood($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
-        $mods = "The floodgates only respond to mods";
+        $mods = $repsonse['setflood']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];
@@ -179,6 +183,7 @@ function setflood($update, $MadelineProto, $msg)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         if (is_moderated($ch_id)) {
             if (!empty($msg)) {
@@ -190,28 +195,34 @@ function setflood($update, $MadelineProto, $msg)
                         if (array_key_exists($ch_id, $locked)) {
                             $locked[$ch_id]['floodlimit'] = (int) $msg;
                             file_put_contents('locked.json', json_encode($locked));
-                            $message = "Flood has been set to $msg";
-                            $len = strlen($message) - strlen($msg);
-                            $entity = create_style('bold', $len, $msg);
+                            $str = $responses['setflood']['success'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
                         } else {
                             $locked[$ch_id] = [];
                             $locked[$ch_id]['floodlimit'] = (int) $msg;
                             file_put_contents('locked.json', json_encode($locked));
-                            $message = "Flood has been set to $msg";
-                            $len = strlen($message) - strlen($msg);
-                            $entity = create_style('bold', $len, $msg);
+                            $str = $responses['setflood']['success'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
                             $default['message'] = $message;
-                            $default['entities'] = $entity;
                         }
                     }
                 } else {
-                    $message = "$msg is not a numeric value.";
+                    $str = $responses['setflood']['invalid'];
+                    $repl = array(
+                        "msg" => $msg
+                    );
+                    $message = $engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = "Use /setflood integer";
+                $message = $responses['setflood']['help'];
                 $default['message'] = $message;
             }
         }
