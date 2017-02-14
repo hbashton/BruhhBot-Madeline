@@ -27,7 +27,7 @@ class NewMessage extends Thread {
                         case 'time':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
-                            getloc($update, $MadelineProto, $msg);
+                            gettime($update, $MadelineProto, $msg);
                         break;
 
                         case 'weather':
@@ -178,7 +178,7 @@ class NewChannelMessage extends Thread {
                             case 'time':
                                 unset($msg_arr[0]);
                                 $msg = implode(" ", $msg_arr);
-                                getloc($update, $MadelineProto, $msg);
+                                gettime($update, $MadelineProto, $msg);
                             break;
 
                             case 'weather':
@@ -466,6 +466,9 @@ class NewChannelMessageAction extends Thread {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         switch ($update['update']['message']['action']['_']) {
+        case 'messageActionPinMessage':
+            pinalert($update, $MadelineProto);
+        break;
         case 'messageActionChatAddUser':
             NewChatAddUser($update, $MadelineProto);
         break;

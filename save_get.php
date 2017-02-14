@@ -19,6 +19,7 @@
  */
 function saveme($update, $MadelineProto, $msg, $name)
 {
+    global $responses, $engine;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -43,7 +44,7 @@ function saveme($update, $MadelineProto, $msg, $name)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html',
             );
-        $mods = "Only mods get to save messages. You don't fit that criteria.";
+        $mods = $responses['saveme']['mods'];
         if ($peerUSER
             or from_admin_mod($update, $MadelineProto, $mods, true)
         ) {
@@ -72,18 +73,26 @@ function saveme($update, $MadelineProto, $msg, $name)
                     }
                     $saved[$ch_id][$name] = $msg;
                     file_put_contents('saved.json', json_encode($saved));
-                    $message = "Message $codename has been saved";
+                    $str = $responses['saveme']['success'];
+                    $repl = array(
+                        "name" => $name
+                    );
+                    $message = $engine->render($str, $repl);
                     $default['message'] = $message;
                 } else {
                     $saved[$ch_id] = [];
                     $saved[$ch_id]["from"] = [];
                     $saved[$ch_id][$name] = $msg;
                     file_put_contents('saved.json', json_encode($saved));
-                    $message = "Message $codename has been saved";
+                    $str = $responses['saveme']['success'];
+                    $repl = array(
+                        "name" => $name
+                    );
+                    $message = $engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = "Use <code>/save name message</code> to save a message for later!";
+                $message = $responses['saveme']['help'];
                 $default['message'] = $message;
             }
             if (isset($default['message'])) {
@@ -166,6 +175,7 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
+    global $responses, $engine;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -184,13 +194,12 @@ function savefrom($update, $MadelineProto, $name)
         $peerUSER = false;
     }
     $replyto = $update['update']['message']['id'];
-    $mods = "Only mods get to save messages. You don't fit that criteria.";
+    $mods = $responses['savefrom']['mods'];
     $default = array(
         'peer' => $peer,
         'reply_to_msg_id' => $replyto,
         'parse_mode' => 'html',
     );
-    $codename = "<code>$name</code>";
     if ($peerUSER or from_admin_mod($update, $MadelineProto, $mods, true)) {
         if (array_key_exists("reply_to_msg_id", $update["update"]["message"])) {
             $msg_id = $update['update']['message']["reply_to_msg_id"];
@@ -208,7 +217,11 @@ function savefrom($update, $MadelineProto, $name)
                     unset($saved[$ch_id][$name]);
                 }
                 file_put_contents('saved.json', json_encode($saved));
-                $message = "Message $codename has been saved";
+                $str = $responses['savefrom']['success'];
+                $repl = array(
+                    "name" => $name
+                );
+                $message = $engine->render($str, $repl);
                 $default['message'] = $message;
             } else {
                 $saved[$ch_id] = [];
@@ -217,11 +230,15 @@ function savefrom($update, $MadelineProto, $name)
                 $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
                 $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
                 file_put_contents('saved.json', json_encode($saved));
-                $message = "Message $codename has been saved";
+                $str = $responses['savefrom']['success'];
+                $repl = array(
+                    "name" => $name
+                );
+                $message = $engine->render($str, $repl);
                 $default['message'] = $message;
             }
         } else {
-            $message = "Save a message by reply with <code>/save from name</code>";
+            $message = $responses['savefrom']['help'];
             $default['message'] = $message;
         }
     }

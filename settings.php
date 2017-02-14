@@ -36,7 +36,8 @@ function get_settings($update, $MadelineProto)
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": <code>Yes</code>\r\n";
                         } else {
-                            $message = "Lock ".$cfg['settings_template'][$key].
+                            $message = "<b>Settings for $title:</b>\r\n".
+                            "Lock ".$cfg['settings_template'][$key].
                             ": <code>Yes</code>\r\n";
                         }
                     } else {
@@ -44,7 +45,8 @@ function get_settings($update, $MadelineProto)
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": <code>No</code>\r\n";
                         } else {
-                            $message = "Lock ".$cfg['settings_template'][$key].
+                            $message = "<b>Settings for $title:</b>\r\n".
+                            "Lock ".$cfg['settings_template'][$key].
                             ": <code>No</code>\r\n";
                         }
                     }
@@ -62,7 +64,8 @@ function get_settings($update, $MadelineProto)
                             ": <code>Yes</code>\r\n";
 
                         } else {
-                            $message = "Lock ".$cfg['settings_template'][$key].
+                            $message = "<b>Settings for $title:</b>\r\n".
+                            "Lock ".$cfg['settings_template'][$key].
                             ": <code>Yes</code>\r\n";
                         }
                     } else {
@@ -70,7 +73,8 @@ function get_settings($update, $MadelineProto)
                             $message = $message."Lock ".$cfg['settings_template'][$key].
                             ": <code>No</code>\r\n";
                         } else {
-                            $message = "Lock ".$cfg['settings_template'][$key].
+                            $message = "<b>Settings for $title:</b>\r\n".
+                            "Lock ".$cfg['settings_template'][$key].
                             ": <code>No</code>\r\n";
                         }
                     }

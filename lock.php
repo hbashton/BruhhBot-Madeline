@@ -173,6 +173,7 @@ function unlockme($update, $MadelineProto, $msg)
 
 function setflood($update, $MadelineProto, $msg)
 {
+    global $responses, $engine;
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
         $mods = $repsonse['setflood']['mods'];

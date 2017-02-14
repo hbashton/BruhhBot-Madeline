@@ -556,3 +556,28 @@ function leave_setting($update, $MadelineProto, $msg) {
         }
     }
 }
+function pinalert($update, $MadelineProto) {
+    $chat = parse_chat_data($update, $MadelineProto);
+    $ch_id = $chat['id'];
+    $chatpeer = $chat['peer'];
+    $title = $chat['title'];
+    $msgid = $update['update']['message']['id'];
+    $peer = cache_get_info(
+        $update,
+        $MadelineProto,
+        getenv('MASTER_USERNAME')
+    )['bot_api_id'];
+    $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+    $username = catch_id($update, $MadelineProto, $fromid)[2];
+    $mention = html_mention($username, $fromid);
+    $default = array(
+        'peer' => $peer,
+        'parse_mode' => 'html'
+    );
+    $message = "User $mention pinned a message in <b>$title</b> - $ch_id";
+    $default['message'] = $message;
+    $sentMessage = $MadelineProto->messages->sendMessage(
+        $default
+    );
+    \danog\MadelineProto\Logger::log($sentMessage);
+}

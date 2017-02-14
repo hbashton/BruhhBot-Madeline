@@ -333,6 +333,7 @@ function kickhim($update, $MadelineProto, $msg)
 
 function kickme($update, $MadelineProto)
 {
+    global $responses, $engine;
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
         $chat = parse_chat_data($update, $MadelineProto);
