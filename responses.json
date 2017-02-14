@@ -78,7 +78,7 @@
     {
         "mods":"Only mods can get us a new invite link.",
         "link":"The new invite link is {link}",
-        "exception":"I am not the owner of this chat. On the bright side, just save the invite link with my <code>/save</code> command."
+        "exception":"I couldn't get us a new link. On the bright side, just save the invite link with my <code>/save</code> command."
     },
     "public_toggle":
     {
@@ -99,13 +99,13 @@
     {
         "idk":"I don't know a {msg}, who's that?",
         "success":"{mention} is now an admin of <b>{title}</b>",
-        "exception":"I am not the owner of this chat, and cannot add any admins"
+        "exception":"I couldn't change the admins"
     },
     "rmadmin":
     {
         "idk":"I don't know a {msg}, who's that?",
         "success":"{mention} is no longer an admin of <b>{title}</b>",
-        "exception":"I am not the owner of this chat, and cannot remove any admins"
+        "exception":"I couldn't change the admins"
     },
     "idme":
     {
