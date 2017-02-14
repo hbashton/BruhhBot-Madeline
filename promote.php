@@ -54,7 +54,7 @@ function promoteme($update, $MadelineProto, $msg)
                             $message = $engine->render($str, $repl);
                             $default['message'] = $message;
                         } else {
-                            $str = $responses['addadmin']['already'];
+                            $str = $responses['promoteme']['already'];
                             $repl = array(
                                 "mention" => $mention,
                                 "title" => $title
@@ -97,8 +97,8 @@ function promoteme($update, $MadelineProto, $msg)
 
 function demoteme($update, $MadelineProto, $msg)
 {
+    global $responses, $engine;
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
         $mods = "Wow. Mr. I'm not admin over here is trying to DEMOTE people.";
         $chat = parse_chat_data($update, $MadelineProto);
@@ -108,13 +108,14 @@ function demoteme($update, $MadelineProto, $msg)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         if (from_admin($update, $MadelineProto, $mods, true)) {
             $id = catch_id($update, $MadelineProto, $msg);
             if ($id[0]) {
                 $userid = $id[1];
                 $username = $id[2];
-                $mention = create_mention(5, $username, $userid);
+                $mention = html_mention($username, $userid);
                 check_json_array('promoted.json', $ch_id);
                 $file = file_get_contents("promoted.json");
                 $promoted = json_decode($file, true);

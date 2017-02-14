@@ -310,12 +310,13 @@ function modlist($update, $MadelineProto)
                 }
                 $default['message'] = $message;
             }
-            if (!isset($mention)) {
-                $message = $responses['modlist']['none'];
+            if (!isset($message)) {
+                $str = $responses['modlist']['none'];
+                        $repl = array(
+                            "title" => $title
+                        );
+                $message = $engine->render($str, $repl);
                 $default['message'] = $message;
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
             }
         }
         if (isset($default['message'])) {

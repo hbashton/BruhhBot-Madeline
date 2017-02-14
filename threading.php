@@ -53,6 +53,24 @@ class NewMessage extends Thread {
                             $msg = implode(" ", $msg_arr);
                             leave_setting($update, $MadelineProto, $msg);
                         break;
+                        
+                        case 'newgroup':
+                            unset($msg_arr[0]);
+                            if (isset($msg_arr[1]) && isset($msg_arr[2])) {
+                                $title = $msg_arr[1];
+                                unset($msg_arr[1]);
+                                $about = implode(" ", $msg_arr);
+                            } else {
+                                $title = "";
+                                $about = "";
+                                }
+                            create_new_supergroup(
+                                $update,
+                                $MadelineProto,
+                                $title,
+                                $about
+                            );
+                        break;
                     }
                 }
                 if (array_key_exists("fwd_from", $update['update']['message'])) {
@@ -401,24 +419,6 @@ class NewChannelMessage extends Thread {
                                 export_new_invite($update, $MadelineProto);
                             break;
 
-                            case 'newgroup':
-                                unset($msg_arr[0]);
-                                if (isset($msg_arr[1]) && isset($msg_arr[2])) {
-                                        $title = $msg_arr[1];
-                                        unset($msg_arr[1]);
-                                        $about = implode(" ", $msg_arr);
-                                } else {
-                                        $title = "";
-                                        $about = "";
-                                }
-                                create_new_supergroup(
-                                    $update,
-                                    $MadelineProto,
-                                    $title,
-                                    $about
-                                );
-                            break;
-
                             case 'lock':
                                 if (isset($msg_arr[1])) {
                                         $name = $msg_arr[1];
@@ -503,6 +503,7 @@ function NewChatAddUser($update, $MadelineProto)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         $mention = $id[1];
         if (is_moderated($ch_id)) {
@@ -557,9 +558,8 @@ function NewChatAddUser($update, $MadelineProto)
             $bot_id = $MadelineProto->
                 API->datacenter->authorization['user']['id'];
             if ($mention !== $bot_id && empty($default['message'])) {
-                    $message = "Hi $username, welcome to $title";
-                    $entity = create_mention(3, $username, $mention);
-                    $default['entities'] = $entity;
+                    $mention2 = html_mention($username, $mention);
+                    $message = "Hi $mention2, welcome to <b>$title</b>";
                     $default['message'] = $message;
                     $sentMessage = $MadelineProto->
                     messages->sendMessage($default);
@@ -628,6 +628,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         if (is_moderated($ch_id)) {
             check_json_array('banlist.json', $ch_id);
@@ -681,9 +682,8 @@ function NewChatJoinedByLink($update, $MadelineProto)
             $bot_id = $MadelineProto->
                 API->datacenter->authorization['user']['id'];
             if ($mention !== $bot_id && empty($default['message'])) {
-                    $message = "Hi $username, welcome to $title";
-                    $entity = create_mention(3, $username, $mention);
-                    $default['entities'] = $entity;
+                    $mention2 = html_mention($username, $mention);
+                    $message = "Hi $mention2, welcome to <b>$title</b>";
                     $default['message'] = $message;
                     $sentMessage = $MadelineProto->
                     messages->sendMessage($default);

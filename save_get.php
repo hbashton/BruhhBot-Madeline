@@ -59,49 +59,52 @@ function saveme($update, $MadelineProto, $msg, $name)
                     }
                 }
             }
-            if ($name && $msg) {
-                $codename = "<code>$name</code>";
-                check_json_array('saved.json', $ch_id);
-                $file = file_get_contents("saved.json");
-                $saved = json_decode($file, true);
-                if (array_key_exists($ch_id, $saved)) {
-                    if (!array_key_exists("from", $saved[$ch_id])) {
+            if (strlen($msg) < 2000) {
+                if ($name && $msg) {
+                    var_dump(strlen($msg));
+                    $codename = "<code>$name</code>";
+                    check_json_array('saved.json', $ch_id);
+                    $file = file_get_contents("saved.json");
+                    $saved = json_decode($file, true);
+                    if (array_key_exists($ch_id, $saved)) {
+                        if (!array_key_exists("from", $saved[$ch_id])) {
+                            $saved[$ch_id]["from"] = [];
+                        }
+                        if (array_key_exists($name, $saved[$ch_id]["from"])) {
+                            unset($saved[$ch_id]["from"][$name]);
+                        }
+                        $saved[$ch_id][$name] = $msg;
+                        file_put_contents('saved.json', json_encode($saved));
+                        $str = $responses['saveme']['success'];
+                        $repl = array(
+                            "name" => $name
+                        );
+                        $message = $engine->render($str, $repl);
+                        $default['message'] = $message;
+                    } else {
+                        $saved[$ch_id] = [];
                         $saved[$ch_id]["from"] = [];
+                        $saved[$ch_id][$name] = $msg;
+                        file_put_contents('saved.json', json_encode($saved));
+                        $str = $responses['saveme']['success'];
+                        $repl = array(
+                            "name" => $name
+                        );
+                        $message = $engine->render($str, $repl);
+                        $default['message'] = $message;
                     }
-                    if (array_key_exists($name, $saved[$ch_id]["from"])) {
-                        unset($saved[$ch_id]["from"][$name]);
-                    }
-                    $saved[$ch_id][$name] = $msg;
-                    file_put_contents('saved.json', json_encode($saved));
-                    $str = $responses['saveme']['success'];
-                    $repl = array(
-                        "name" => $name
-                    );
-                    $message = $engine->render($str, $repl);
-                    $default['message'] = $message;
                 } else {
-                    $saved[$ch_id] = [];
-                    $saved[$ch_id]["from"] = [];
-                    $saved[$ch_id][$name] = $msg;
-                    file_put_contents('saved.json', json_encode($saved));
-                    $str = $responses['saveme']['success'];
-                    $repl = array(
-                        "name" => $name
-                    );
-                    $message = $engine->render($str, $repl);
+                    $message = $responses['saveme']['help'];
                     $default['message'] = $message;
                 }
-            } else {
-                $message = $responses['saveme']['help'];
-                $default['message'] = $message;
-            }
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
-            if (isset($sentMessage)) {
-                \danog\MadelineProto\Logger::log($sentMessage);
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                }
+                if (isset($sentMessage)) {
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
             }
         }
     }
@@ -138,10 +141,14 @@ function getme($update, $MadelineProto, $name)
         $saved = json_decode($file, true);
         $boldname = html_bold($name);
         if (array_key_exists($ch_id, $saved)) {
-            foreach ($saved[$ch_id] as $i => $ii) {
-                if ($i == $name) {
-                    $message = "$boldname:\r\n".$saved[$ch_id][$i];
-                    $default['message'] = $message;
+            if ($name !== "from") {
+                foreach ($saved[$ch_id] as $i => $ii) {
+                    if (!is_array($i)) {
+                        if ($i == $name) {
+                            $message = "$boldname:\r\n".$saved[$ch_id][$i];
+                            $default['message'] = $message;
+                        }
+                    }
                 }
             }
             if (!isset($message)) {
@@ -201,45 +208,47 @@ function savefrom($update, $MadelineProto, $name)
         'parse_mode' => 'html',
     );
     if ($peerUSER or from_admin_mod($update, $MadelineProto, $mods, true)) {
-        if (array_key_exists("reply_to_msg_id", $update["update"]["message"])) {
-            $msg_id = $update['update']['message']["reply_to_msg_id"];
-            check_json_array('saved.json', $ch_id);
-            $file = file_get_contents("saved.json");
-            $saved = json_decode($file, true);
-            if (array_key_exists($ch_id, $saved)) {
-                if (!array_key_exists("from", $saved[$ch_id])) {
+        if ($name !== "from") {
+            if (array_key_exists("reply_to_msg_id", $update["update"]["message"])) {
+                $msg_id = $update['update']['message']["reply_to_msg_id"];
+                check_json_array('saved.json', $ch_id);
+                $file = file_get_contents("saved.json");
+                $saved = json_decode($file, true);
+                if (array_key_exists($ch_id, $saved)) {
+                    if (!array_key_exists("from", $saved[$ch_id])) {
+                        $saved[$ch_id]["from"] = [];
+                    }
+                    $saved[$ch_id]["from"][$name] = [];
+                    $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
+                    $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
+                    if (array_key_exists($name, $saved[$ch_id])) {
+                        unset($saved[$ch_id][$name]);
+                    }
+                    file_put_contents('saved.json', json_encode($saved));
+                    $str = $responses['savefrom']['success'];
+                    $repl = array(
+                        "name" => $name
+                    );
+                    $message = $engine->render($str, $repl);
+                    $default['message'] = $message;
+                } else {
+                    $saved[$ch_id] = [];
                     $saved[$ch_id]["from"] = [];
+                    $saved[$ch_id]["from"][$name] = [];
+                    $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
+                    $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
+                    file_put_contents('saved.json', json_encode($saved));
+                    $str = $responses['savefrom']['success'];
+                    $repl = array(
+                        "name" => $name
+                    );
+                    $message = $engine->render($str, $repl);
+                    $default['message'] = $message;
                 }
-                $saved[$ch_id]["from"][$name] = [];
-                $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
-                $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
-                if (array_key_exists($name, $saved[$ch_id])) {
-                    unset($saved[$ch_id][$name]);
-                }
-                file_put_contents('saved.json', json_encode($saved));
-                $str = $responses['savefrom']['success'];
-                $repl = array(
-                    "name" => $name
-                );
-                $message = $engine->render($str, $repl);
-                $default['message'] = $message;
             } else {
-                $saved[$ch_id] = [];
-                $saved[$ch_id]["from"] = [];
-                $saved[$ch_id]["from"][$name] = [];
-                $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
-                $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
-                file_put_contents('saved.json', json_encode($saved));
-                $str = $responses['savefrom']['success'];
-                $repl = array(
-                    "name" => $name
-                );
-                $message = $engine->render($str, $repl);
+                $message = $responses['savefrom']['help'];
                 $default['message'] = $message;
             }
-        } else {
-            $message = $responses['savefrom']['help'];
-            $default['message'] = $message;
         }
     }
     if (isset($default['message'])) {
@@ -285,10 +294,12 @@ function saved_get($update, $MadelineProto)
         $saved = json_decode($file, true);
         if (array_key_exists($ch_id, $saved)) {
             foreach ($saved[$ch_id] as $i => $ii) {
-                if (!isset($message)) {
-                    $message = "<b>Saved messages for $title:</b>\r\n<code>$i</code>\r\n";
-                } else {
-                    $message = "$message<code>$i</code>\r\n";
+                if ($i !== "from") {
+                    if (!isset($message)) {
+                        $message = "<b>Saved messages for $title:</b>\r\n<code>$i</code>\r\n";
+                    } else {
+                        $message = "$message<code>$i</code>\r\n";
+                    }
                 }
             }
             if (array_key_exists("from", $saved[$ch_id])) {
@@ -332,53 +343,55 @@ function save_clear($update, $MadelineProto, $msg) {
         $peerUSER = false;
     }
     if ($cont) {
-        $msg_id = $update['update']['message']['id'];
-        $default = array(
-            'peer' => $peer,
-            'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html',
-            );
-        $mods = "Why the hell would we let a normal user clear saved messages?";
-        if ($peerUSER
-            or from_admin_mod($update, $MadelineProto, $mods, true)
-        ) {
-            if ($msg) {
-                check_json_array('saved.json', $ch_id);
-                $file = file_get_contents("saved.json");
-                $saved = json_decode($file, true);
-                if (array_key_exists($ch_id, $saved)) {
-                    if (!array_key_exists("from", $saved[$ch_id])) {
-                        $saved[$ch_id]["from"] = [];
-                    }
-                    if (array_key_exists($msg, $saved[$ch_id]["from"])) {
-                        unset($saved[$ch_id]["from"][$msg]);
-                        $message = "<code>$msg</code> was successfully cleared";
-                        $default['message'] = $message;
-                        file_put_contents('saved.json', json_encode($saved));
-                    } elseif (array_key_exists($msg, $saved[$ch_id])) {
-                        unset($saved[$ch_id][$msg]);
-                        $message = "<code>$msg</code> was successfully cleared";
-                        $default['message'] = $message;
-                        file_put_contents('saved.json', json_encode($saved));
+        if ($msg !== "from") {
+            $msg_id = $update['update']['message']['id'];
+            $default = array(
+                'peer' => $peer,
+                'reply_to_msg_id' => $msg_id,
+                'parse_mode' => 'html',
+                );
+            $mods = "Why the hell would we let a normal user clear saved messages?";
+            if ($peerUSER
+                or from_admin_mod($update, $MadelineProto, $mods, true)
+            ) {
+                if ($msg) {
+                    check_json_array('saved.json', $ch_id);
+                    $file = file_get_contents("saved.json");
+                    $saved = json_decode($file, true);
+                    if (array_key_exists($ch_id, $saved)) {
+                        if (!array_key_exists("from", $saved[$ch_id])) {
+                            $saved[$ch_id]["from"] = [];
+                        }
+                        if (array_key_exists($msg, $saved[$ch_id]["from"])) {
+                            unset($saved[$ch_id]["from"][$msg]);
+                            $message = "<code>$msg</code> was successfully cleared";
+                            $default['message'] = $message;
+                            file_put_contents('saved.json', json_encode($saved));
+                        } elseif (array_key_exists($msg, $saved[$ch_id])) {
+                            unset($saved[$ch_id][$msg]);
+                            $message = "<code>$msg</code> was successfully cleared";
+                            $default['message'] = $message;
+                            file_put_contents('saved.json', json_encode($saved));
+                        } else {
+                            $message = "<code>$msg</code> is not a saved message";
+                            $default['message'] = $message;
+                        }
                     } else {
                         $message = "<code>$msg</code> is not a saved message";
                         $default['message'] = $message;
                     }
                 } else {
-                    $message = "<code>$msg</code> is not a saved message";
+                    $message = "Use <code>/save clear message</code> to clear the contents of a message";
                     $default['message'] = $message;
                 }
-            } else {
-                $message = "Use <code>/save clear message</code> to clear the contents of a message";
-                $default['message'] = $message;
-            }
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
-            if (isset($sentMessage)) {
-                \danog\MadelineProto\Logger::log($sentMessage);
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                }
+                if (isset($sentMessage)) {
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
             }
         }
     }

@@ -250,7 +250,7 @@ function kickhim($update, $MadelineProto, $msg)
         $mods = $responses['kickhim']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = html_bold($chat['title']);
+        $title = $chat['title'];
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,

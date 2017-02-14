@@ -25,6 +25,7 @@ define('CONST_SERVER_DATEFORMAT', 'l, j - H:i:s');
 
 function gettime($update, $MadelineProto, $area)
 {
+    global $responses, $engine;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
