@@ -68,6 +68,7 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
         }
     }
 }
+
 function export_new_invite($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {

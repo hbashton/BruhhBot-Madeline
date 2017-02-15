@@ -146,7 +146,8 @@ function user_specific_data($update, $MadelineProto, $user)
     }
 }
 
-function is_gbanned($update, $MadelineProto, $user) {
+function is_gbanned($update, $MadelineProto, $user)
+{
     check_json_array('gbanlist.json', false, false);
     $file = file_get_contents("gbanlist.json");
     $gbanlist = json_decode($file, true);
@@ -163,7 +164,8 @@ function is_gbanned($update, $MadelineProto, $user) {
     }
 }
 
-function is_banned_anywhere($update, $MadelineProto, $user) {
+function is_banned_anywhere($update, $MadelineProto, $user)
+{
     check_json_array('banlist.json', false, false);
     $file = file_get_contents("banlist.json");
     $banlist = json_decode($file, true);
@@ -232,19 +234,23 @@ function create_mention($offset, $username, $userid, $full = true)
     }
 }
 
-function html_mention($username, $userid) {
+function html_mention($username, $userid)
+{
     $mention = "<a href=\"mention:$userid\">$username</a>";
     return($mention);
 }
 
-function html_bold($text) {
+function html_bold($text)
+{
     $bold = "<b>$text</b>";
     return($bold);
 }
 
-class Template_String {
+class Template_String
+{
 
-    public static function sprintf($format, array $args = array()) {
+    public static function sprintf($format, array $args = array())
+    {
         $arg_nums = array_slice(array_flip(array_keys(array(0 => 0) + $args)), 1);
 
         for ($pos = 0; preg_match('/(?<=%)\(([a-zA-Z_][\w\s]*)\)/', $format, $match, PREG_OFFSET_CAPTURE, $pos);) {
@@ -264,13 +270,15 @@ class Template_String {
     }
 }
 
-function cb($content){
+function cb($content)
+{
 
-  if(!mb_check_encoding($content, 'UTF-8')
-   OR !($content === mb_convert_encoding(mb_convert_encoding($content, 'UTF-32', 'UTF-8' ), 'UTF-8', 'UTF-32'))) {
+    if (!mb_check_encoding($content, 'UTF-8')
+        OR !($content === mb_convert_encoding(mb_convert_encoding($content, 'UTF-32', 'UTF-8'), 'UTF-8', 'UTF-32'))
+    ) {
 
-    $content = mb_convert_encoding($content, 'UTF-8');
+        $content = mb_convert_encoding($content, 'UTF-8');
 
-  }
-  return $content;
+    }
+    return $content;
 }

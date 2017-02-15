@@ -229,7 +229,7 @@ function muteall($update, $MadelineProto, $send = true)
                             array_push($mutelist[$ch_id], $userid);
                             file_put_contents(
                                 'mutelist.json',
-                                 json_encode($mutelist)
+                                json_encode($mutelist)
                             );
                             $message = $responses['muteall']['success'];
                             $default['message'] = $message;
@@ -242,7 +242,7 @@ function muteall($update, $MadelineProto, $send = true)
                         array_push($mutelist[$ch_id], $userid);
                         file_put_contents(
                             'mutelist.json',
-                             json_encode($mutelist)
+                            json_encode($mutelist)
                         );
                         $message = $responses['muteall']['success'];
                         $default['message'] = $message;

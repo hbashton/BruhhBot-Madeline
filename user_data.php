@@ -1,6 +1,7 @@
 <?php
 
-function get_user_stats($update, $MadelineProto, $user) {
+function get_user_stats($update, $MadelineProto, $user) 
+{
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,

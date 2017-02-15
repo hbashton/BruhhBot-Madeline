@@ -49,7 +49,7 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                 $banmod,
                                 true
                             )
-                        ) {
+                            ) {
                                 $username = $id[2];
                                 $mention = html_mention($username, $userid);
                                 check_json_array('banlist.json', $ch_id);
@@ -371,7 +371,8 @@ function kickme($update, $MadelineProto)
                         );
                         $message = $engine->render($str, $repl);
                         $default['message'] = $message;
-                    } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                    } catch (\danog\MadelineProto\RPCErrorException $e) {
+                    }
                 }
             }
         }
@@ -502,7 +503,8 @@ function unbanall($update, $MadelineProto, $msg)
                                         'user_id' => $userid,
                                         'kicked' => false]
                                     );
-                                } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                                } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                }
                             } else {
                                 $str = $responses['unbanall']['already'];
                                 $repl = array(
@@ -600,7 +602,8 @@ function banall($update, $MadelineProto, $msg, $send = true)
                                         } catch (
                                         \danog\MadelineProto\RPCErrorException
                                         $e
-                                        ) {}
+                                        ) {
+                                        }
                                     } else {
                                         $str = $responses['banall']['already'];
                                         $repl = array(

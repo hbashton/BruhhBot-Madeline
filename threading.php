@@ -1,13 +1,16 @@
 <?php
 
-class NewMessage extends Thread {
+class NewMessage extends Thread
+{
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) {
+    public function __construct($update, $MadelineProto) 
+    {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() {
+    public function run() 
+    {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         if (array_key_exists('message', $update['update']['message'])) {
@@ -24,52 +27,52 @@ class NewMessage extends Thread {
                     $msg_id = $update['update']['message']['id'];
                     $msg_arr = explode(' ', trim($msg));
                     switch ($msg_arr[0]) {
-                        case 'time':
-                            unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            gettime($update, $MadelineProto, $msg);
+                    case 'time':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        gettime($update, $MadelineProto, $msg);
                         break;
 
-                        case 'weather':
-                            unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            getweather($update, $MadelineProto, $msg);
+                    case 'weather':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        getweather($update, $MadelineProto, $msg);
                         break;
 
-                        case 'id':
-                            unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            idme($update, $MadelineProto, $msg);
+                    case 'id':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        idme($update, $MadelineProto, $msg);
                         break;
 
-                        case 'stats':
-                            unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            get_user_stats($update, $MadelineProto, $msg);
+                    case 'stats':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        get_user_stats($update, $MadelineProto, $msg);
                         break;
 
-                        case 'leave':
-                            unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            leave_setting($update, $MadelineProto, $msg);
+                    case 'leave':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        leave_setting($update, $MadelineProto, $msg);
                         break;
                         
-                        case 'newgroup':
-                            unset($msg_arr[0]);
-                            if (isset($msg_arr[1]) && isset($msg_arr[2])) {
-                                $title = $msg_arr[1];
-                                unset($msg_arr[1]);
-                                $about = implode(" ", $msg_arr);
-                            } else {
-                                $title = "";
-                                $about = "";
-                                }
-                            create_new_supergroup(
-                                $update,
-                                $MadelineProto,
-                                $title,
-                                $about
-                            );
+                    case 'newgroup':
+                        unset($msg_arr[0]);
+                        if (isset($msg_arr[1]) && isset($msg_arr[2])) {
+                            $title = $msg_arr[1];
+                            unset($msg_arr[1]);
+                            $about = implode(" ", $msg_arr);
+                        } else {
+                            $title = "";
+                            $about = "";
+                        }
+                        create_new_supergroup(
+                            $update,
+                            $MadelineProto,
+                            $title,
+                            $about
+                        );
                         break;
                     }
                 }
@@ -82,14 +85,17 @@ class NewMessage extends Thread {
     }
 }
 
-class NewChannelMessage extends Thread {
+class NewChannelMessage extends Thread
+{
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) {
+    public function __construct($update, $MadelineProto) 
+    {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() {
+    public function run() 
+    {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
@@ -160,7 +166,8 @@ class NewChannelMessage extends Thread {
                                     \danog\MadelineProto\Logger::log(
                                         $sentMessage
                                     );
-                                } catch (Exception $e) {}
+                                } catch (Exception $e) {
+                                }
                             }
                         }
                     }
@@ -193,258 +200,258 @@ class NewChannelMessage extends Thread {
                         $msg_id = $update['update']['message']['id'];
                         $msg_arr = explode(' ', trim($msg));
                         switch ($msg_arr[0]) {
-                            case 'time':
+                        case 'time':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            gettime($update, $MadelineProto, $msg);
+                            break;
+
+                        case 'weather':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            getweather($update, $MadelineProto, $msg);
+                            break;
+
+                        case 'add':
+                            add_group($update, $MadelineProto);
+                            break;
+
+                        case 'rm':
+                            rm_group($update, $MadelineProto);
+                            break;
+
+                        case 'adminlist':
+                            adminlist($update, $MadelineProto);
+                            break;
+
+                        case 'kick':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            kickhim($update, $MadelineProto, $msg);
+                            break;
+
+                        case 'kickme':
+                            kickme($update, $MadelineProto);
+                            break;
+
+                        case 'del':
+                            if (isset($msg_arr[1])) {
                                 unset($msg_arr[0]);
                                 $msg = implode(" ", $msg_arr);
-                                gettime($update, $MadelineProto, $msg);
+                                delmessage_user($update, $MadelineProto, $msg);
+                            } else {
+                                delmessage($update, $MadelineProto);
+                            }
                             break;
 
-                            case 'weather':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                getweather($update, $MadelineProto, $msg);
+                        case 'ban':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            banme($update, $MadelineProto, $msg);
                             break;
 
-                            case 'add':
-                                add_group($update, $MadelineProto);
+                        case 'banall':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            banall($update, $MadelineProto, $msg);
                             break;
 
-                            case 'rm':
-                                rm_group($update, $MadelineProto);
+                        case 'mute':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            if ($msg == "all") {
+                                muteall($update, $MadelineProto);
+                            } else {
+                                muteme($update, $MadelineProto, $msg);
+                            }
                             break;
 
-                            case 'adminlist':
-                                adminlist($update, $MadelineProto);
+                        case 'unmute':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            if ($msg == "all") {
+                                unmuteall($update, $MadelineProto);
+                            } else {
+                                unmuteme($update, $MadelineProto, $msg);
+                            }
                             break;
 
-                            case 'kick':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                kickhim($update, $MadelineProto, $msg);
+                        case 'mutelist':
+                            getmutelist($update, $MadelineProto);
                             break;
 
-                            case 'kickme':
-                                kickme($update, $MadelineProto);
+                        case 'settings':
+                            get_settings($update, $MadelineProto);
                             break;
 
-                            case 'del':
-                                if (isset($msg_arr[1])) {
-                                    unset($msg_arr[0]);
-                                    $msg = implode(" ", $msg_arr);
-                                    delmessage_user($update, $MadelineProto, $msg);
-                                } else {
-                                    delmessage($update, $MadelineProto);
-                                }
+                        case 'setflood':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            setflood($update, $MadelineProto, $msg);
                             break;
 
-                            case 'ban':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                banme($update, $MadelineProto, $msg);
+                        case 'modlist':
+                            modlist($update, $MadelineProto);
                             break;
 
-                            case 'banall':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                banall($update, $MadelineProto, $msg);
+                        case 'banlist':
+                            getbanlist($update, $MadelineProto);
                             break;
 
-                            case 'mute':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                if ($msg == "all") {
-                                    muteall($update, $MadelineProto);
-                                } else {
-                                    muteme($update, $MadelineProto, $msg);
-                                }
+                        case 'gbanlist':
+                            getgbanlist($update, $MadelineProto);
                             break;
 
-                            case 'unmute':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                if ($msg == "all") {
-                                    unmuteall($update, $MadelineProto);
-                                } else {
-                                    unmuteme($update, $MadelineProto, $msg);
-                                }
+                        case 'who':
+                            wholist($update, $MadelineProto);
                             break;
 
-                            case 'mutelist':
-                                getmutelist($update, $MadelineProto);
+                        case 'whofile':
+                            whofile($update, $MadelineProto);
                             break;
 
-                            case 'settings':
-                                get_settings($update, $MadelineProto);
+                        case 'whoban':
+                            whoban($update, $MadelineProto);
                             break;
 
-                            case 'setflood':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                setflood($update, $MadelineProto, $msg);
+                        case 'whobanall':
+                            whobanall($update, $MadelineProto);
                             break;
 
-                            case 'modlist':
-                                modlist($update, $MadelineProto);
+                        case 'unban':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            unbanme($update, $MadelineProto, $msg);
                             break;
 
-                            case 'banlist':
-                                getbanlist($update, $MadelineProto);
+                        case 'unbanall':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            unbanall($update, $MadelineProto, $msg);
                             break;
 
-                            case 'gbanlist':
-                                getgbanlist($update, $MadelineProto);
+                        case 'stats':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            get_user_stats($update, $MadelineProto, $msg);
                             break;
 
-                            case 'who':
-                                wholist($update, $MadelineProto);
+                        case 'promote':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            promoteme($update, $MadelineProto, $msg);
                             break;
 
-                            case 'whofile':
-                                whofile($update, $MadelineProto);
+                        case 'demote':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            demoteme($update, $MadelineProto, $msg);
                             break;
 
-                            case 'whoban':
-                                whoban($update, $MadelineProto);
+                        case 'save':
+                            if (isset($msg_arr[1])) {
+                                    $name = $msg_arr[1];
+                                    unset($msg_arr[1]);
+                            } else {
+                                $name = false;
+                            }
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            if ($name == "clear") {
+                                save_clear($update, $MadelineProto, $msg);
+                            } else {
+                                saveme($update, $MadelineProto, $msg, $name);
+                            }
                             break;
 
-                            case 'whobanall':
-                                whobanall($update, $MadelineProto);
+                        case 'saved':
+                            saved_get($update, $MadelineProto);
                             break;
 
-                            case 'unban':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                unbanme($update, $MadelineProto, $msg);
-                            break;
-
-                            case 'unbanall':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                unbanall($update, $MadelineProto, $msg);
-                            break;
-
-                            case 'stats':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                get_user_stats($update, $MadelineProto, $msg);
-                            break;
-
-                            case 'promote':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                promoteme($update, $MadelineProto, $msg);
-                            break;
-
-                            case 'demote':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                demoteme($update, $MadelineProto, $msg);
-                            break;
-
-                            case 'save':
-                                if (isset($msg_arr[1])) {
-                                        $name = $msg_arr[1];
-                                        unset($msg_arr[1]);
-                                } else {
-                                        $name = false;
-                                }
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                if ($name == "clear") {
-                                    save_clear($update, $MadelineProto, $msg);
-                                } else {
-                                    saveme($update, $MadelineProto, $msg, $name);
-                                }
-                            break;
-
-                            case 'saved':
-                                saved_get($update, $MadelineProto);
-                            break;
-
-                            case 'pin':
-                                if (isset($msg_arr[1])) {
-                                    $msg = $msg_arr[1];
-                                    if ($msg = "silent") {
-                                        $silent = true;
-                                    } else {
-                                        $silent = false;
-                                    }
+                        case 'pin':
+                            if (isset($msg_arr[1])) {
+                                $msg = $msg_arr[1];
+                                if ($msg = "silent") {
+                                    $silent = true;
                                 } else {
                                     $silent = false;
                                 }
-                                pinmessage($update, $MadelineProto, $silent);
+                            } else {
+                                $silent = false;
+                            }
+                            pinmessage($update, $MadelineProto, $silent);
                             break;
 
-                            case 'id':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                idme($update, $MadelineProto, $msg);
+                        case 'id':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            idme($update, $MadelineProto, $msg);
                             break;
 
-                            case 'setphoto':
-                                set_chat_photo($update, $MadelineProto);
+                        case 'setphoto':
+                            set_chat_photo($update, $MadelineProto);
                             break;
 
-                            case 'public':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                public_toggle($update, $MadelineProto, $msg);
+                        case 'public':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            public_toggle($update, $MadelineProto, $msg);
                             break;
 
-                            case 'invite':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                invite_user($update, $MadelineProto, $msg);
+                        case 'invite':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            invite_user($update, $MadelineProto, $msg);
                             break;
 
-                            case 'addadmin':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                addadmin($update, $MadelineProto, $msg);
+                        case 'addadmin':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            addadmin($update, $MadelineProto, $msg);
                             break;
 
-                            case 'rmadmin':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                rmadmin($update, $MadelineProto, $msg);
+                        case 'rmadmin':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            rmadmin($update, $MadelineProto, $msg);
                             break;
 
-                            case 'setname':
-                                unset($msg_arr[0]);
-                                $msg = implode(" ", $msg_arr);
-                                set_chat_title($update, $MadelineProto, $msg);
+                        case 'setname':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            set_chat_title($update, $MadelineProto, $msg);
                             break;
 
-                            case 'newlink':
-                                export_new_invite($update, $MadelineProto);
+                        case 'newlink':
+                            export_new_invite($update, $MadelineProto);
                             break;
 
-                            case 'lock':
-                                if (isset($msg_arr[1])) {
-                                        $name = $msg_arr[1];
-                                        unset($msg_arr[1]);
-                                } else {
-                                        $name = "";
-                                }
-                                unset($msg_arr[0]);
-                                lockme($update, $MadelineProto, $name);
+                        case 'lock':
+                            if (isset($msg_arr[1])) {
+                                    $name = $msg_arr[1];
+                                    unset($msg_arr[1]);
+                            } else {
+                                $name = "";
+                            }
+                            unset($msg_arr[0]);
+                            lockme($update, $MadelineProto, $name);
                             break;
 
-                            case 'unlock':
-                                if (isset($msg_arr[1])) {
-                                        $name = $msg_arr[1];
-                                        unset($msg_arr[1]);
-                                } else {
-                                        $name = "";
-                                }
-                                unset($msg_arr[0]);
-                                unlockme($update, $MadelineProto, $name);
+                        case 'unlock':
+                            if (isset($msg_arr[1])) {
+                                    $name = $msg_arr[1];
+                                    unset($msg_arr[1]);
+                            } else {
+                                $name = "";
+                            }
+                            unset($msg_arr[0]);
+                            unlockme($update, $MadelineProto, $name);
                             break;
 
-                            case 'end':
-                                if (from_master($update, $MadelineProto)) {
-                                        exit(0);
-                                }
+                        case 'end':
+                            if (from_master($update, $MadelineProto)) {
+                                    exit(0);
+                            }
                             break;
                         }
                     }
@@ -455,29 +462,32 @@ class NewChannelMessage extends Thread {
 }
 
 
-class NewChannelMessageAction extends Thread {
+class NewChannelMessageAction extends Thread
+{
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) {
+    public function __construct($update, $MadelineProto) 
+    {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() {
+    public function run() 
+    {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         switch ($update['update']['message']['action']['_']) {
         case 'messageActionPinMessage':
             pinalert($update, $MadelineProto);
-        break;
+            break;
         case 'messageActionChatAddUser':
             NewChatAddUser($update, $MadelineProto);
-        break;
+            break;
         case 'messageActionChatJoinedByLink':
             NewChatJoinedByLink($update, $MadelineProto);
-        break;
+            break;
         case 'messageActionChatDeleteUser':
             NewChatDeleteUser($update, $MadelineProto);
-        break;
+            break;
         }
     }
 }
@@ -789,7 +799,8 @@ function NewChatDeleteUser($update, $MadelineProto)
                         \danog\MadelineProto\Logger::log(
                             $sentMessage
                         );
-                    } catch (Exception $e) {}
+                    } catch (Exception $e) {
+                    }
                 }
             }
         }
@@ -797,14 +808,17 @@ function NewChatDeleteUser($update, $MadelineProto)
 }
 
 
-class CheckMuted extends Thread {
+class CheckMuted extends Thread
+{
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) {
+    public function __construct($update, $MadelineProto) 
+    {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() {
+    public function run() 
+    {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $chat = parse_chat_data($update, $MadelineProto);
@@ -821,7 +835,8 @@ class CheckMuted extends Thread {
                     if (!from_admin_mod($update, $MadelineProto)) {
                         if (array_key_exists($ch_id, $mutelist)) {
                             if (in_array($fromid, $mutelist[$ch_id])
-                                or in_array("all", $mutelist[$ch_id])) {
+                                or in_array("all", $mutelist[$ch_id])
+                            ) {
                                 try {
                                     $delete = $MadelineProto->
                                     channels->deleteMessages(
@@ -832,7 +847,8 @@ class CheckMuted extends Thread {
                                     $thred = new Exec($delete);
                                     $thred->start();
                                     $thred->join();
-                                } catch (Exception $e) {}
+                                } catch (Exception $e) {
+                                }
                                 $this->muted = true;
                             } else {
                                 $this->muted = false;

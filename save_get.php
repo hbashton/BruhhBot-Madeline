@@ -289,8 +289,7 @@ function saved_get($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $default = array(
             'peer' => $peer,
-            'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html',
+            'reply_to_msg_id' => $msg_id
             );
         check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");
@@ -300,10 +299,15 @@ function saved_get($update, $MadelineProto)
                 if ($i !== "from") {
                     if (!isset($message)) {
                         $name = cb($i);
-                        $message = "<b>Saved messages for $title:</b>\r\n<code>$name</code>\r\n";
+                        $message = "Saved messages for $title: \n";
+                        $offset = mb_strlen($message);
+                        $entity = create_style('bold', 0, $message);
+                        $message .= "[x] ".$name."\n";
+                        $length = $offset + strlen($name);
                     } else {
                         $name = cb($i);
-                        $message = "$message<code>$name</code>\r\n";
+                        $message .= "[x] ".$name."\n";
+                        $length = $length + strlen($name);
                     }
                 }
             }
@@ -311,20 +315,29 @@ function saved_get($update, $MadelineProto)
                 foreach ($saved[$ch_id]["from"] as $i => $ii) {
                     if (!isset($message)) {
                         $name = cb($i);
-                        $message = "<b>Saved messages for $title:</b>\r\n$name\r\n";
+                        $message = "Saved messages for $title: \n";
+                        $offset = mb_strlen($message);
+                        $entity = create_style('bold', 0, $message);
+                        $message .= "[x] ".$name."\n";
+                        $length = $offset + strlen($name);
                     } else {
                         $name = cb($i);
-                        $message = "$message<code>$name</code>\r\n";
+                        $message .= "[x] ".$name."\n";
+                        $length = $length + strlen($name);
                     }
                 }
             }
             if (isset($message)) {
+                $length = mb_strlen($message) - $offset;
+                $default['entities'] = $entity;
                 $default['message'] = $message;
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
                 );
             } else {
-                $default['message'] = "There are no saved messages for <b>$title</b>";
+                $default['message'] = "There are no saved messages for $title";
+                $offset = mb_strlen($default['message']) - mb_strlen($title);
+                $default['entitites'] = create_style('bold', $offset, mb_strlen($title));
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
                 );
@@ -336,7 +349,8 @@ function saved_get($update, $MadelineProto)
     }
 }
 
-function save_clear($update, $MadelineProto, $msg) {
+function save_clear($update, $MadelineProto, $msg) 
+{
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,

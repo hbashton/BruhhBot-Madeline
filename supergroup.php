@@ -243,7 +243,8 @@ function adminlist($update, $MadelineProto)
             $username = catch_id($update, $MadelineProto, $id)[2];
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
-                    or $key['role'] == "creator") {
+                    or $key['role'] == "creator"
+                ) {
                     $mod = true;
                 } else {
                     $mod = false;
@@ -353,16 +354,16 @@ function pinmessage($update, $MadelineProto, $silent)
                     )
                     ) {
                         try {
-                        $pin_id = $update['update']['message']['reply_to_msg_id'];
-                        $pin = $MadelineProto->
-                        channels->updatePinnedMessage(
-                            ['silent' => $silent,
-                            'channel' => $peer,
-                            'id' => $pin_id ]
-                        );
-                        $message = $responses['pinmessage']['success'];
-                        $default['message'] = $message;
-                        \danog\MadelineProto\Logger::log($pin);
+                            $pin_id = $update['update']['message']['reply_to_msg_id'];
+                            $pin = $MadelineProto->
+                            channels->updatePinnedMessage(
+                                ['silent' => $silent,
+                                'channel' => $peer,
+                                'id' => $pin_id ]
+                            );
+                            $message = $responses['pinmessage']['success'];
+                            $default['message'] = $message;
+                            \danog\MadelineProto\Logger::log($pin);
                         } catch (Exception $e) {
                         }
                     } else {
@@ -403,18 +404,18 @@ function delmessage($update, $MadelineProto)
                     )
                     ) {
                         try {
-                        $del_id = $update['update']['message']['reply_to_msg_id'];
-                        $delete = $MadelineProto->channels->deleteMessages(
-                            ['channel' => $peer,
-                            'id' => [$del_id]]
-                        );
-                        \danog\MadelineProto\Logger::log($delete);
-                        $del_id = $msg_id - 1;
-                        $delete = $MadelineProto->channels->deleteMessages(
-                            ['channel' => $peer,
-                            'id' => [$msg_id]]
-                        );
-                        \danog\MadelineProto\Logger::log($delete);
+                            $del_id = $update['update']['message']['reply_to_msg_id'];
+                            $delete = $MadelineProto->channels->deleteMessages(
+                                ['channel' => $peer,
+                                'id' => [$del_id]]
+                            );
+                            \danog\MadelineProto\Logger::log($delete);
+                            $del_id = $msg_id - 1;
+                            $delete = $MadelineProto->channels->deleteMessages(
+                                ['channel' => $peer,
+                                'id' => [$msg_id]]
+                            );
+                            \danog\MadelineProto\Logger::log($delete);
                         } catch (Exception $e) {
                         }
                     } else {
@@ -473,7 +474,8 @@ function delmessage_user($update, $MadelineProto, $msg)
                                     );
                                     $message = $engine->render($str, $repl);
                                     $default['message'] = $message;
-                                } catch (Exception $e) {}
+                                } catch (Exception $e) {
+                                }
                             } else {
                                 $message = $responses['delmessage_user']['mod'];
                                 $default['message'] = $message;
@@ -495,7 +497,8 @@ function delmessage_user($update, $MadelineProto, $msg)
     }
 }
 
-function leave_setting($update, $MadelineProto, $msg) {
+function leave_setting($update, $MadelineProto, $msg) 
+{
     if (is_peeruser($update, $MadelineProto)) {
         global $responses, $engine;
         $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
@@ -557,7 +560,8 @@ function leave_setting($update, $MadelineProto, $msg) {
         }
     }
 }
-function pinalert($update, $MadelineProto) {
+function pinalert($update, $MadelineProto) 
+{
     $chat = parse_chat_data($update, $MadelineProto);
     $ch_id = $chat['id'];
     $chatpeer = $chat['peer'];
