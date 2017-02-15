@@ -56,7 +56,26 @@ class NewMessage extends Thread
                         $msg = implode(" ", $msg_arr);
                         leave_setting($update, $MadelineProto, $msg);
                         break;
-                        
+
+                    case 'save':
+                        if (isset($msg_arr[1])) {
+                                $name = $msg_arr[1];
+                                unset($msg_arr[1]);
+                        } else {
+                            $name = false;
+                        }
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        if ($name == "clear") {
+                            save_clear($update, $MadelineProto, $msg);
+                        } else {
+                            saveme($update, $MadelineProto, $msg, $name);
+                        }
+                        break;
+
+                    case 'saved':
+                        saved_get($update, $MadelineProto);
+                    break;
                     case 'newgroup':
                         unset($msg_arr[0]);
                         if (isset($msg_arr[1]) && isset($msg_arr[2])) {

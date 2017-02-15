@@ -176,7 +176,7 @@ function setflood($update, $MadelineProto, $msg)
     global $responses, $engine;
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
-        $mods = $repsonse['setflood']['mods'];
+        $mods = $responses['setflood']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = $chat['title'];

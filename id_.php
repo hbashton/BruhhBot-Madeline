@@ -23,16 +23,20 @@ function catch_id($update, $MadelineProto, $user)
     if (is_numeric($user)) {
         $user_ = cache_get_info($update, $MadelineProto, $user);
         if ($user_) {
-            if (array_key_exists(
-                'username', $user_['User']
-            )
-            ) {
-                $username = $user_['User']['username'];
-            } else {
-                $username = $user_['User']['first_name'];
+            try {
+                if (array_key_exists(
+                    'username', $user_['User']
+                )
+                ) {
+                    $username = $user_['User']['username'];
+                } else {
+                    $username = $user_['User']['first_name'];
+                }
+                $userid = $user_['bot_api_id'];
+                return array(true, $userid, $username);
+            } catch (Exception $e) {
+                return array(false);
             }
-            $userid = $user_['bot_api_id'];
-            return array(true, $userid, $username);
         } else {
             return array(false);
         }
@@ -40,16 +44,20 @@ function catch_id($update, $MadelineProto, $user)
     if (preg_match_all('/@/', $first_char, $matches)) {
         $user_ = cache_get_info($update, $MadelineProto, $user);
         if ($user_) {
-            if (array_key_exists(
-                'username', $user_['User']
-            )
-            ) {
-                $username = $user_['User']['username'];
-            } else {
-                $username = $user_['User']['first_name'];
+            try {
+                if (array_key_exists(
+                    'username', $user_['User']
+                )
+                ) {
+                    $username = $user_['User']['username'];
+                } else {
+                    $username = $user_['User']['first_name'];
+                }
+                $userid = $user_['bot_api_id'];
+                return array(true, $userid, $username);
+            } catch (Exception $e) {
+                return array(false);
             }
-            $userid = $user_['bot_api_id'];
-            return array(true, $userid, $username);
         } else {
             return array(false);
         }
