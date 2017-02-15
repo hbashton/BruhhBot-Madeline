@@ -37,9 +37,9 @@ For support, message [@hunter_bruhh](https://telegram.me/hunter_bruhh) on telegr
 
 ## Authors
 
-* **Hunter Ashton** - *Primary developer* - [@hbashotn](https://github.com/hbashton)
+* **Hunter Ashton** - *Primary developer* - [@hbashton](https://github.com/hbashton)
 
-* **Daniil Gentili** - *The handyman* - [@hbashotn](https://github.com/danog)
+* **Daniil Gentili** - *The handyman* - [@danog](https://github.com/danog)
 
 ## License
 
@@ -49,3 +49,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 * [@MSF-Jarvis](https://github.com/msf-jarvis) thank you for your ideas, love, and support on the days I need it the most.
 * [@xdevs23](https://github.com/xdevs23) thank you for everything, as a fellow team member and friend without your support I couldn't do stuff like this
+* [@nicholaschum](https://github.com/nicholaschum) you push me to be the best I can be, and I can't begin to thank you.
+* [@danog](https://github.com/danog) OK yes I mentioned him as the handyman and as an author, but he needs an acknowledgement too. I LOVE YOU MAN!!!! WE DID GREAT
