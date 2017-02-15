@@ -6,6 +6,7 @@ BruhhBotV2.0 is a supergroup manager bot, based on [Daniil's](https://github.com
 
 To begin using BruhhBot, you will first need to have PHP 7 installed, and set as the default
 
+You will also need to register your account and retrieve your Telegram MTProto API and ID [here](https://my.telegram.org/apps)
 ### Installing
 
 To deploy BruhhBot, let's clone it to the computer we want to use it on
