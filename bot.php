@@ -105,27 +105,32 @@ while (true) {
             if ($dumpme) {
                 var_dump($update);
             }
-            $NewMessage = new NewMessage($update, $MadelineProto);
-            $NewMessage->start();
-            break;
+            if (is_peeruser($update, $MadelineProto)) {
+                $NewMessage = new NewMessage($update, $MadelineProto);
+                $NewMessage->start();
+            }
+        break;
+                
 
         case 'updateNewChannelMessage':
             $res = json_encode($update, JSON_PRETTY_PRINT);
             if ($dumpme) {
                 var_dump($update);
             }
-            $command = check_locked($update, $MadelineProto);
-            $check = new Exec($command);
-            $check->start();
-            $command = check_flood($update, $MadelineProto);
-            $check = new Exec($command);
-            $check->start();
-            $NewChannelMessage = new NewChannelMessage($update, $MadelineProto);
-            $NewChannelMessage->start();
-            if (array_key_exists('action', $update['update']['message'])) {
-                $NewChannelMessageAction =
-                    new NewChannelMessageAction($update, $MadelineProto);
-                $NewChannelMessageAction->start();
+            if (is_supergroup($update, $MadelineProto)) {
+                $command = check_locked($update, $MadelineProto);
+                $check = new Exec($command);
+                $check->start();
+                $command = check_flood($update, $MadelineProto);
+                $check = new Exec($command);
+                $check->start();
+                $NewChannelMessage = new NewChannelMessage($update, $MadelineProto);
+                $NewChannelMessage->start();
+                if (array_key_exists('action', $update['update']['message'])) {
+                    $NewChannelMessageAction =
+                        new NewChannelMessageAction($update, $MadelineProto);
+                    $NewChannelMessageAction->start();
+                }
             }
         }
     }
