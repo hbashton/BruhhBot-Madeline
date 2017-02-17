@@ -542,7 +542,7 @@ function unbanall($update, $MadelineProto, $msg)
     }
 }
 
-function banall($update, $MadelineProto, $msg, $send = true)
+function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
         global $responses, $engine;
@@ -556,6 +556,7 @@ function banall($update, $MadelineProto, $msg, $send = true)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html'
             );
+        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
@@ -574,24 +575,51 @@ function banall($update, $MadelineProto, $msg, $send = true)
                                 true
                             )
                             ) {
+                            
                                 if (isset($userid)) {
                                     $username = $id[2];
+                                    $fromuser = catch_id($update, $MadelineProto, $fromid)[2];
                                     $mention = html_mention($username, $userid);
+                                    $mention2 = html_mention($fromuser, $fromid);
                                     check_json_array('gbanlist.json', false, false);
                                     $file = file_get_contents("gbanlist.json");
                                     $gbanlist = json_decode($file, true);
+                                    var_dump($gbanlist);
+                                    check_json_array('reasons.json', false, false);
+                                    $file = file_get_contents("reasons.json");
+                                    $reasons = json_decode($file, true);
                                     if (!in_array($userid, $gbanlist)) {
                                         array_push($gbanlist, $userid);
                                         file_put_contents(
                                             'gbanlist.json',
                                             json_encode($gbanlist)
                                         );
-                                        $str = $responses['banall']['banned'];
-                                        $repl = array(
-                                            "mention" => $mention
-                                        );
-                                        $message = $engine->render($str, $repl);
-                                        $default['message'] = $message;
+                                        if ($reason) {
+                                            if (preg_match('/"([^"]+)"/', $reason, $m)) {
+                                                $reasons[$userid] = $m[1];
+                                                $str = $responses['banall']['reasoning'];
+                                                $repl = array(
+                                                    "mention" => $mention,
+                                                    "reason" => $m[1]
+                                                );
+                                                $message = $engine->render($str, $repl);
+                                                $default['message'] = $message;
+                                                file_put_contents(
+                                                    'reasons.json',
+                                                    json_encode($reasons)
+                                                );
+                                            } else {
+                                                $message = $responses['banall']['help'];
+                                                $default['message'] = $message;
+                                            }
+                                        } else {
+                                            $str = $responses['banall']['banned'];
+                                            $repl = array(
+                                                "mention" => $mention
+                                            );
+                                            $message = $engine->render($str, $repl);
+                                            $default['message'] = $message;
+                                        }
                                         try {
                                             $kick = $MadelineProto->
                                             channels->kickFromChannel(
@@ -604,6 +632,7 @@ function banall($update, $MadelineProto, $msg, $send = true)
                                         $e
                                         ) {
                                         }
+                                        
                                     } else {
                                         $str = $responses['banall']['already'];
                                         $repl = array(
@@ -666,6 +695,9 @@ function getgbanlist($update, $MadelineProto)
             check_json_array('gbanlist.json', false, false);
             $file = file_get_contents("gbanlist.json");
             $gbanlist = json_decode($file, true);
+            check_json_array('reasons.json', false, false);
+            $file = file_get_contents("reasons.json");
+            $reasons = json_decode($file, true);
             foreach ($gbanlist as $i => $key) {
                 $username = catch_id($update, $MadelineProto, $key)[2];
                 $mention = html_mention($username, $key);
@@ -675,9 +707,19 @@ function getgbanlist($update, $MadelineProto)
                         "title" => $title
                     );
                     $message = $engine->render($str, $repl);
-                    $message = $message."$mention - $key\r\n";
+                    if (array_key_exists($key, $reasons)) {
+                        $reason = $reasons[$key];
+                        $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
+                    } else {
+                        $message = $message."$mention - $key\r\n";
+                    }
                 } else {
-                    $message = $message."$mention - $key\r\n";
+                    if (array_key_exists($key, $reasons)) {
+                        $reason = $reasons[$key];
+                        $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
+                    } else {
+                        $message = $message."$mention - $key\r\n";
+                    }
                 }
             }
             if (!isset($message)) {

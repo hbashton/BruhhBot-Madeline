@@ -271,13 +271,18 @@ class NewChannelMessage extends Thread
 
                         case 'banall':
                             unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            banall($update, $MadelineProto, $msg);
+                            if (isset($msg_arr[1])) {
+                                $msg = $msg_arr[1];
+                                unset($msg_arr[1]);
+                            } else {
+                                $msg = "";
+                            }
+                            $reason = implode(" ", $msg_arr);
+                            banall($update, $MadelineProto, $msg, $reason);
                             break;
 
                         case 'mute':
                             unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
                             if ($msg == "all") {
                                 muteall($update, $MadelineProto);
                             } else {
@@ -465,6 +470,9 @@ class NewChannelMessage extends Thread
                             }
                             unset($msg_arr[0]);
                             unlockme($update, $MadelineProto, $name);
+                            break;
+                        case 'hunterbruhhrox':
+                            var_dump($MadelineProto->messages->getAllChats(['except_ids' => [], ]));
                             break;
 
                         case 'end':

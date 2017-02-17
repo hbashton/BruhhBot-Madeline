@@ -29,8 +29,13 @@ function catch_id($update, $MadelineProto, $user)
                 )
                 ) {
                     $username = $user_['User']['username'];
-                } else {
+                } elseif (array_key_exists(
+                    'first_name', $user_['User']
+                )
+                ) {
                     $username = $user_['User']['first_name'];
+                } else {
+                    $username = "no-name-user";
                 }
                 $userid = $user_['bot_api_id'];
                 return array(true, $userid, $username);
@@ -50,8 +55,13 @@ function catch_id($update, $MadelineProto, $user)
                 )
                 ) {
                     $username = $user_['User']['username'];
-                } else {
+                } elseif (array_key_exists(
+                    'first_name', $user_['User']
+                )
+                ) {
                     $username = $user_['User']['first_name'];
+                } else {
+                    $username = "no-name-user";
                 }
                 $userid = $user_['bot_api_id'];
                 return array(true, $userid, $username);
@@ -65,9 +75,27 @@ function catch_id($update, $MadelineProto, $user)
         if (array_key_exists('entities', $update['update']['message'])) {
             foreach ($update['update']['message']['entities'] as $key) {
                 if (array_key_exists('user_id', $key)) {
-                    $userid = $key['user_id'];
-                    $username = cache_get_info($update, $MadelineProto, $userid)['User']['first_name'];
-                    break;
+                    try {
+                        $userid = $key['user_id'];
+                        $user_ = cache_get_info($update, $MadelineProto, $userid);
+                        if (array_key_exists(
+                            'username', $user_['User']
+                        )
+                        ) {
+                            $username = $user_['User']['username'];
+                        } elseif (array_key_exists(
+                            'first_name', $user_['User']
+                        )
+                        ) {
+                            $username = $user_['User']['first_name'];
+                        } else {
+                            $username = "no-name-user";
+                        }
+                        $userid = $user_['bot_api_id'];
+                        break;
+                    } catch (Exception $e) {
+                        return array(false);
+                    }
                 }
             }
         }

@@ -250,7 +250,7 @@ function whobanall($update, $MadelineProto, $wait = true)
                                     $whobantxt = json_decode($file, true);
                                     var_dump($whobantxt);
                                     foreach ($whobantxt as $key => $value) {
-                                        banall($update, $MadelineProto, $key, false);
+                                        banall($update, $MadelineProto, $key, false, false);
                                     }
                                     $default['message'] = $message;
 
