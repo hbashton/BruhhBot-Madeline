@@ -58,7 +58,7 @@
         "banmod":"You can't ban mods :/",
         "banned":"User {mention} has been globally banned! I do NOT like them anymore ;-;",
         "banned_all":"<code>{mention2} banned {mention}\n\nReason: {reason}</code>",
-        "reasoning":"User {mention} has been banned.\n\n<code>Reason: {reason}</code>",
+        "reasoning":"User {mention} has been banned.<br><br><code>Reason: {reason}</code>",
         "already":"I already hate {mention}",
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/banall @username \"reason\"</code> to ban someone from all my groups!"

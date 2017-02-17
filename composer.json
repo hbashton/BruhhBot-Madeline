@@ -21,7 +21,6 @@
         "spatie/emoji": "dev-master",
         "krakjoe/pthreads-polyfill": "dev-master",
         "nicmart/string-template": "~0.1",
-        "danog/php-html-parser": "dev-master",
         "erusev/parsedown": "^1.6"
     },
     "require-dev": {
