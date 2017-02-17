@@ -496,6 +496,7 @@ function unbanall($update, $MadelineProto, $msg)
                                 );
                                 $message = $engine->render($str, $repl);
                                 $default['message'] = $message;
+                                unban_from_moderated($MadelineProto, $userid, [$ch_id]);
                                 try {
                                     $kick = $MadelineProto->
                                     channels->kickFromChannel(
@@ -539,6 +540,7 @@ function unbanall($update, $MadelineProto, $msg)
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
         }
+        unban_from_moderated($MadelineProto, $userid, [$ch_id]);
     }
 }
 
@@ -607,7 +609,6 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                                 'reasons.json',
                                                 json_encode($reasons)
                                             );
-                                            send_to_moderated($MadelineProto, $message, [$ch_id]);
                                         } else {
                                             $message = $responses['banall']['help'];
                                             $default['message'] = $message;
@@ -619,6 +620,8 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                         );
                                         $message = $engine->render($str, $repl);
                                         $default['message'] = $message;
+                                        send_to_moderated($MadelineProto, $message, [$ch_id]);
+                                        ban_from_moderated($MadelineProto, $userid, [$ch_id]);
                                     }
                                     try {
                                         $kick = $MadelineProto->
@@ -666,6 +669,10 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
         if (isset($sentMessage) && $send) {
             \danog\MadelineProto\Logger::log($sentMessage);
         }
+        if ($send) {
+            send_to_moderated($MadelineProto, $message, [$ch_id]);
+        }
+        ban_from_moderated($MadelineProto, $userid, [$ch_id]);
     }
 }
 

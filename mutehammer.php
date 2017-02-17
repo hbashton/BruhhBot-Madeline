@@ -41,6 +41,7 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                             $userid = $id[1];
                         }
                         if (isset($userid)) {
+                            var_dump(true);
                             $mutemod = $responses['muteme']['mutemod'];
                             if (!is_admin_mod(
                                 $update,
@@ -50,43 +51,13 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                 true
                             )
                             ) {
-                                if (!isset($userid)) {
-                                    $str = $responses['muteme']['idk'];
-                                    $repl = array(
-                                        "msg" => $msg
-                                    );
-                                    $message = $engine->render($str, $repl);
-                                    $default['message'] = $message;
-                                } else {
-                                    $username = $id[2];
-                                    $mention = html_mention($username, $userid);
-                                    check_json_array('mutelist.json', $ch_id);
-                                    $file = file_get_contents("mutelist.json");
-                                    $mutelist = json_decode($file, true);
-                                    if (array_key_exists($ch_id, $mutelist)) {
-                                        if (!in_array($userid, $mutelist[$ch_id])) {
-                                            array_push($mutelist[$ch_id], $userid);
-                                            file_put_contents(
-                                                'mutelist.json',
-                                                json_encode($mutelist)
-                                            );
-                                            $str = $responses['muteme']['success'];
-                                            $repl = array(
-                                                "mention" => $mention
-                                            );
-                                            $message = $engine->render($str, $repl);
-                                            $default['message'] = $message;
-                                        } else {
-                                            $str = $responses['muteme']['already'];
-                                            $repl = array(
-                                                "mention" => $mention
-                                            );
-                                            $message = $engine->render($str, $repl);
-                                            $default['message'] = $message;
-
-                                        }
-                                    } else {
-                                        $mutelist[$ch_id] = [];
+                                $username = $id[2];
+                                $mention = html_mention($username, $userid);
+                                check_json_array('mutelist.json', $ch_id);
+                                $file = file_get_contents("mutelist.json");
+                                $mutelist = json_decode($file, true);
+                                if (array_key_exists($ch_id, $mutelist)) {
+                                    if (!in_array($userid, $mutelist[$ch_id])) {
                                         array_push($mutelist[$ch_id], $userid);
                                         file_put_contents(
                                             'mutelist.json',
@@ -98,9 +69,37 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                         );
                                         $message = $engine->render($str, $repl);
                                         $default['message'] = $message;
+                                    } else {
+                                        $str = $responses['muteme']['already'];
+                                        $repl = array(
+                                            "mention" => $mention
+                                        );
+                                        $message = $engine->render($str, $repl);
+                                        $default['message'] = $message;
+
                                     }
+                                } else {
+                                    $mutelist[$ch_id] = [];
+                                    array_push($mutelist[$ch_id], $userid);
+                                    file_put_contents(
+                                        'mutelist.json',
+                                        json_encode($mutelist)
+                                    );
+                                    $str = $responses['muteme']['success'];
+                                    $repl = array(
+                                        "mention" => $mention
+                                    );
+                                    $message = $engine->render($str, $repl);
+                                    $default['message'] = $message;
                                 }
                             }
+                        } else {
+                            $str = $responses['muteme']['idk'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
+                            $default['message'] = $message;
                         }
                     } else {
                         $message = $responses['muteme']['help'];

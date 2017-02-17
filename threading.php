@@ -4,12 +4,12 @@ class NewMessage extends Thread
 {
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) 
+    public function __construct($update, $MadelineProto)
     {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() 
+    public function run()
     {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
@@ -108,12 +108,12 @@ class NewChannelMessage extends Thread
 {
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) 
+    public function __construct($update, $MadelineProto)
     {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() 
+    public function run()
     {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
@@ -283,6 +283,7 @@ class NewChannelMessage extends Thread
 
                         case 'mute':
                             unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
                             if ($msg == "all") {
                                 muteall($update, $MadelineProto);
                             } else {
@@ -493,12 +494,12 @@ class NewChannelMessageAction extends Thread
 {
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) 
+    public function __construct($update, $MadelineProto)
     {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() 
+    public function run()
     {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
@@ -839,12 +840,12 @@ class CheckMuted extends Thread
 {
     private $update;
     private $MadelineProto;
-    public function __construct($update, $MadelineProto) 
+    public function __construct($update, $MadelineProto)
     {
         $this->update = $update;
         $this->MadelineProto = $MadelineProto;
     }
-    public function run() 
+    public function run()
     {
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
