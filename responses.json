@@ -15,15 +15,15 @@
     {
         "mods":"Only mods can use me to kick butts!",
         "banmod":"You can't ban mods?!?!",
-        "banned":"{mention}<code> banned from </code><b>{title}</b>",
-        "already":"<code>User </code>{mention}<code> already banned</code>",
+        "banned":"{mention} banned from <b>{title}</b>",
+        "already":"<code>User {mention} already banned",
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/ban @username</code> to ban someone from this chat!"
     },
     "unbanme":
     {
         "mods":"Only mods can use me to unban peeps!",
-        "unbanned":"{mention}<code> unbanned from </code><b>{title}</b>",
+        "unbanned":"{mention} unbanned from <b>{title}</b>",
         "already":"User {mention} is not banned, no reason to unban them!",
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/unban @username</code> to unban someone from this chat!"
@@ -48,7 +48,7 @@
     },
     "unbanall":
     {
-        "unbanned":"<code>User </code>{mention}<code> has been given another chance!</code>",
+        "unbanned":"User {mention} has been given another chance!",
         "already":"I'm already fond of {mention}, so they're not banned :)",
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/unbanall @username</code> to unban someone from all my groups!"
@@ -57,8 +57,7 @@
     {
         "banmod":"You can't ban mods :/",
         "banned":"User {mention} has been globally banned! I do NOT like them anymore ;-;",
-        "banned_all":"{mention2}<code> banned </code>{mention}<br><br><code>Reason: {reason}</code>",
-        "reasoning":"<code>User </code>{mention}<code> has been banned.</code><br><br><code>Reason: {reason}</code>",
+        "banned_all":"{mention2} banned {mention}<br><br><code>Reason: {reason}</code>",
         "already":"I already hate {mention}",
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/banall @username \"reason\"</code> to ban someone from all my groups!"
