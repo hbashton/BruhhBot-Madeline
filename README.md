@@ -4,9 +4,15 @@ BruhhBotV2.0 is a supergroup manager bot, based on [Daniil's](https://github.com
 
 ## Getting Started
 
-To begin using BruhhBot, you will first need to have PHP 7 installed, and set as the default
+To begin using BruhhBot, you will first need to have PHP 7 installed, and set as the default (see below). You will also need php7.0-xml and php7.0-mbstring.
 
 You will also need to register your account and retrieve your Telegram MTProto API and ID [here](https://my.telegram.org/apps)
+
+Install php and it's required extensions
+
+```
+sudo apt-get install -y php7.0 php7.0-common php7.0-mbstring php7.0-xml
+```
 ### Installing
 
 To deploy BruhhBot, let's clone it to the computer we want to use it on
@@ -26,6 +32,12 @@ Finally, deploy your bot
 ```
 php bot.php
 ```
+
+## PLEASE READ THIS!
+
+Your session, where you're logged in, is saved in session.madeline (in the root of your bot directory).
+Sometimes, inevitably, the bot gets killed before fully writing to the file. In this case, you will need to remove it and rerun the bot.
+To prevent this, end the bot with /end instead of from the terminal. Then, delete the /end message to prevent the bot from reading it over and over.
 
 ## Support
 

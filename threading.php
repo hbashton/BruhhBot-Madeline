@@ -93,6 +93,15 @@ class NewMessage extends Thread
                             $about
                         );
                         break;
+                    case 'end':
+                        if (from_master($update, $MadelineProto)) {
+                            \danog\MadelineProto\Serialization::serialize(
+                                'session.madeline',
+                                $MadelineProto
+                            ).PHP_EOL;
+                            exit(0);
+                        }
+                        break;
                     }
                 }
                 if (array_key_exists("fwd_from", $update['update']['message'])) {
@@ -472,13 +481,14 @@ class NewChannelMessage extends Thread
                             unset($msg_arr[0]);
                             unlockme($update, $MadelineProto, $name);
                             break;
-                        case 'hunterbruhhrox':
-                            var_dump($MadelineProto->messages->getAllChats(['except_ids' => [], ]));
-                            break;
 
                         case 'end':
                             if (from_master($update, $MadelineProto)) {
-                                    exit(0);
+                                \danog\MadelineProto\Serialization::serialize(
+                                    'session.madeline',
+                                    $MadelineProto
+                                ).PHP_EOL;
+                                exit(0);
                             }
                             break;
                         }
