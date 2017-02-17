@@ -575,76 +575,68 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                 true
                             )
                             ) {
-                            
-                                if (isset($userid)) {
-                                    $username = $id[2];
-                                    $fromuser = catch_id($update, $MadelineProto, $fromid)[2];
-                                    $mention = html_mention($username, $userid);
-                                    $mention2 = html_mention($fromuser, $fromid);
-                                    check_json_array('gbanlist.json', false, false);
-                                    $file = file_get_contents("gbanlist.json");
-                                    $gbanlist = json_decode($file, true);
-                                    var_dump($gbanlist);
-                                    check_json_array('reasons.json', false, false);
-                                    $file = file_get_contents("reasons.json");
-                                    $reasons = json_decode($file, true);
-                                    if (!in_array($userid, $gbanlist)) {
-                                        array_push($gbanlist, $userid);
-                                        file_put_contents(
-                                            'gbanlist.json',
-                                            json_encode($gbanlist)
-                                        );
-                                        if ($reason) {
-                                            if (preg_match('/"([^"]+)"/', $reason, $m)) {
-                                                $reasons[$userid] = $m[1];
-                                                $str = $responses['banall']['reasoning'];
-                                                $repl = array(
-                                                    "mention" => $mention,
-                                                    "reason" => $m[1]
-                                                );
-                                                $message = $engine->render($str, $repl);
-                                                $default['message'] = $message;
-                                                file_put_contents(
-                                                    'reasons.json',
-                                                    json_encode($reasons)
-                                                );
-                                            } else {
-                                                $message = $responses['banall']['help'];
-                                                $default['message'] = $message;
-                                            }
-                                        } else {
-                                            $str = $responses['banall']['banned'];
+                                $username = $id[2];
+                                $fromuser = catch_id($update, $MadelineProto, $fromid)[2];
+                                $mention = html_mention($username, $userid);
+                                $mention2 = html_mention($fromuser, $fromid);
+                                check_json_array('gbanlist.json', false, false);
+                                $file = file_get_contents("gbanlist.json");
+                                $gbanlist = json_decode($file, true);
+                                var_dump($gbanlist);
+                                check_json_array('reasons.json', false, false);
+                                $file = file_get_contents("reasons.json");
+                                $reasons = json_decode($file, true);
+                                if (!in_array($userid, $gbanlist)) {
+                                    array_push($gbanlist, $userid);
+                                    file_put_contents(
+                                        'gbanlist.json',
+                                        json_encode($gbanlist)
+                                    );
+                                    if ($reason) {
+                                        if (preg_match('/"([^"]+)"/', $reason, $m)) {
+                                            $reasons[$userid] = $m[1];
+                                            $str = $responses['banall']['banned_all'];
                                             $repl = array(
-                                                "mention" => $mention
+                                                "mention2" => $mention2,
+                                                "mention" => $mention,
+                                                "reason" => $m[1]
                                             );
                                             $message = $engine->render($str, $repl);
                                             $default['message'] = $message;
-                                        }
-                                        try {
-                                            $kick = $MadelineProto->
-                                            channels->kickFromChannel(
-                                                ['channel' => $peer,
-                                                'user_id' => $userid,
-                                                'kicked' => true]
+                                            file_put_contents(
+                                                'reasons.json',
+                                                json_encode($reasons)
                                             );
-                                        } catch (
-                                        \danog\MadelineProto\RPCErrorException
-                                        $e
-                                        ) {
+                                            send_to_moderated($MadelineProto, $message, [$ch_id]);
+                                        } else {
+                                            $message = $responses['banall']['help'];
+                                            $default['message'] = $message;
                                         }
-                                        
                                     } else {
-                                        $str = $responses['banall']['already'];
+                                        $str = $responses['banall']['banned'];
                                         $repl = array(
                                             "mention" => $mention
                                         );
                                         $message = $engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
+                                    try {
+                                        $kick = $MadelineProto->
+                                        channels->kickFromChannel(
+                                            ['channel' => $peer,
+                                            'user_id' => $userid,
+                                            'kicked' => true]
+                                        );
+                                    } catch (
+                                    \danog\MadelineProto\RPCErrorException
+                                    $e
+                                    ) {
+                                    }
+
                                 } else {
-                                    $str = $responses['banall']['idk'];
+                                    $str = $responses['banall']['already'];
                                     $repl = array(
-                                        "msg" => $msg
+                                        "mention" => $mention
                                     );
                                     $message = $engine->render($str, $repl);
                                     $default['message'] = $message;

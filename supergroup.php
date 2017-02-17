@@ -497,7 +497,7 @@ function delmessage_user($update, $MadelineProto, $msg)
     }
 }
 
-function leave_setting($update, $MadelineProto, $msg) 
+function leave_setting($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
         global $responses, $engine;
@@ -560,7 +560,7 @@ function leave_setting($update, $MadelineProto, $msg)
         }
     }
 }
-function pinalert($update, $MadelineProto) 
+function pinalert($update, $MadelineProto)
 {
     $chat = parse_chat_data($update, $MadelineProto);
     $ch_id = $chat['id'];
@@ -585,4 +585,27 @@ function pinalert($update, $MadelineProto)
         $default
     );
     \danog\MadelineProto\Logger::log($sentMessage);
+}
+
+function send_to_moderated($MadelineProto, $msg, $except = []) {
+    check_json_array('chatlist.json', false, false);
+    $file = file_get_contents("chatlist.json");
+    $chatlist = json_decode($file, true);
+    foreach ($chatlist as $peer) {
+        if (!in_array($peer, $except)) {
+            $default = array(
+                'peer' => $peer,
+                'message' => $msg,
+                'parse_mode' => 'html',
+            );
+            try {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+            } catch (Exception $e) {
+                continue;
+            }
+        }
+    }
 }
