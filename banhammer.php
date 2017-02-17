@@ -544,7 +544,7 @@ function unbanall($update, $MadelineProto, $msg)
     }
 }
 
-function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
+function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all = false)
 {
     if (is_supergroup($update, $MadelineProto)) {
         global $responses, $engine;
@@ -609,9 +609,11 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                                 'reasons.json',
                                                 json_encode($reasons)
                                             );
+                                            $all = true;
                                         } else {
                                             $message = $responses['banall']['help'];
                                             $default['message'] = $message;
+                                            $all = true;
                                         }
                                     } else {
                                         $str = $responses['banall']['banned'];
@@ -620,8 +622,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                         );
                                         $message = $engine->render($str, $repl);
                                         $default['message'] = $message;
-                                        send_to_moderated($MadelineProto, $message, [$ch_id]);
-                                        ban_from_moderated($MadelineProto, $userid, [$ch_id]);
+                                        $all = true;
                                     }
                                     try {
                                         $kick = $MadelineProto->
@@ -669,7 +670,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
         if (isset($sentMessage) && $send) {
             \danog\MadelineProto\Logger::log($sentMessage);
         }
-        if ($send) {
+        if ($send && $all) {
             send_to_moderated($MadelineProto, $message, [$ch_id]);
         }
         ban_from_moderated($MadelineProto, $userid, [$ch_id]);
