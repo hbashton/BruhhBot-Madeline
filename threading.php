@@ -26,7 +26,7 @@ class NewMessage extends Thread
                     );
                     $msg_id = $update['update']['message']['id'];
                     $msg_arr = explode(' ', trim($msg));
-                    switch ($msg_arr[0]) {
+                    switch (strtolower($msg_arr[0])) {
                     case 'time':
                         unset($msg_arr[0]);
                         $msg = implode(" ", $msg_arr);
@@ -227,7 +227,7 @@ class NewChannelMessage extends Thread
                         );
                         $msg_id = $update['update']['message']['id'];
                         $msg_arr = explode(' ', trim($msg));
-                        switch ($msg_arr[0]) {
+                        switch (strtolower($msg_arr[0])) {
                         case 'time':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
