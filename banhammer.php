@@ -411,18 +411,21 @@ function getbanlist($update, $MadelineProto)
             $banlist = json_decode($file, true);
             if (array_key_exists($ch_id, $banlist)) {
                 foreach ($banlist[$ch_id] as $i => $key) {
-                    $user = cache_get_info($update, $MadelineProto, (int) $key);
-                    $username = catch_id($update, $MadelineProto, $key)[2];
-                    $mention = html_mention($username, $key);
-                    if (!isset($message)) {
-                        $str = $responses['getbanlist']['header'];
-                        $repl = array(
-                            "title" => $title
-                        );
-                        $message = $engine->render($str, $repl);
-                        $message = $message."$mention - $key\r\n";
-                    } else {
-                        $message = $message."$mention - $key\r\n";
+                    $id = catch_id($update, $MadelineProto, $key);
+                    if ($id[0]) {
+                        $username = $id[2];
+                        $user = cache_get_info($update, $MadelineProto, (int) $key);
+                        $mention = html_mention($username, $key);
+                        if (!isset($message)) {
+                            $str = $responses['getbanlist']['header'];
+                            $repl = array(
+                                "title" => $title
+                            );
+                            $message = $engine->render($str, $repl);
+                            $message = $message."$mention - $key\r\n";
+                        } else {
+                            $message = $message."$mention - $key\r\n";
+                        }
                     }
                 }
             }
@@ -699,26 +702,29 @@ function getgbanlist($update, $MadelineProto)
             $file = file_get_contents("reasons.json");
             $reasons = json_decode($file, true);
             foreach ($gbanlist as $i => $key) {
-                $username = catch_id($update, $MadelineProto, $key)[2];
-                $mention = html_mention($username, $key);
-                if (!isset($message)) {
-                    $str = $responses['getgbanlist']['header'];
-                    $repl = array(
-                        "title" => $title
-                    );
-                    $message = $engine->render($str, $repl);
-                    if (array_key_exists($key, $reasons)) {
-                        $reason = $reasons[$key];
-                        $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
+                $id = catch_id($update, $MadelineProto, $key);
+                if ($id[0]) {
+                    $username = $id[2];
+                    $mention = html_mention($username, $key);
+                    if (!isset($message)) {
+                        $str = $responses['getgbanlist']['header'];
+                        $repl = array(
+                            "title" => $title
+                        );
+                        $message = $engine->render($str, $repl);
+                        if (array_key_exists($key, $reasons)) {
+                            $reason = $reasons[$key];
+                            $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
+                        } else {
+                            $message = $message."$mention - $key\r\n";
+                        }
                     } else {
-                        $message = $message."$mention - $key\r\n";
-                    }
-                } else {
-                    if (array_key_exists($key, $reasons)) {
-                        $reason = $reasons[$key];
-                        $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
-                    } else {
-                        $message = $message."$mention - $key\r\n";
+                        if (array_key_exists($key, $reasons)) {
+                            $reason = $reasons[$key];
+                            $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
+                        } else {
+                            $message = $message."$mention - $key\r\n";
+                        }
                     }
                 }
             }
