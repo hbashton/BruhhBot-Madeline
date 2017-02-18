@@ -293,7 +293,7 @@ function unmuteall($update, $MadelineProto)
                                 'mutelist.json',
                                 json_encode($mutelist)
                             );
-                            $style[] = $responses['unmuteall']['success'];
+                            $message = $responses['unmuteall']['success'];
                             $default['message'] = $message;
                         } else {
                             $message = $responses['unmuteall']['already'];
@@ -332,7 +332,6 @@ function getmutelist($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html'
         );
-        var_dump($responses);
         if (is_moderated($ch_id)) {
             check_json_array('mutelist.json', $ch_id);
             $file = file_get_contents("mutelist.json");

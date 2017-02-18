@@ -21,25 +21,25 @@ function catch_id($update, $MadelineProto, $user)
 {
 
     $user_ = cache_get_info($update, $MadelineProto, $user);
-        try {
-            if (array_key_exists(
-                'username', $user_['User']
-            )
-            ) {
-                $username = $user_['User']['username'];
-            } elseif (array_key_exists(
-                'first_name', $user_['User']
-            )
-            ) {
-                $username = $user_['User']['first_name'];
-            } else {
-                $username = "no-name-user";
-            }
-            $userid = $user_['bot_api_id'];
-            $return = array(true, $userid, $username);
-        } catch (Exception $e) {
-            return array(false);
+    try {
+        if (array_key_exists(
+            'username', $user_['User']
+        )
+        ) {
+            $username = $user_['User']['username'];
+        } elseif (array_key_exists(
+            'first_name', $user_['User']
+        )
+        ) {
+            $username = $user_['User']['first_name'];
+        } else {
+            $username = "no-name-user";
         }
+        $userid = $user_['bot_api_id'];
+        $return = array(true, $userid, $username);
+    } catch (Exception $e) {
+        return array(false);
+    }
     if (!isset($return)); {
         if (array_key_exists('entities', $update['update']['message'])) {
             foreach ($update['update']['message']['entities'] as $key) {
