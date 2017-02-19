@@ -135,20 +135,20 @@ function getme($update, $MadelineProto, $name)
         $msg_id = $update['update']['message']['id'];
         $default = array(
             'peer' => $peer,
-            'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html',
+            'reply_to_msg_id' => $msg_id
             );
         check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");
         $saved = json_decode($file, true);
-        $boldname = html_bold($name);
+        $boldname = create_style('bold', 0, $name);
         if (array_key_exists($ch_id, $saved)) {
             if ($name !== "from") {
                 foreach ($saved[$ch_id] as $i => $ii) {
                     if (!is_array($i)) {
                         if ($i == $name) {
-                            $message = "$boldname:\r\n".$saved[$ch_id][$i];
+                            $message = "$name:\r\n".$saved[$ch_id][$i];
                             $default['message'] = $message;
+                            $default['entities'] = $boldname;
                         }
                     }
                 }
