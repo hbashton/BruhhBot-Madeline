@@ -340,9 +340,22 @@ function pinmessage($update, $MadelineProto, $silent)
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
+        $title = $chat['title'];
+        $peer2 = cache_get_info(
+            $update,
+            $MadelineProto,
+            getenv('MASTER_USERNAME')
+        )['bot_api_id'];
+        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+        $username = catch_id($update, $MadelineProto, $fromid)[2];
+        $mention = html_mention($username, $fromid);
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
+        );
+        $default2 = array(
+            'peer' => $peer2,
             'parse_mode' => 'html'
         );
         if (is_moderated($ch_id)) {
@@ -364,6 +377,12 @@ function pinmessage($update, $MadelineProto, $silent)
                             $message = $responses['pinmessage']['success'];
                             $default['message'] = $message;
                             \danog\MadelineProto\Logger::log($pin);
+                            $message2 = "User $mention pinned a message in <b>$title</b> - $ch_id";
+                            $default2['message'] = $message2;
+                            $sentMessage2 = $MadelineProto->messages->sendMessage(
+                                $default2
+                            );
+                            \danog\MadelineProto\Logger::log($sentMessage2);
                         } catch (Exception $e) {
                         }
                     } else {

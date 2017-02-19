@@ -533,7 +533,9 @@ class NewChannelMessageAction extends Thread
         $MadelineProto = $this->MadelineProto;
         switch ($update['update']['message']['action']['_']) {
         case 'messageActionPinMessage':
-            pinalert($update, $MadelineProto);
+            if (!$update['update']['message']['out']) {
+                pinalert($update, $MadelineProto);
+            }
             break;
         case 'messageActionChatAddUser':
             NewChatAddUser($update, $MadelineProto);
