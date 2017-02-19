@@ -25,6 +25,35 @@ class NewMessage extends Thread
                         ['message'], 1
                     );
                     $msg_id = $update['update']['message']['id'];
+                    $fromid = $update['update']['message']['from_id'];
+                    $default = array(
+                        'peer' => $fromid,
+                        'reply_to_msg_id' => $msg_id,
+                        'parse_mode' => 'html'
+                    );
+                    check_json_array('gbanlist.json', false, false);
+                    $file = file_get_contents("gbanlist.json");
+                    $gbanlist = json_decode($file, true);
+                    if (in_array($fromid, $gbanlist)) {
+                        try {
+                            $message = "You know not to message me. You have been reported as spam. #savage";
+                            $default['message'] = $message;
+                            $report = $MadelineProto->messages->reportSpam(['peer' => $fromid]);
+                            $sentMessage = $MadelineProto->
+                            messages->sendMessage(
+                                $default
+                            );
+                        } catch (Exception $e) {}
+                        if (isset($report)) {
+                            \danog\MadelineProto\Logger::log($kick);
+                        }
+                        if (isset($sentMessage)) {
+                            \danog\MadelineProto\Logger::log(
+                                $sentMessage
+                            );
+                        }
+                    }
+                    $msg_id = $update['update']['message']['id'];
                     $msg_arr = explode(' ', trim($msg));
                     switch (strtolower($msg_arr[0])) {
                     case 'time':
