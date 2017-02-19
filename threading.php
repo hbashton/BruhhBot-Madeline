@@ -66,7 +66,8 @@ class NewMessage extends Thread
                         }
                         unset($msg_arr[0]);
                         $msg = implode(" ", $msg_arr);
-                        if ($name == "clear") {
+                        $name_ = strtolower($name);
+                        if ($name_ == "clear") {
                             save_clear($update, $MadelineProto, $msg);
                         } else {
                             saveme($update, $MadelineProto, $msg, $name);
@@ -279,6 +280,7 @@ class NewChannelMessage extends Thread
                             break;
 
                         case 'banall':
+                        
                             unset($msg_arr[0]);
                             if (isset($msg_arr[1])) {
                                 $msg = $msg_arr[1];
@@ -293,7 +295,8 @@ class NewChannelMessage extends Thread
                         case 'mute':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
-                            if ($msg == "all") {
+                            $msg_ = strtolower($msg);
+                            if ($msg_ == "all") {
                                 muteall($update, $MadelineProto);
                             } else {
                                 muteme($update, $MadelineProto, $msg);
@@ -303,7 +306,8 @@ class NewChannelMessage extends Thread
                         case 'unmute':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
-                            if ($msg == "all") {
+                            $msg_ = strtolower($msg);
+                            if ($msg_ == "all") {
                                 unmuteall($update, $MadelineProto);
                             } else {
                                 unmuteme($update, $MadelineProto, $msg);
@@ -391,7 +395,8 @@ class NewChannelMessage extends Thread
                             }
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
-                            if ($name == "clear") {
+                            $name_ = strtolower($name);
+                            if ($name_ == "clear") {
                                 save_clear($update, $MadelineProto, $msg);
                             } else {
                                 saveme($update, $MadelineProto, $msg, $name);
@@ -405,7 +410,8 @@ class NewChannelMessage extends Thread
                         case 'pin':
                             if (isset($msg_arr[1])) {
                                 $msg = $msg_arr[1];
-                                if ($msg = "silent") {
+                                $msg_ = strtolower($msg);
+                                if ($msg_ = "silent") {
                                     $silent = true;
                                 } else {
                                     $silent = false;
@@ -462,7 +468,7 @@ class NewChannelMessage extends Thread
 
                         case 'lock':
                             if (isset($msg_arr[1])) {
-                                    $name = $msg_arr[1];
+                                    $name = strtolower($msg_arr[1]);
                                     unset($msg_arr[1]);
                             } else {
                                 $name = "";
@@ -473,7 +479,7 @@ class NewChannelMessage extends Thread
 
                         case 'unlock':
                             if (isset($msg_arr[1])) {
-                                    $name = $msg_arr[1];
+                                    $name = strtolower($msg_arr[1]);
                                     unset($msg_arr[1]);
                             } else {
                                 $name = "";

@@ -41,7 +41,6 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                             $userid = $id[1];
                         }
                         if (isset($userid)) {
-                            var_dump(true);
                             $mutemod = $responses['muteme']['mutemod'];
                             if (!is_admin_mod(
                                 $update,
