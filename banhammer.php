@@ -547,7 +547,7 @@ function unbanall($update, $MadelineProto, $msg)
     }
 }
 
-function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all = false)
+function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
         global $responses, $engine;
@@ -612,11 +612,9 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all 
                                                 'reasons.json',
                                                 json_encode($reasons)
                                             );
-                                            $all = true;
                                         } else {
                                             $message = $responses['banall']['help'];
                                             $default['message'] = $message;
-                                            $all = true;
                                         }
                                     } else {
                                         $str = $responses['banall']['banned'];
@@ -625,7 +623,6 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all 
                                         );
                                         $message = $engine->render($str, $repl);
                                         $default['message'] = $message;
-                                        $all = true;
                                     }
                                     try {
                                         $kick = $MadelineProto->
@@ -647,6 +644,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all 
                                     );
                                     $message = $engine->render($str, $repl);
                                     $default['message'] = $message;
+                                    $all = false;
                                 }
                             }
                         } else {
@@ -656,10 +654,12 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all 
                             );
                             $message = $engine->render($str, $repl);
                             $default['message'] = $message;
+                            $all = false;
                         }
                     } else {
                         $message = $responses['banall']['help'];
                         $default['message'] = $message;
+                        $all = false;
                     }
                 }
             }
@@ -672,6 +672,9 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $all 
         }
         if (isset($sentMessage) && $send) {
             \danog\MadelineProto\Logger::log($sentMessage);
+        }
+        if (!isset($all)) {
+            $all = true;
         }
         if ($send && $all) {
             send_to_moderated($MadelineProto, $message, [$ch_id]);
