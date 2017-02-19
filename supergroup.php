@@ -477,7 +477,11 @@ function delmessage_user($update, $MadelineProto, $msg)
                             $userid = $id[1];
                             $username = $id[2];
                         } else {
-                            $message = $responses['delmessage_user']['idk'];
+                            $str = $responses['delmessage_user']['idk'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                         if (isset($userid)) {
