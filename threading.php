@@ -39,13 +39,17 @@ class NewMessage extends Thread
                             $message = "You know not to message me. You have been reported as spam. #savage";
                             $default['message'] = $message;
                             $report = $MadelineProto->messages->reportSpam(['peer' => $fromid]);
+                            $block = $MadelineProto->contacts->block(['id' => $fromid]);
                             $sentMessage = $MadelineProto->
                             messages->sendMessage(
                                 $default
                             );
                         } catch (Exception $e) {}
                         if (isset($report)) {
-                            \danog\MadelineProto\Logger::log($kick);
+                            \danog\MadelineProto\Logger::log($report);
+                        }
+                        if (isset($block)) {
+                            \danog\MadelineProto\Logger::log($block);
                         }
                         if (isset($sentMessage)) {
                             \danog\MadelineProto\Logger::log(
