@@ -166,9 +166,10 @@ function idme($update, $MadelineProto, $msg)
         $title = $chat['title'];
         $ch_id = $chat['id'];
         $str = $responses['idme']['supergroup'];
+        $tg_id = str_replace("-100", "", $ch_id);
         $repl = array(
             "title" => $title,
-            "ch_id" => $ch_id
+            "ch_id" => $tg_id
         );
         $noid = $engine->render($str, $repl);
         $cont = true;
@@ -346,6 +347,7 @@ function pinmessage($update, $MadelineProto, $silent)
             $MadelineProto,
             getenv('MASTER_USERNAME')
         )['bot_api_id'];
+        $tg_id = str_replace("-100", "", $ch_id);
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         $username = catch_id($update, $MadelineProto, $fromid)[2];
         $mention = html_mention($username, $fromid);
@@ -377,7 +379,7 @@ function pinmessage($update, $MadelineProto, $silent)
                             $message = $responses['pinmessage']['success'];
                             $default['message'] = $message;
                             \danog\MadelineProto\Logger::log($pin);
-                            $message2 = "User $mention pinned a message in <b>$title</b> - $ch_id";
+                            $message2 = "User $mention pinned a message in <b>$title</b> - $tg_id";
                             $default2['message'] = $message2;
                             $sentMessage2 = $MadelineProto->messages->sendMessage(
                                 $default2
@@ -591,6 +593,7 @@ function pinalert($update, $MadelineProto)
         $MadelineProto,
         getenv('MASTER_USERNAME')
     )['bot_api_id'];
+    $tg_id = str_replace("-100", "", $ch_id);
     $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
     $username = catch_id($update, $MadelineProto, $fromid)[2];
     $mention = html_mention($username, $fromid);
@@ -598,7 +601,7 @@ function pinalert($update, $MadelineProto)
         'peer' => $peer,
         'parse_mode' => 'html'
     );
-    $message = "User $mention pinned a message in <b>$title</b> - $ch_id";
+    $message = "User $mention pinned a message in <b>$title</b> - $tg_id";
     $default['message'] = $message;
     $sentMessage = $MadelineProto->messages->sendMessage(
         $default
