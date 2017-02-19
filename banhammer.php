@@ -304,7 +304,11 @@ function kickhim($update, $MadelineProto, $msg)
 
                             }
                         } else {
-                            $message = $responses['kickhim']['idk'];
+                            $str = $responses['kickhim']['idk'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
