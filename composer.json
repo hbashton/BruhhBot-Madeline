@@ -34,7 +34,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "MadelineProto\\danog\\MadelineProto\\": "src/"
+            "danog\\MadelineProto\\": "MadelineProto/src/"
         }
     }
 }

@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-require 'MadelineProto/vendor/autoload.php';
 require 'vendor/autoload.php';
 require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
