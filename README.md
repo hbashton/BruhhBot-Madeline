@@ -15,24 +15,44 @@ sudo apt-get install -y php7.0 php7.0-common php7.0-mbstring php7.0-xml
 ```
 ### Installing
 
-To deploy BruhhBot, let's clone it to the computer we want to use it on
+To deploy BruhhBot (TO HEROKU), let's clone it to the computer we want to use it on
 
 ```
-git clone --recursive https://github.com/hbashton/BruhhBot-Madeline.git
-```
-Run the included init script
-
-```
-./init.sh
+git clone --recursive https://github.com/hbashton/BruhhBot-Madeline.git -b heroku
 ```
 Create a .env file using [the one provided](.env.example) as a template
 
-Finally, deploy your bot
+Update composer
+
+```
+composer update
+```
+Create an account at heroku.com, and install the Heroku CLI following [this guide](https://devcenter.heroku.com/articles/heroku-cli)
+
+Login to heroku
+
+```
+heroku login 
+```
+Create a project, for example, in my case I did:
+
+```
+heroku create bruhhbot-madeline
+```
+But the name can be anything you want it to be
+
+Run your bot one time and login to get the session.madeline file
 
 ```
 php bot.php
 ```
+Finally, deploy your bot to heroku
 
+```
+git push heroku master
+```
+
+Congratulations! You've just deployed your bot to heroku!
 ## PLEASE READ THIS!
 
 Your session, where you're logged in, is saved in session.madeline (in the root of your bot directory).
