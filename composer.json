@@ -21,7 +21,10 @@
         "spatie/emoji": "dev-master",
         "krakjoe/pthreads-polyfill": "dev-master",
         "nicmart/string-template": "~0.1",
-        "erusev/parsedown": "^1.6"
+        "erusev/parsedown": "^1.6",
+        "ext-mbstring": "*",
+        "ext-bcmath": "*",
+        "ext-mcrypt": "*"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"
