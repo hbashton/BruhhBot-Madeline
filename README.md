@@ -46,10 +46,14 @@ Run your bot one time and login to get the session.madeline file
 ```
 php bot.php
 ```
-Finally, deploy your bot to heroku
+Exit the terminal
+
+Finally, commit your results and deploy your bot to heroku
 
 ```
-git push heroku master
+git add -A
+git commit
+git push heroku heroku:master
 ```
 
 Congratulations! You've just deployed your bot to heroku!
