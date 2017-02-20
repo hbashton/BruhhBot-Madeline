@@ -385,6 +385,13 @@ function pinmessage($update, $MadelineProto, $silent)
                                 $default2
                             );
                             \danog\MadelineProto\Logger::log($sentMessage2);
+                            $forwardMessage = $MadelineProto->messages->forwardMessages([
+                                'silent' => false,
+                                'from_peer' => $ch_id,
+                                'id' => [$pin_id],
+                                'to_peer' => $peer2]
+                            );
+                            \danog\MadelineProto\Logger::log($forwardMessage);
                         } catch (Exception $e) {
                         }
                     } else {
@@ -592,6 +599,7 @@ function pinalert($update, $MadelineProto)
     $chatpeer = $chat['peer'];
     $title = $chat['title'];
     $msgid = $update['update']['message']['id'];
+    $pin_id = $update['update']['message']['reply_to_msg_id'];
     $peer = cache_get_info(
         $update,
         $MadelineProto,
@@ -611,4 +619,11 @@ function pinalert($update, $MadelineProto)
         $default
     );
     \danog\MadelineProto\Logger::log($sentMessage);
+    $MadelineProto->messages->forwardMessages([
+        'silent' => false,
+        'from_peer' => $ch_id,
+        'id' => [$pin_id],
+        'to_peer' => $peer]
+    );
+    \danog\MadelineProto\Logger::log($forwardMessage);
 }
