@@ -82,8 +82,3 @@ db_connect.php
 sessions
 docs_md
 
-/who
-#json db
-*.json
-!configuration.json
-!responses.json
