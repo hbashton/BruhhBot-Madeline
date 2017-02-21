@@ -544,6 +544,7 @@ class NewChannelMessage extends Thread
                             }
                             unset($msg_arr[0]);
                             set_chat_username($update, $MadelineProto, $name);
+                            break;
                         }
                     }
                 }

@@ -223,7 +223,7 @@ function set_chat_username($update, $MadelineProto, $msg)
                 }
             }
         }
-        if (!isset($default['message'])) {
+        if (isset($default['message'])) {
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );
