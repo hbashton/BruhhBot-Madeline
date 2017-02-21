@@ -154,48 +154,52 @@ function is_admin($update, $MadelineProto, $userid, $send = false)
 
 function is_bot_admin($update, $MadelineProto, $send = false)
 {
-    $admins = cache_get_chat_info($update, $MadelineProto);
-    $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-        ['InputPeer'];
-    $bot_id = $MadelineProto->API->datacenter->authorization['user']['id'];
-    foreach ($admins['participants'] as $key) {
-        if (array_key_exists('user', $key)) {
-            $id = $key['user']['id'];
-        } else {
-            if (array_key_exists('bot', $key)) {
-                $id = $key['bot']['id'];
+    try {
+        $admins = cache_get_chat_info($update, $MadelineProto);
+        $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+            ['InputPeer'];
+        $bot_id = $MadelineProto->API->datacenter->authorization['user']['id'];
+        foreach ($admins['participants'] as $key) {
+            if (array_key_exists('user', $key)) {
+                $id = $key['user']['id'];
+            } else {
+                if (array_key_exists('bot', $key)) {
+                    $id = $key['bot']['id'];
+                }
             }
-        }
-        if ($id == $bot_id) {
-            if (array_key_exists("role", $key)) {
-                if ($key['role'] == "moderator"
-                    or $key['role'] == "creator"
-                ) {
-                    $mod = true;
-                    break;
+            if ($id == $bot_id) {
+                if (array_key_exists("role", $key)) {
+                    if ($key['role'] == "moderator"
+                        or $key['role'] == "creator"
+                    ) {
+                        $mod = true;
+                        break;
+                    } else {
+                        $mod = false;
+                        break;
+                    }
                 } else {
                     $mod = false;
                     break;
                 }
-            } else {
-                $mod = false;
-                break;
             }
+            $mod = false;
         }
-        $mod = false;
-    }
-    if ($mod) {
-        return true;
-    } else {
-        if ($send) {
-            $msg_id = $update['update']['message']['id'];
-            $message = "I have to be an admin for this to work";
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' =>
-                $msg_id, 'message' => $message]
-            );
-            \danog\MadelineProto\Logger::log($sentMessage);
+        if ($mod) {
+            return true;
+        } else {
+            if ($send) {
+                $msg_id = $update['update']['message']['id'];
+                $message = "I have to be an admin for this to work";
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' =>
+                    $msg_id, 'message' => $message]
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+            return false;
         }
+    } catch (Exception $e) {
         return false;
     }
 }
