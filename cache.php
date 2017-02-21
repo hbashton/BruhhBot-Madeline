@@ -22,26 +22,30 @@ function cache_get_info($update, $MadelineProto, $data)
 
 function cache_get_chat_info($update, $MadelineProto, $full_fetch = false)
 {
-    if (is_supergroup($update, $MadelineProto)) {
-        $id = -100 . $update['update']['message']['to_id']['channel_id'];
-        if (isset($MadelineProto->cached_full[$id])) {
-            if ((time() - $MadelineProto->cached_full[$id]['date']) < 120) {
-                $info = $MadelineProto->cached_full[$id]['data'];
-            } else {
-                try {
-                    $info = $MadelineProto->get_pwr_chat(-100 . $update['update']['message']['to_id']['channel_id']);
-                    $MadelineProto->cached_full[$id] =
-                    ['date' => time(), 'data' => $info];
-                } catch (Exception $e) {
-                    return(false);
+    try {
+        if (is_supergroup($update, $MadelineProto)) {
+            $id = -100 . $update['update']['message']['to_id']['channel_id'];
+            if (isset($MadelineProto->cached_full[$id])) {
+                if ((time() - $MadelineProto->cached_full[$id]['date']) < 120) {
+                    $info = $MadelineProto->cached_full[$id]['data'];
+                } else {
+                    try {
+                        $info = $MadelineProto->get_pwr_chat(-100 . $update['update']['message']['to_id']['channel_id']);
+                        $MadelineProto->cached_full[$id] =
+                        ['date' => time(), 'data' => $info];
+                    } catch (Exception $e) {
+                        return(false);
+                    }
                 }
+            } else {
+                $info = $MadelineProto->get_pwr_chat(-100 . $update['update']['message']['to_id']['channel_id']);
+                $MadelineProto->cached_full[$id]
+                    = ['date' => time(), 'data' => $info];
             }
-        } else {
-            $info = $MadelineProto->get_pwr_chat(-100 . $update['update']['message']['to_id']['channel_id']);
-            $MadelineProto->cached_full[$id]
-                = ['date' => time(), 'data' => $info];
+            return($info);
         }
-        return($info);
+    } catch (Exception $e) {
+        return array();
     }
 }
 
