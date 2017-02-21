@@ -174,3 +174,62 @@ function set_chat_title($update, $MadelineProto, $msg)
         }
     }
 }
+
+function set_chat_username($update, $MadelineProto, $msg)
+{
+    if (is_supergroup($update, $MadelineProto)) {
+        global $responses, $engine;
+        $msg_id = $update['update']['message']['id'];
+        $mods = $responses['set_chat_title']['mods'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = $chat['title'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
+            );
+        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod(
+                    $update,
+                    $MadelineProto,
+                    $mods,
+                    true
+                )
+                ) {
+                    if ($msg) {
+                        try {
+                            $changeUsername = $MadelineProto->channels->updateUsername(
+                                ['channel' => $ch_id, 'username' => $msg ]
+                            );
+                            \danog\MadelineProto\Logger::log($changeUsername);
+                            $str = $responses['set_chat_username']['success'];
+                            $repl = array(
+                                "msg" => $msg
+                            );
+                            $message = $engine->render($str, $repl);
+                            $default['message'] = $message;
+                        } catch (Exception $e) {
+                            $message = $responses['set_chat_username']['fail'];
+                            $default['message'] = $message;
+                        }
+                    } else {
+                        $message = $responses['set_chat_username']['help'];
+                        $default['message'] = $message;
+                    }
+                }
+            }
+        }
+        if (!isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        }
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
+    }
+}

@@ -18,7 +18,7 @@
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function create_new_supergroup($update, $MadelineProto, $title, $about)
+function create_new_supergroup($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
         global $responses, $engine;
@@ -30,31 +30,54 @@ function create_new_supergroup($update, $MadelineProto, $title, $about)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html'
             );
-            if (!empty($title) && !empty($about)) {
-                $channelRoleModerator = ['_' => 'channelRoleModerator', ];
-                $newgroup = $MadelineProto->channels->createChannel(
-                    ['broadcast' => true,
-                    'megagroup' => true,
-                    'title' => $title,
-                    'about' => $about ]
-                );
-                $master = cache_get_info(
-                    $update,
-                    $MadelineProto,
-                    getenv('MASTER_USERNAME')
-                )
-                ['bot_api_id'];
-                $channel_id = -100 . $newgroup['updates'][1]['channel_id'];
-                $invite_master = $MadelineProto->channels->inviteToChannel(
-                    ['channel' => $channel_id,
-                    'users' => [$master]]
-                );
-                \danog\MadelineProto\Logger::log($invite_master);
-                $editadmin = $MadelineProto->channels->editAdmin(
-                    ['channel' => $channel_id,
-                    'user_id' => $master,
-                    'role' => $channelRoleModerator]
-                );
+            if (preg_match_all('/"([^"]+)"/', $msg, $m)) {
+                if (isset($m[1])) {
+                    if (isset($m[1][0])) {
+                        $title = $m[1][0];
+                    } else {
+                        $title = false;
+                    }
+                    if (isset($m[1][1])) {
+                        $about = $m[1][1];
+                    } else {
+                        $about = false;
+                    }
+                }
+                if ($title && $about) {
+                    $channelRoleModerator = ['_' => 'channelRoleModerator', ];
+                    $newgroup = $MadelineProto->channels->createChannel(
+                        ['broadcast' => true,
+                        'megagroup' => true,
+                        'title' => $title,
+                        'about' => $about ]
+                    );
+                    $master = cache_get_info(
+                        $update,
+                        $MadelineProto,
+                        getenv('MASTER_USERNAME')
+                    )
+                    ['bot_api_id'];
+                    $channel_id = -100 . $newgroup['updates'][1]['channel_id'];
+                    $invite_master = $MadelineProto->channels->inviteToChannel(
+                        ['channel' => $channel_id,
+                        'users' => [$master]]
+                    );
+                    \danog\MadelineProto\Logger::log($invite_master);
+                    $editadmin = $MadelineProto->channels->editAdmin(
+                        ['channel' => $channel_id,
+                        'user_id' => $master,
+                        'role' => $channelRoleModerator]
+                    );
+                } else {
+                    $message = $responses['create_new_supergroup']['missing_info'];
+                    $default['message'] = $message;
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    if (isset($sentMessage)) {
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                    }
+                }
             } else {
                 $message = $responses['create_new_supergroup']['missing_info'];
                 $default['message'] = $message;

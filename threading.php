@@ -60,6 +60,14 @@ class NewMessage extends Thread
                     $msg_id = $update['update']['message']['id'];
                     $msg_arr = explode(' ', trim($msg));
                     switch (strtolower($msg_arr[0])) {
+                    case 'start':
+                        start_message($update, $MadelineProto);
+                        break;
+
+                    case 'help':
+                        start_message($update, $MadelineProto);
+                        break;
+
                     case 'time':
                         unset($msg_arr[0]);
                         $msg = implode(" ", $msg_arr);
@@ -109,24 +117,18 @@ class NewMessage extends Thread
 
                     case 'saved':
                         saved_get($update, $MadelineProto);
-                    break;
+                        break;
+
                     case 'newgroup':
                         unset($msg_arr[0]);
-                        if (isset($msg_arr[1]) && isset($msg_arr[2])) {
-                            $title = $msg_arr[1];
-                            unset($msg_arr[1]);
-                            $about = implode(" ", $msg_arr);
-                        } else {
-                            $title = "";
-                            $about = "";
-                        }
+                        $msg = implode(" ", $msg_arr);
                         create_new_supergroup(
                             $update,
                             $MadelineProto,
-                            $title,
-                            $about
+                            $msg
                         );
                         break;
+
                     case 'end':
                         if (from_master($update, $MadelineProto)) {
                             \danog\MadelineProto\Serialization::serialize(
@@ -313,7 +315,7 @@ class NewChannelMessage extends Thread
                             break;
 
                         case 'banall':
-                        
+
                             unset($msg_arr[0]);
                             if (isset($msg_arr[1])) {
                                 $msg = $msg_arr[1];
@@ -533,15 +535,15 @@ class NewChannelMessage extends Thread
                             unlockme($update, $MadelineProto, $name);
                             break;
 
-                        case 'end':
-                            if (from_master($update, $MadelineProto)) {
-                                \danog\MadelineProto\Serialization::serialize(
-                                    'session.madeline',
-                                    $MadelineProto
-                                ).PHP_EOL;
-                                exit(0);
+                        case 'groupuser':
+                            if (isset($msg_arr[1])) {
+                                    $name = strtolower($msg_arr[1]);
+                                    unset($msg_arr[1]);
+                            } else {
+                                $name = "";
                             }
-                            break;
+                            unset($msg_arr[0]);
+                            set_chat_username($update, $MadelineProto, $name);
                         }
                     }
                 }

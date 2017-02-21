@@ -233,6 +233,13 @@
         "fail":"I could not change the title.",
         "help":"Use <code>/setname title</code> to change the chat name"
     },
+    "set_chat_username":
+    {
+        "mods":"Only mods can change this chat's username!",
+        "success":"Chat username successfully changed to {msg}",
+        "fail":"I could not change the username.",
+        "help":"Use <code>/groupuser username</code> to change the chats username"
+    },
     "gettime":
     {
         "success":"The current time in {timezone} is {ctime}",

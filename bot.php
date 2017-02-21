@@ -22,6 +22,7 @@ require 'vendor/autoload.php';
 require 'vendor/rmccue/requests/library/Requests.php';
 require 'vendor/spatie/emoji/src/Emoji.php';
 require_once 'add.php';
+require_once 'arabic.php';
 require_once 'banhammer.php';
 require_once 'cache.php';
 require_once 'check_msg.php';
@@ -35,6 +36,7 @@ require_once 'promote.php';
 require_once 'save_get.php';
 require_once 'set_info.php';
 require_once 'settings.php';
+require_once 'start_help.php';
 require_once 'supergroup.php';
 require_once 'time.php';
 require_once 'threading.php';
@@ -110,7 +112,7 @@ while (true) {
                 $NewMessage->start();
             }
         break;
-                
+
 
         case 'updateNewChannelMessage':
             $res = json_encode($update, JSON_PRETTY_PRINT);

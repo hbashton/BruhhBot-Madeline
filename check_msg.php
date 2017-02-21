@@ -96,6 +96,28 @@ function check_locked($update, $MadelineProto)
                                 }
                             }
                         }
+                    } else {
+                        if (array_key_exists('message', $update['update']['message'])) {
+                            if ($update['update']['message']['message'] !== '') {
+                                if (is_arabic($update['update']['message']['message'])) {
+                                    check_json_array('locked.json', $ch_id);
+                                    $file = file_get_contents("locked.json");
+                                    $locked = json_decode($file, true);
+                                    if (array_key_exists($ch_id, $locked)) {
+                                        if (in_array('arabic', $locked[$ch_id])) {
+                                            $delete = $MadelineProto->
+                                            channels->deleteMessages(
+                                                ['channel' => $peer,
+                                                'id' => [$msg_id]]
+                                            );
+                                            $thred = new Exec($delete);
+                                            $thred->start();
+                                            $thred->join();
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
