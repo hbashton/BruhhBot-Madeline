@@ -129,83 +129,85 @@ function check_locked($update, $MadelineProto)
 function check_flood($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
-        $chat = parse_chat_data($update, $MadelineProto);
-        $peer = $chat['peer'];
-        $ch_id = $chat['id'];
-        $msg_id = $update['update']['message']['id'];
-        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        check_json_array('locked.json', $ch_id);
-        $file = file_get_contents("locked.json");
-        $locked = json_decode($file, true);
-        if (is_moderated($ch_id)) {
-            if (array_key_exists($ch_id, $locked)) {
-                if (in_array('flood', $locked[$ch_id])) {
-                    if (is_bot_admin($update, $MadelineProto)) {
-                        if (from_admin_mod($update, $MadelineProto)) {
-                            global $flooder;
-                            $flooder['num'] = 0;
-                            $flooder['user'] = $fromid;
-                        }
-                        if (!empty($GLOBALS['flooder'])) {
-                            $flooder = $GLOBALS['flooder'];
-                            if ($fromid == $flooder['user']) {
-                                $id = catch_id(
-                                    $update,
-                                    $MadelineProto,
-                                    $fromid
-                                );
-                                if ($id[0]) {
-                                    $username = $id[2];
-                                }
-                                $GLOBALS['flooder']['num'] = $flooder['num'] + 1;
-                                $num = $GLOBALS['flooder']['num'];
-                                if ($num >= $locked[$ch_id]['floodlimit']) {
-                                    if (!from_admin_mod($update, $MadelineProto)) {
-                                        $kick = $MadelineProto->
-                                        channels->kickFromChannel(
-                                            ['channel' => $peer,
-                                            'user_id' => $fromid,
-                                            'kicked' => true]
-                                        );
-                                        $mention = html_mention($username, $fromid);
-                                        $str = $responses['check_flood']['kick'];
-                                        $repl = array(
-                                            "mention" => $mention
-                                        );
-                                        $message = $engine->render($str, $repl);
-                                        if (isset($message)) {
-                                            $sentMessage = $MadelineProto->
-                                            messages->sendMessage(
-                                                ['peer' => $peer,
-                                                'reply_to_msg_id' => $msg_id,
-                                                'message' => $message,
-                                                'parse_mode' => 'html']
-                                            );
-                                        }
-                                        if (isset($kick)) {
-                                            \danog\MadelineProto\Logger::log($kick);
-                                        }
-                                        if (isset($sentMessage)) {
-                                            \danog\MadelineProto\Logger::log(
-                                                $sentMessage
-                                            );
-                                        }
-                                        unset($GLOBALS['flooder']);
+        try {
+            global $responses, $engine;
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $ch_id = $chat['id'];
+            $msg_id = $update['update']['message']['id'];
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            check_json_array('locked.json', $ch_id);
+            $file = file_get_contents("locked.json");
+            $locked = json_decode($file, true);
+            if (is_moderated($ch_id)) {
+                if (array_key_exists($ch_id, $locked)) {
+                    if (in_array('flood', $locked[$ch_id])) {
+                        if (is_bot_admin($update, $MadelineProto)) {
+                            if (from_admin_mod($update, $MadelineProto)) {
+                                global $flooder;
+                                $flooder['num'] = 0;
+                                $flooder['user'] = $fromid;
+                            }
+                            if (!empty($GLOBALS['flooder'])) {
+                                $flooder = $GLOBALS['flooder'];
+                                if ($fromid == $flooder['user']) {
+                                    $id = catch_id(
+                                        $update,
+                                        $MadelineProto,
+                                        $fromid
+                                    );
+                                    if ($id[0]) {
+                                        $username = $id[2];
                                     }
+                                    $GLOBALS['flooder']['num'] = $flooder['num'] + 1;
+                                    $num = $GLOBALS['flooder']['num'];
+                                    if ($num >= $locked[$ch_id]['floodlimit']) {
+                                        if (!from_admin_mod($update, $MadelineProto)) {
+                                            $kick = $MadelineProto->
+                                            channels->kickFromChannel(
+                                                ['channel' => $peer,
+                                                'user_id' => $fromid,
+                                                'kicked' => true]
+                                            );
+                                            $mention = html_mention($username, $fromid);
+                                            $str = $responses['check_flood']['kick'];
+                                            $repl = array(
+                                                "mention" => $mention
+                                            );
+                                            $message = $engine->render($str, $repl);
+                                            if (isset($message)) {
+                                                $sentMessage = $MadelineProto->
+                                                messages->sendMessage(
+                                                    ['peer' => $peer,
+                                                    'reply_to_msg_id' => $msg_id,
+                                                    'message' => $message,
+                                                    'parse_mode' => 'html']
+                                                );
+                                            }
+                                            if (isset($kick)) {
+                                                \danog\MadelineProto\Logger::log($kick);
+                                            }
+                                            if (isset($sentMessage)) {
+                                                \danog\MadelineProto\Logger::log(
+                                                    $sentMessage
+                                                );
+                                            }
+                                            unset($GLOBALS['flooder']);
+                                        }
+                                    }
+                                } else {
+                                    $GLOBALS['flooder']['user'] = $fromid;
                                 }
                             } else {
-                                $GLOBALS['flooder']['user'] = $fromid;
+                                global $flooder;
+                                $flooder = [];
+                                $flooder['user'] = $fromid;
+                                $flooder['num'] = 0;
                             }
-                        } else {
-                            global $flooder;
-                            $flooder = [];
-                            $flooder['user'] = $fromid;
-                            $flooder['num'] = 0;
                         }
                     }
                 }
             }
         }
-    }
+    } catch (Exception $e) {}
 }
