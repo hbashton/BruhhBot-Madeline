@@ -327,16 +327,14 @@ class NewChannelMessage extends Thread
                                 $last = key(array_slice($msg_arr, -1, 1, TRUE));
                                 if ($msg_arr[$last] == "silent") {
                                     $silent = false;
-                                    unset($msg_arr[$last]);
                                 } else {
                                     $silent = true;
-                                    unset($msg_arr[$last]);
                                 }
                             } else {
                                 $silent = true;
                             }
                             $reason = implode(" ", $msg_arr);
-                            banall($update, $MadelineProto, $msg, $reason, true, $silent);
+                            banall($update, $MadelineProto, $msg, $reason,$silent);
                             break;
 
                         case 'mute':
