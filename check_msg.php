@@ -208,6 +208,6 @@ function check_flood($update, $MadelineProto)
                     }
                 }
             }
-        }
-    } catch (Exception $e) {}
+        } catch (Exception $e) {}
+    }
 }
