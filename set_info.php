@@ -202,16 +202,30 @@ function set_chat_username($update, $MadelineProto, $msg)
                 ) {
                     if ($msg) {
                         try {
-                            $changeUsername = $MadelineProto->channels->updateUsername(
+                            if ($msg == "clear") {
+                                $msg = "";
+                                $changeUsername = $MadelineProto->channels->updateUsername(
                                 ['channel' => $ch_id, 'username' => $msg ]
-                            );
-                            \danog\MadelineProto\Logger::log($changeUsername);
-                            $str = $responses['set_chat_username']['success'];
-                            $repl = array(
-                                "msg" => $msg
-                            );
-                            $message = $engine->render($str, $repl);
-                            $default['message'] = $message;
+                                );
+                                \danog\MadelineProto\Logger::log($changeUsername);
+                                $str = $responses['set_chat_username']['clear'];
+                                $repl = array(
+                                    "title" => $title
+                                );
+                                $message = $engine->render($str, $repl);
+                                $default['message'] = $message;
+                            } else {
+                                $changeUsername = $MadelineProto->channels->updateUsername(
+                                    ['channel' => $ch_id, 'username' => $msg ]
+                                );
+                                \danog\MadelineProto\Logger::log($changeUsername);
+                                $str = $responses['set_chat_username']['success'];
+                                $repl = array(
+                                    "msg" => $msg
+                                );
+                                $message = $engine->render($str, $repl);
+                                $default['message'] = $message;
+                            }
                         } catch (Exception $e) {
                             $message = $responses['set_chat_username']['fail'];
                             $default['message'] = $message;

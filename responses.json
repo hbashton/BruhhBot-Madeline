@@ -236,9 +236,10 @@
     "set_chat_username":
     {
         "mods":"Only mods can change this chat's username!",
-        "success":"Chat username successfully changed to {msg}",
+        "success":"Chat username successfully changed to <code>{msg}</code>",
         "fail":"I could not change the username.",
-        "help":"Use <code>/groupuser username</code> to change the chats username"
+        "help":"Use <code>/groupuser username</code> to change the chats username",
+        "clear":"I have cleared the username for <b>{title}</b>"
     },
     "gettime":
     {
