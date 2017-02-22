@@ -51,17 +51,21 @@ function cache_get_chat_info($update, $MadelineProto, $full_fetch = false)
 
 function cache_from_user_info($update, $MadelineProto)
 {
-    $id = $update['update']['message']['from_id'];
-    if (isset($MadelineProto->cached_user[$id])) {
-        if ((time() - $MadelineProto->cached_user[$id]['date']) < 120) {
-            $user = $MadelineProto->cached_user[$id]['data'];
+    try {
+        $id = $update['update']['message']['from_id'];
+        if (isset($MadelineProto->cached_user[$id])) {
+            if ((time() - $MadelineProto->cached_user[$id]['date']) < 120) {
+                $user = $MadelineProto->cached_user[$id]['data'];
+            } else {
+                $user =$MadelineProto->get_info($id);
+                $MadelineProto->cached_user[$id] = ['date' => time(), 'data' => $user];
+            }
         } else {
             $user =$MadelineProto->get_info($id);
             $MadelineProto->cached_user[$id] = ['date' => time(), 'data' => $user];
         }
-    } else {
-        $user =$MadelineProto->get_info($id);
-        $MadelineProto->cached_user[$id] = ['date' => time(), 'data' => $user];
+        return($user);
+    } catch (Exception $e) {
+        return array();
     }
-    return($user);
 }
