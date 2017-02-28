@@ -47,7 +47,7 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                 $MadelineProto,
                                 $userid,
                                 $banmod,
-                                true
+                                $send
                             )
                             ) {
                                 $username = $id[2];
@@ -581,7 +581,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                 $MadelineProto,
                                 $userid,
                                 $banmod,
-                                true
+                                $send
                             )
                             ) {
                                 $username = $id[2];
