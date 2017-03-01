@@ -37,7 +37,6 @@ php bot.php
 
 Your session, where you're logged in, is saved in session.madeline (in the root of your bot directory).
 Sometimes, inevitably, the bot gets killed before fully writing to the file. In this case, you will need to remove it and rerun the bot.
-To prevent this, end the bot with /end instead of from the terminal. Then, delete the /end message to prevent the bot from reading it over and over.
 
 ## Support
 
