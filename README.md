@@ -27,6 +27,8 @@ Run the included init script
 ```
 Create a .env file using [the one provided](.env.example) as a template
 
+Grab your weather API key using [OpenWeather](https://openweathermap.org/api) and place in the .env file
+
 Finally, deploy your bot
 
 ```
