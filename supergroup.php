@@ -306,11 +306,12 @@ function modlist($update, $MadelineProto)
                         );
                         $message = $engine->render($str, $repl);
                         $message = $message."$mention - $key\r\n";
+                        $default['message'] = $message;
                     } else {
                         $message = $message."$mention - $key\r\n";
+                        $default['message'] = $message;
                     }
                 }
-                $default['message'] = $message;
             }
             if (!isset($message)) {
                 $str = $responses['modlist']['none'];
