@@ -485,14 +485,8 @@ function unbanall($update, $MadelineProto, $msg)
                             check_json_array('gbanlist.json', false, false);
                             $file = file_get_contents("gbanlist.json");
                             $gbanlist = json_decode($file, true);
-                            if (in_array($userid, $gbanlist)) {
-                                if (($key = array_search(
-                                    $userid,
-                                    $gbanlist
-                                )) !== false
-                                ) {
-                                    unset($gbanlist[$key]);
-                                }
+                            if (array_key_exists($userid, $gbanlist)) {
+                                unset($gbanlist[$userid]);
                                 file_put_contents(
                                     'gbanlist.json',
                                     json_encode($gbanlist)
@@ -503,7 +497,6 @@ function unbanall($update, $MadelineProto, $msg)
                                 );
                                 $message = $engine->render($str, $repl);
                                 $default['message'] = $message;
-                                unban_from_moderated($MadelineProto, $userid, [$ch_id]);
                                 try {
                                     $kick = $MadelineProto->
                                     channels->kickFromChannel(
@@ -547,7 +540,9 @@ function unbanall($update, $MadelineProto, $msg)
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
         }
-        unban_from_moderated($MadelineProto, $userid, [$ch_id]);
+        if (isset($userid)) {
+            unban_from_moderated($MadelineProto, $userid, [$ch_id]);
+        }
     }
 }
 
@@ -591,12 +586,11 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
                                 check_json_array('gbanlist.json', false, false);
                                 $file = file_get_contents("gbanlist.json");
                                 $gbanlist = json_decode($file, true);
-                                var_dump($gbanlist);
                                 check_json_array('reasons.json', false, false);
                                 $file = file_get_contents("reasons.json");
                                 $reasons = json_decode($file, true);
-                                if (!in_array($userid, $gbanlist)) {
-                                    array_push($gbanlist, $userid);
+                                if (!array_key_exists($userid, $gbanlist)) {
+                                    $gbanlist[$userid] = $username;
                                     file_put_contents(
                                         'gbanlist.json',
                                         json_encode($gbanlist)
@@ -709,29 +703,27 @@ function getgbanlist($update, $MadelineProto)
             $file = file_get_contents("reasons.json");
             $reasons = json_decode($file, true);
             foreach ($gbanlist as $i => $key) {
-                $id = catch_id($update, $MadelineProto, $key);
-                if ($id[0]) {
-                    $username = $id[2];
-                    $mention = html_mention($username, $key);
-                    if (!isset($message)) {
-                        $str = $responses['getgbanlist']['header'];
-                        $repl = array(
-                            "title" => $title
-                        );
-                        $message = $engine->render($str, $repl);
-                        if (array_key_exists($key, $reasons)) {
-                            $reason = $reasons[$key];
-                            $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
-                        } else {
-                            $message = $message."$mention - $key\r\n";
-                        }
+                $id = $i;
+                $username = $key;
+                $mention = html_mention($username, $id);
+                if (!isset($message)) {
+                    $str = $responses['getgbanlist']['header'];
+                    $repl = array(
+                        "title" => $title
+                    );
+                    $message = $engine->render($str, $repl);
+                    if (array_key_exists($id, $reasons)) {
+                        $reason = $reasons[$id];
+                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\r\n";
                     } else {
-                        if (array_key_exists($key, $reasons)) {
-                            $reason = $reasons[$key];
-                            $message = $message."$mention - $key\n<code>Reason: $reason</code>\r\n";
-                        } else {
-                            $message = $message."$mention - $key\r\n";
-                        }
+                        $message = $message."$mention - $id\r\n";
+                    }
+                } else {
+                    if (array_key_exists($id, $reasons)) {
+                        $reason = $reasons[$id];
+                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\r\n";
+                    } else {
+                        $message = $message."$mention - $id\r\n";
                     }
                 }
             }

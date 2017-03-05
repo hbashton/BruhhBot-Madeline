@@ -34,7 +34,7 @@ class NewMessage extends Thread
                     check_json_array('gbanlist.json', false, false);
                     $file = file_get_contents("gbanlist.json");
                     $gbanlist = json_decode($file, true);
-                    if (in_array($fromid, $gbanlist)) {
+                    if (array_key_exists($fromid, $gbanlist)) {
                         try {
                             $message = "You know not to message me. You have been reported as spam. #savage";
                             $default['message'] = $message;
@@ -189,7 +189,7 @@ class NewChannelMessage extends Thread
                         check_json_array('gbanlist.json', false, false);
                         $file = file_get_contents("gbanlist.json");
                         $gbanlist = json_decode($file, true);
-                        if (in_array($fromid, $gbanlist)) {
+                        if (array_key_exists($fromid, $gbanlist)) {
                             $message = "I really don't like them!";
                             $default['message'] = $message;
                             $kick = $MadelineProto->
@@ -612,7 +612,7 @@ function NewChatAddUser($update, $MadelineProto)
             check_json_array('gbanlist.json', false, false);
             $file = file_get_contents("gbanlist.json");
             $gbanlist = json_decode($file, true);
-            if (in_array($mention, $gbanlist)) {
+            if (array_key_exists($mention, $gbanlist)) {
                 $message = "I really don't like them!";
                 $default['message'] = $message;
                 $kick = $MadelineProto->
@@ -739,7 +739,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
             check_json_array('gbanlist.json', false, false);
             $file = file_get_contents("gbanlist.json");
             $gbanlist = json_decode($file, true);
-            if (in_array($mention, $gbanlist)) {
+            if (array_key_exists($mention, $gbanlist)) {
                 $message = "I really don't like them!";
                 $default['message'] = $message;
                 $kick = $MadelineProto->

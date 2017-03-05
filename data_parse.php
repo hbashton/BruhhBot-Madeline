@@ -154,7 +154,7 @@ function is_gbanned($update, $MadelineProto, $user)
     $id = catch_id($update, $MadelineProto, $user);
     if ($id[0]) {
         $userid = $id[1];
-        if (in_array($userid, $gbanlist)) {
+        if (array_key_exists($userid, $gbanlist)) {
             return true;
         } else {
             return false;
