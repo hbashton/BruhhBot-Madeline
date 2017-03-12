@@ -1,4 +1,4 @@
-From 952f75a092a7efd9a1dfb0b3309e4da12b0ebb00 Mon Sep 17 00:00:00 2001
+From 691de5c3fdd3040c04631f78b4160b4010509a83 Mon Sep 17 00:00:00 2001
 From: halogenOS Code Review <xosdeveloperbruhh@gmail.com>
 Date: Sun, 29 Jan 2017 19:04:06 -0600
 Subject: [PATCH 1/1] Remove log spam
@@ -6,24 +6,24 @@ Subject: [PATCH 1/1] Remove log spam
 ---
  src/danog/MadelineProto/MTProtoTools/CallHandler.php     | 2 +-
  src/danog/MadelineProto/MTProtoTools/ResponseHandler.php | 2 +-
- src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 5 +++--
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/src/danog/MadelineProto/MTProtoTools/CallHandler.php b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-index 3474d4c..25aa1fa 100644
+index 44f34ca..1d414e7 100644
 --- a/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-@@ -24,7 +24,7 @@ trait CallHandler
-         }
+@@ -30,7 +30,7 @@ trait CallHandler
+         $content_related = $this->content_related($method);
          for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
              try {
 -                \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
 +                #\danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
  
-                 $args = $this->get_named_method_args($method, $args);
-                 $int_message_id = $this->send_message($this->serialize_method($method, $args), $this->content_related($method), $message_id);
+                 $int_message_id = $this->send_message($serialized, $content_related, $aargs);
+                 if ($method === 'http_wait') {
 diff --git a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
-index 01acbfd..772016b 100644
+index 2d83e60..a3ed0ce 100644
 --- a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 @@ -72,7 +72,7 @@ trait ResponseHandler
@@ -36,10 +36,10 @@ index 01acbfd..772016b 100644
              switch ($response['_']) {
                  case 'msgs_ack':
 diff --git a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-index e890e23..1db7b07 100644
+index 7d6ea6b..a30f025 100644
 --- a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-@@ -141,8 +141,8 @@ trait UpdateHandler
+@@ -143,8 +143,8 @@ trait UpdateHandler
              return false;
          }
          $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
@@ -49,11 +49,12 @@ index e890e23..1db7b07 100644
          switch ($difference['_']) {
              case 'updates.channelDifferenceEmpty':
                  $this->set_channel_state($channel, $difference);
-@@ -210,9 +210,9 @@ trait UpdateHandler
+@@ -220,9 +220,10 @@ trait UpdateHandler
+             $this->get_update_state()['pending_seq_updates'] = [];
          }
- 
-         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => -1]);
+         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']]);
 -        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
++        
          $this->get_update_state()['sync_loading'] = false;
  
 +        #\danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
