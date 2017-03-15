@@ -681,7 +681,9 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
         if ($send && $all) {
             send_to_moderated($MadelineProto, $message, [$ch_id]);
         }
-        ban_from_moderated($MadelineProto, $userid, [$ch_id]);
+        if (isset($userid)) {
+            ban_from_moderated($MadelineProto, $userid, [$ch_id]);
+        }
     }
 }
 
