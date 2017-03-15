@@ -244,14 +244,19 @@ function whobanall($update, $MadelineProto, $wait = true)
                                         $output_file_name
                                     );
                                     $message = "I'm on it! Banning as we speak";
+                                    $default['message'] = $message;
+                                    $sentMessage = $MadelineProto->messages->sendMessage(
+                                        $default
+                                    );
                                     $file = file_get_contents(
                                         $output_file_name
                                     );
                                     $whobantxt = json_decode($file, true);
                                     var_dump($whobantxt);
                                     foreach ($whobantxt as $key => $value) {
-                                        banall($update, $MadelineProto, $key, false, false);
+                                        banall($update, $MadelineProto, $key, false, false, true);
                                     }
+                                    $message = "ALL DONE!";
                                     $default['message'] = $message;
 
                                 } catch (Exception $e) {

@@ -550,7 +550,7 @@ function unbanall($update, $MadelineProto, $msg)
     }
 }
 
-function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
+function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $confident = false)
 {
     if (is_supergroup($update, $MadelineProto)) {
         global $responses, $engine;
@@ -683,6 +683,9 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true)
         }
         if (isset($userid)) {
             ban_from_moderated($MadelineProto, $userid, [$ch_id]);
+        }
+        if ($confident) {
+            ban_from_moderated($MadelineProto, $msg, [$ch_id]);
         }
     }
 }
