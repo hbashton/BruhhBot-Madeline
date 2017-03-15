@@ -298,7 +298,11 @@ function kickhim($update, $MadelineProto, $msg)
                                     $message = $engine->render($str, $repl);
                                     $default['message'] = $message;
                                 } catch (\danog\MadelineProto\RPCErrorException $e) {
-                                    $message = $responses['kickhim']['already'];
+                                    $str = $responses['kickhim']['already'];
+                                    $repl = array(
+                                        "mention" => $mention
+                                    );
+                                    $message = $engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
 

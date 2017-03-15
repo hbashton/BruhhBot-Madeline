@@ -139,16 +139,16 @@ function whoban($update, $MadelineProto, $wait = true)
                                 ['update']['message']['media'];
                                 try {
                                     $output_file_name =
-                                    $MadelineProto->download_to_file(
+                                    $MadelineProto->download_to_dir(
                                         $Document,
-                                        "who/whoban$ch_id.txt"
+                                        "who"
                                     );
                                     \danog\MadelineProto\Logger::log(
                                         $output_file_name
                                     );
                                     $message = "I'm on it! Banning as we speak";
                                     $file = file_get_contents(
-                                        "who/whoban$ch_id.txt"
+                                        $output_file_name
                                     );
                                     $whobantxt = json_decode($file, true);
                                     var_dump($whobantxt, true);
@@ -236,16 +236,16 @@ function whobanall($update, $MadelineProto, $wait = true)
                                 ['update']['message']['media'];
                                 try {
                                     $output_file_name =
-                                    $MadelineProto->download_to_file(
+                                    $MadelineProto->download_to_dir(
                                         $Document,
-                                        "who/whoban$ch_id.txt"
+                                        "who"
                                     );
                                     \danog\MadelineProto\Logger::log(
                                         $output_file_name
                                     );
                                     $message = "I'm on it! Banning as we speak";
                                     $file = file_get_contents(
-                                        "who/whoban$ch_id.txt"
+                                        $output_file_name
                                     );
                                     $whobantxt = json_decode($file, true);
                                     var_dump($whobantxt);
