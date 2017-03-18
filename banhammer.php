@@ -723,16 +723,16 @@ function getgbanlist($update, $MadelineProto)
                     $message = $engine->render($str, $repl);
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\r\n";
+                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\n";
                     } else {
-                        $message = $message."$mention - $id\r\n";
+                        $message = $message."$mention - $id\n";
                     }
                 } else {
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\r\n";
+                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\n";
                     } else {
-                        $message = $message."$mention - $id\r\n";
+                        $message = $message."$mention - $id\n";
                     }
                 }
             }
@@ -742,15 +742,31 @@ function getgbanlist($update, $MadelineProto)
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
                 );
+            } else {
+                if (mb_strlen($message) > 4000) {
+                    $message = split_to_chunks($message);
+                }
             }
-            if (!isset($sentMessage)) {
-                $default['message'] = $message;
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
-            if (isset($sentMessage)) {
-                \danog\MadelineProto\Logger::log($sentMessage);
+            var_dump($message);
+            $default['message'] = $message;
+            if (is_array($message)) {
+                foreach ($message as $value) {
+                    $default['message'] = $value;
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
+            } else {
+                if (!isset($sentMessage)) {
+                    $default['message'] = $message;
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                }
+                if (isset($sentMessage)) {
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
             }
         }
     }
