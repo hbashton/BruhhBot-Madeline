@@ -135,7 +135,8 @@ function getme($update, $MadelineProto, $name)
         $msg_id = $update['update']['message']['id'];
         $default = array(
             'peer' => $peer,
-            'reply_to_msg_id' => $msg_id
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'markdown'
             );
         check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");

@@ -246,6 +246,22 @@ function html_bold($text)
     return($bold);
 }
 
+function markdown($text, $style)
+{
+    switch ($style) {
+    case 'bold':
+        $text = "*$text*";
+    break;
+    case 'italic':
+        $text = "_$text_";
+    break;
+    case 'code':
+        $text = "```$text```";
+    break;
+    }
+    return($text);
+}
+
 class Template_String
 {
 
