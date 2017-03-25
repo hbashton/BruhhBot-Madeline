@@ -678,7 +678,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
         if (!isset($all)) {
             $all = true;
         }
-        if ($send && $all) {
+        if ($send && $all && isset($message)) {
             send_to_moderated($MadelineProto, $message, [$ch_id]);
         }
         if (isset($userid)) {
