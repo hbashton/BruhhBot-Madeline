@@ -620,7 +620,7 @@ function pinalert($update, $MadelineProto)
         $default
     );
     \danog\MadelineProto\Logger::log($sentMessage);
-    $MadelineProto->messages->forwardMessages([
+    $forwardMessage = $MadelineProto->messages->forwardMessages([
         'silent' => false,
         'from_peer' => $ch_id,
         'id' => [$pin_id],
