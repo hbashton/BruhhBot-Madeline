@@ -1,20 +1,20 @@
-From 691de5c3fdd3040c04631f78b4160b4010509a83 Mon Sep 17 00:00:00 2001
+From 9203ac1b7a159e1acdfe574853ef6bd8e70d456b Mon Sep 17 00:00:00 2001
 From: halogenOS Code Review <xosdeveloperbruhh@gmail.com>
 Date: Sun, 29 Jan 2017 19:04:06 -0600
 Subject: [PATCH 1/1] Remove log spam
 
 ---
  src/danog/MadelineProto/MTProtoTools/CallHandler.php     | 2 +-
- src/danog/MadelineProto/MTProtoTools/ResponseHandler.php | 2 +-
- src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 5 +++--
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ src/danog/MadelineProto/MTProtoTools/ResponseHandler.php | 1 -
+ src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 4 ++--
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/src/danog/MadelineProto/MTProtoTools/CallHandler.php b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-index 44f34ca..1d414e7 100644
+index 203e299..72f2e2a 100644
 --- a/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-@@ -30,7 +30,7 @@ trait CallHandler
-         $content_related = $this->content_related($method);
+@@ -34,7 +34,7 @@ trait CallHandler
+         $type = $this->methods->find_by_method($method)['type'];
          for ($count = 1; $count <= $this->settings['max_tries']['query']; $count++) {
              try {
 -                \danog\MadelineProto\Logger::log(['Calling method (try number '.$count.' for '.$method.')...'], \danog\MadelineProto\Logger::VERBOSE);
@@ -23,38 +23,36 @@ index 44f34ca..1d414e7 100644
                  $int_message_id = $this->send_message($serialized, $content_related, $aargs);
                  if ($method === 'http_wait') {
 diff --git a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
-index 2d83e60..a3ed0ce 100644
+index 620e1a6..474e409 100644
 --- a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
-@@ -72,7 +72,7 @@ trait ResponseHandler
-         foreach ($this->datacenter->new_incoming as $current_msg_id) {
-             $this->only_updates = false;
-             $response = $this->datacenter->incoming_messages[$current_msg_id]['content'];
--            \danog\MadelineProto\Logger::log(['Received '.$response['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
-+            #\danog\MadelineProto\Logger::log(['Received '.$response['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
+@@ -73,7 +73,6 @@ trait ResponseHandler
+         $only_updates = true;
+         foreach ($this->datacenter->sockets[$datacenter]->new_incoming as $current_msg_id) {
+             $unset = false;
+-            \danog\MadelineProto\Logger::log(['Received '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].'.'], \danog\MadelineProto\Logger::VERBOSE);
  
-             switch ($response['_']) {
+             switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                  case 'msgs_ack':
 diff --git a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-index 7d6ea6b..a30f025 100644
+index 27bea61..2450ffa 100644
 --- a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 @@ -143,8 +143,8 @@ trait UpdateHandler
              return false;
          }
-         $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30]);
+         $difference = $this->method_call('updates.getChannelDifference', ['channel' => $input, 'filter' => ['_' => 'channelMessagesFilterEmpty'], 'pts' => $this->get_channel_state($channel)['pts'], 'limit' => 30], ['datacenter' => $this->datacenter->curdc]);
 -        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
          $this->get_channel_state($channel)['sync_loading'] = false;
 +        #\danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
          switch ($difference['_']) {
              case 'updates.channelDifferenceEmpty':
                  $this->set_channel_state($channel, $difference);
-@@ -220,9 +220,10 @@ trait UpdateHandler
+@@ -220,9 +220,9 @@ trait UpdateHandler
              $this->get_update_state()['pending_seq_updates'] = [];
          }
-         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']]);
+         $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
 -        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
-+        
          $this->get_update_state()['sync_loading'] = false;
  
 +        #\danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
