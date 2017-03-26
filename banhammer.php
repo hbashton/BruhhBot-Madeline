@@ -417,7 +417,6 @@ function getbanlist($update, $MadelineProto)
                     $id = catch_id($update, $MadelineProto, $key);
                     if ($id[0]) {
                         $username = $id[2];
-                        $user = cache_get_info($update, $MadelineProto, (int) $key);
                         $mention = html_mention($username, $key);
                         if (!isset($message)) {
                             $str = $MadelineProto->responses['getbanlist']['header'];
@@ -695,7 +694,7 @@ function getgbanlist($update, $MadelineProto)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html',
+            'parse_mode' => 'html'
         );
         if (is_moderated($ch_id)) {
             check_json_array('gbanlist.json', false, false);
@@ -716,16 +715,16 @@ function getgbanlist($update, $MadelineProto)
                     $message = $MadelineProto->engine->render($str, $repl);
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = htmlentities($message)."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
+                        $message = $message."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
                     } else {
-                        $message = htmlentities($message)."$mention - $id\n";
+                        $message = $message."$mention - $id\n";
                     }
                 } else {
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = htmlentities($message)."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
+                        $message = $message."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
                     } else {
-                        $message = htmlentities($message)."$mention - $id\n";
+                        $message = $message."$mention - $id\n";
                     }
                 }
             }
