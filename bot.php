@@ -104,9 +104,10 @@ if (!isset($MadelineProto)) {
 $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
+//var_dump($MadelineProto->get_pwr_chat('@pwrtelegramgroup'));
+
 $pool = new Pool(100);
-$work = [];
-$curwork = 0;
+
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(
@@ -125,8 +126,7 @@ while (true) {
                 var_dump($update);
             }
             if (is_peeruser($update, $MadelineProto)) {
-                $work[$curwork] = new NewMessage($update, $MadelineProto);
-                $pool->submit($work[$curwork]++);
+                $pool->submit(new NewMessage($update, $MadelineProto));
             }
         break;
 
@@ -142,9 +142,7 @@ while (true) {
                 $NewChannelMessage = new NewChannelMessage($update, $MadelineProto);
                 $pool->submit($NewChannelMessage);
                 if (array_key_exists('action', $update['update']['message'])) {
-                    $work[$curwork] =
-                        new NewChannelMessageAction($update, $MadelineProto);
-                    $pool->submit($work[$curwork]++);
+                    $pool->submit(new NewChannelMessageAction($update, $MadelineProto));
                 }
             }
         }
