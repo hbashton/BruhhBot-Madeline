@@ -158,7 +158,7 @@ function is_bot_admin($update, $MadelineProto, $send = false)
         $admins = cache_get_chat_info($update, $MadelineProto);
         $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
             ['InputPeer'];
-        $bot_id = $MadelineProto->API->datacenter->authorization['user']['id'];
+        $bot_id = $MadelineProto->bot_id;
         foreach ($admins['participants'] as $key) {
             if (array_key_exists('user', $key)) {
                 $id = $key['user']['id'];

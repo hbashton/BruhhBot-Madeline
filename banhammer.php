@@ -559,6 +559,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_moderated($ch_id)) {
+            var_dump(is_bot_admin($update, $MadelineProto));
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
                     if ($msg) {
@@ -671,7 +672,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
         if (!isset($all)) {
             $all = true;
         }
-        if ($send && $all) {
+        if ($send && $all && isset($message)) {
             send_to_moderated($MadelineProto, $message, [$ch_id]);
         }
         if (isset($userid)) {

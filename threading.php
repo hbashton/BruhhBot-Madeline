@@ -177,6 +177,7 @@ if (!isset($fromid['bot_api_id'])) var_dump($fromid);
         $msg_id = $update['update']['message']['id'];
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
+        $this->muted = false;
         if (is_moderated($ch_id)) {
             if (is_supergroup($update, $MadelineProto)) {
                 check_json_array('mutelist.json', $ch_id);
@@ -696,8 +697,7 @@ function NewChatAddUser($update, $MadelineProto)
                     );
                 }
             }
-            $bot_id = $MadelineProto->
-                API->datacenter->authorization['user']['id'];
+            $bot_id = $MadelineProto->bot_id;
             if ($mention !== $bot_id && empty($default['message'])) {
                     $mention2 = html_mention($username, $mention);
                     $message = "Hi $mention2, welcome to <b>$title</b>";
@@ -820,8 +820,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
                     );
                 }
             }
-            $bot_id = $MadelineProto->
-                API->datacenter->authorization['user']['id'];
+            $bot_id = $MadelineProto->bot_id;
             if ($mention !== $bot_id && empty($default['message'])) {
                     $mention2 = html_mention($username, $mention);
                     $message = "Hi $mention2, welcome to <b>$title</b>";
@@ -892,8 +891,7 @@ function NewChatDeleteUser($update, $MadelineProto)
         $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         if (is_moderated($ch_id)) {
-            $bot_id = $MadelineProto->
-            API->datacenter->authorization['user']['id'];
+            $bot_id = $MadelineProto->bot_id;
             if ($mention !== $bot_id && empty($default['message'])) {
                 $userid = $update
                 ['update']['message']['action']['user_id'];

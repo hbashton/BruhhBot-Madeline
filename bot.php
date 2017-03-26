@@ -104,6 +104,7 @@ if (!isset($MadelineProto)) {
 $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
+$MadelineProto->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
 //var_dump($MadelineProto->get_pwr_chat('@pwrtelegramgroup'));
 
 $pool = new Pool(100);
