@@ -20,12 +20,11 @@
 function banme($update, $MadelineProto, $msg, $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['banme']['mods'];
+        $mods = $MadelineProto->responses['banme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -41,7 +40,7 @@ function banme($update, $MadelineProto, $msg, $send = true)
                             $userid = $id[1];
                         }
                         if (isset($userid)) {
-                            $banmod = $responses['banme']['banmod'];
+                            $banmod = $MadelineProto->responses['banme']['banmod'];
                             if (!is_admin_mod(
                                 $update,
                                 $MadelineProto,
@@ -62,12 +61,12 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                             'banlist.json',
                                             json_encode($banlist)
                                         );
-                                        $str = $responses['banme']['banned'];
+                                        $str = $MadelineProto->responses['banme']['banned'];
                                         $repl = array(
                                             "mention" => $mention,
                                             "title" => $title
                                         );
-                                        $message = $engine->render($str, $repl);
+                                        $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                         try {
                                             $kick = $MadelineProto->
@@ -82,11 +81,11 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                         ) {
                                         }
                                     } else {
-                                        $str = $responses['banme']['already'];
+                                        $str = $MadelineProto->responses['banme']['already'];
                                         $repl = array(
                                             "mention" => $mention
                                         );
-                                        $message = $engine->render($str, $repl);
+                                        $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
                                 } else {
@@ -105,23 +104,23 @@ function banme($update, $MadelineProto, $msg, $send = true)
                                         'banlist.json',
                                         json_encode($banlist)
                                     );
-                                    $str = $responses['banme']['banned'];
+                                    $str = $MadelineProto->responses['banme']['banned'];
                                     $repl = array(
                                         "mention" => $mention,
                                         "title" => $title
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
                             }
                         } else {
-                            $str = $responses['banme']['idk'];
+                            $str = $MadelineProto->responses['banme']['idk'];
                             $repl = array("msg" => $msg);
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['banme']['help'];
+                        $message = $MadelineProto->responses['banme']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -144,8 +143,7 @@ function unbanme($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
-        $mods = $responses['unbanme']['mods'];
+        $mods = $MadelineProto->responses['unbanme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = html_bold($chat['title']);
@@ -182,12 +180,12 @@ function unbanme($update, $MadelineProto, $msg)
                                         'banlist.json',
                                         json_encode($banlist)
                                     );
-                                    $str = $responses['unbanme']['unbanned'];
+                                    $str = $MadelineProto->responses['unbanme']['unbanned'];
                                     $repl = array(
                                         "mention" => $mention,
                                         "title" => $title
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                     try {
                                         $kick = $MadelineProto->
@@ -199,29 +197,29 @@ function unbanme($update, $MadelineProto, $msg)
                                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                                     }
                                 } else {
-                                    $str = $responses['unbanme']['already'];
+                                    $str = $MadelineProto->responses['unbanme']['already'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
                             } else {
-                                $str = $responses['unbanme']['already'];
+                                $str = $MadelineProto->responses['unbanme']['already'];
                                 $repl = array(
                                     "mention" => $mention
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
                         } else {
-                            $str = $responses['unbanme']['idk'];
+                            $str = $MadelineProto->responses['unbanme']['idk'];
                             $repl = array("msg" => $msg);
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['unbanme']['help'];
+                        $message = $MadelineProto->responses['unbanme']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -246,11 +244,10 @@ function kickhim($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
-        $mods = $responses['kickhim']['mods'];
+        $mods = $MadelineProto->responses['kickhim']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -266,7 +263,7 @@ function kickhim($update, $MadelineProto, $msg)
                             $userid = $id[1];
                         }
                         if (isset($userid)) {
-                            $kickmod = $responses['kickhim']['kickmod'];
+                            $kickmod = $MadelineProto->responses['kickhim']['kickmod'];
                             if (!is_admin_mod(
                                 $update,
                                 $MadelineProto,
@@ -290,33 +287,33 @@ function kickhim($update, $MadelineProto, $msg)
                                         'user_id' => $userid,
                                         'kicked' => false]
                                     );
-                                    $str = $responses['kickhim']['kicked'];
+                                    $str = $MadelineProto->responses['kickhim']['kicked'];
                                     $repl = array(
                                         "mention" => $mention,
                                         "title" => $title
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 } catch (\danog\MadelineProto\RPCErrorException $e) {
-                                    $str = $responses['kickhim']['already'];
+                                    $str = $MadelineProto->responses['kickhim']['already'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
 
                             }
                         } else {
-                            $str = $responses['kickhim']['idk'];
+                            $str = $MadelineProto->responses['kickhim']['idk'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['kickhim']['help'];
+                        $message = $MadelineProto->responses['kickhim']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -341,13 +338,12 @@ function kickhim($update, $MadelineProto, $msg)
 
 function kickme($update, $MadelineProto)
 {
-    global $responses, $engine;
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
@@ -372,12 +368,12 @@ function kickme($update, $MadelineProto)
                             'user_id' => $userid,
                             'kicked' => false]
                         );
-                        $str = $responses['kickme']['kicked'];
+                        $str = $MadelineProto->responses['kickme']['kicked'];
                         $repl = array(
                             "mention" => $mention,
                             "title" => $title
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                     }
@@ -403,10 +399,9 @@ function getbanlist($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -425,11 +420,11 @@ function getbanlist($update, $MadelineProto)
                         $user = cache_get_info($update, $MadelineProto, (int) $key);
                         $mention = html_mention($username, $key);
                         if (!isset($message)) {
-                            $str = $responses['getbanlist']['header'];
+                            $str = $MadelineProto->responses['getbanlist']['header'];
                             $repl = array(
                                 "title" => $title
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $message = $message."$mention - $key\r\n";
                         } else {
                             $message = $message."$mention - $key\r\n";
@@ -438,11 +433,11 @@ function getbanlist($update, $MadelineProto)
                 }
             }
             if (!isset($message)) {
-                $str = $responses['getbanlist']['none'];
+                $str = $MadelineProto->responses['getbanlist']['none'];
                 $repl = array(
                     "title" => $title
                 );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
@@ -465,10 +460,9 @@ function unbanall($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -495,11 +489,11 @@ function unbanall($update, $MadelineProto, $msg)
                                     'gbanlist.json',
                                     json_encode($gbanlist)
                                 );
-                                $str = $responses['unbanall']['unbanned'];
+                                $str = $MadelineProto->responses['unbanall']['unbanned'];
                                 $repl = array(
                                     "mention" => $mention
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                                 try {
                                     $kick = $MadelineProto->
@@ -511,23 +505,23 @@ function unbanall($update, $MadelineProto, $msg)
                                 } catch (\danog\MadelineProto\RPCErrorException $e) {
                                 }
                             } else {
-                                $str = $responses['unbanall']['already'];
+                                $str = $MadelineProto->responses['unbanall']['already'];
                                 $repl = array(
                                     "mention" => $mention
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
                         } else {
-                            $str = $responses['unbanall']['idk'];
+                            $str = $MadelineProto->responses['unbanall']['idk'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['unbanall']['help'];
+                        $message = $MadelineProto->responses['unbanall']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -553,11 +547,10 @@ function unbanall($update, $MadelineProto, $msg)
 function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $confident = false)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -574,7 +567,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
                             $userid = $id[1];
                         }
                         if (isset($userid)) {
-                            $banmod = $responses['banall']['banmod'];
+                            $banmod = $MadelineProto->responses['banall']['banmod'];
                             if (!is_admin_mod(
                                 $update,
                                 $MadelineProto,
@@ -602,28 +595,28 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
                                     if ($reason) {
                                         if (preg_match('/"([^"]+)"/', $reason, $m)) {
                                             $reasons[$userid] = $m[1];
-                                            $str = $responses['banall']['banned_all'];
+                                            $str = $MadelineProto->responses['banall']['banned_all'];
                                             $repl = array(
                                                 "mention2" => $mention2,
                                                 "mention" => $mention,
                                                 "reason" => $m[1]
                                             );
-                                            $message = $engine->render($str, $repl);
+                                            $message = $MadelineProto->engine->render($str, $repl);
                                             $default['message'] = $message;
                                             file_put_contents(
                                                 'reasons.json',
                                                 json_encode($reasons)
                                             );
                                         } else {
-                                            $message = $responses['banall']['help'];
+                                            $message = $MadelineProto->responses['banall']['help'];
                                             $default['message'] = $message;
                                         }
                                     } else {
-                                        $str = $responses['banall']['banned'];
+                                        $str = $MadelineProto->responses['banall']['banned'];
                                         $repl = array(
                                             "mention" => $mention
                                         );
-                                        $message = $engine->render($str, $repl);
+                                        $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
                                     try {
@@ -640,26 +633,26 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
                                     }
 
                                 } else {
-                                    $str = $responses['banall']['already'];
+                                    $str = $MadelineProto->responses['banall']['already'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                     $all = false;
                                 }
                             }
                         } else {
-                            $str = $responses['banall']['idk'];
+                            $str = $MadelineProto->responses['banall']['idk'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                             $all = false;
                         }
                     } else {
-                        $message = $responses['banall']['help'];
+                        $message = $MadelineProto->responses['banall']['help'];
                         $default['message'] = $message;
                         $all = false;
                     }
@@ -694,10 +687,9 @@ function getgbanlist($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -716,28 +708,28 @@ function getgbanlist($update, $MadelineProto)
                 $username = $key;
                 $mention = html_mention($username, $id);
                 if (!isset($message)) {
-                    $str = $responses['getgbanlist']['header'];
+                    $str = $MadelineProto->responses['getgbanlist']['header'];
                     $repl = array(
                         "title" => $title
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\n";
+                        $message = htmlentities($message)."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
                     } else {
-                        $message = $message."$mention - $id\n";
+                        $message = htmlentities($message)."$mention - $id\n";
                     }
                 } else {
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = $message."$mention - $id\n<code>Reason: $reason</code>\n";
+                        $message = htmlentities($message)."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
                     } else {
-                        $message = $message."$mention - $id\n";
+                        $message = htmlentities($message)."$mention - $id\n";
                     }
                 }
             }
             if (!isset($message)) {
-                $message = $responses['getgbanlist']['none'];
+                $message = $MadelineProto->responses['getgbanlist']['none'];
                 $default['message'] = $message;
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default

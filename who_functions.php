@@ -6,7 +6,7 @@ function wholist($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -55,7 +55,7 @@ function whofile($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -104,7 +104,7 @@ function whoban($update, $MadelineProto, $wait = true)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         $default = array(
@@ -118,8 +118,8 @@ function whoban($update, $MadelineProto, $wait = true)
                 $MadelineProto
             )
             ) {
-                if (isset($GLOBALS['wait_for_whoban'])) {
-                    if ($GLOBALS['wait_for_whoban'] == $fromid) {
+                if (isset($MadelineProto->wait_for_whoban)) {
+                    if ($MadelineProto->wait_for_whoban == $fromid) {
                         if (array_key_exists(
                             "media",
                             $update['update']['message']
@@ -161,23 +161,22 @@ function whoban($update, $MadelineProto, $wait = true)
                                     $message = "something went horribly wrong ^.^";
                                     $default['message'] = $message;
                                 }
-                                unset($GLOBALS['wait_for_whoban']);
+                                unset($MadelineProto->wait_for_whoban);
                             } else {
                                 $message = "The message you sent was not a".
                                 "document! Try again ";
                                 $default['message'] = $message;
-                                unset($GLOBALS['wait_for_whoban']);
+                                unset($MadelineProto->wait_for_whoban);
                             }
                         } else {
                             $message = "The message you sent was not a document!".
                             " Try again ";
                             $default['message'] = $message;
-                            unset($GLOBALS['wait_for_whoban']);
+                            unset($MadelineProto->wait_for_whoban);
                         }
                     }
                 } else {
-                    global $wait_for_whoban;
-                    $wait_for_whoban = $fromid;
+                    $MadelineProto->wait_for_whoban = $fromid;
                     $message = "Just send the /whofile and I'll ".
                     "bring down the banhammer";
                     $default['message'] = $message;
@@ -201,7 +200,7 @@ function whobanall($update, $MadelineProto, $wait = true)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         $default = array(
@@ -215,8 +214,8 @@ function whobanall($update, $MadelineProto, $wait = true)
                 $MadelineProto
             )
             ) {
-                if (isset($GLOBALS['wait_for_whobanall'])) {
-                    if ($GLOBALS['wait_for_whobanall'] == $fromid) {
+                if (isset($MadelineProto->wait_for_whobanall)) {
+                    if ($MadelineProto->wait_for_whobanall == $fromid) {
                         if (array_key_exists(
                             "media",
                             $update['update']['message']
@@ -263,23 +262,22 @@ function whobanall($update, $MadelineProto, $wait = true)
                                     $message = "something went horribly wrong ^.^";
                                     $default['message'] = $message;
                                 }
-                                unset($GLOBALS['wait_for_whobanall']);
+                                unset($MadelineProto->wait_for_whobanall);
                             } else {
                                 $message = "The message you sent was not a".
                                 "document! Try again ";
                                 $default['message'] = $message;
-                                unset($GLOBALS['wait_for_whobanall']);
+                                unset($MadelineProto->wait_for_whobanall);
                             }
                         } else {
                             $message = "The message you sent was not a document! ".
                             " Try again ";
                             $default['message'] = $message;
-                            unset($GLOBALS['wait_for_whobanall']);
+                            unset($MadelineProto->wait_for_whobanall);
                         }
                     }
                 } else {
-                    global $wait_for_whobanall;
-                    $wait_for_whobanall = $fromid;
+                    $MadelineProto->wait_for_whobanall = $fromid;
                     $message = "Just send the /whofile and I'll ".
                     "bring down the banhammer";
                     $default['message'] = $message;

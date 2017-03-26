@@ -21,12 +21,12 @@
 function set_chat_photo($update, $MadelineProto, $wait = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+    
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['set_chat_photo']['mods'];
+        $mods = $MadelineProto->responses['set_chat_photo']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -43,8 +43,8 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                     $wait
                 )
                 ) {
-                    if (isset($GLOBALS['from_user_chat_photo'])) {
-                        if ($GLOBALS['from_user_chat_photo'] == $fromid) {
+                    if (isset($MadelineProto->from_user_chat_photo)) {
+                        if ($MadelineProto->from_user_chat_photo == $fromid) {
                             if (array_key_exists(
                                 "media",
                                 $update['update']['message']
@@ -73,33 +73,32 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                                         \danog\MadelineProto\Logger::log(
                                             $changePhoto
                                         );
-                                        $str = $responses['set_chat_photo']['success'];
+                                        $str = $MadelineProto->responses['set_chat_photo']['success'];
                                         $repl = array(
                                             "title" => $title
                                         );
-                                        $message = $engine->render($str, $repl);
+                                        $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
 
                                     } catch (Exception $e) {
-                                        $message = $responses['set_chat_photo']['exception'];
+                                        $message = $MadelineProto->responses['set_chat_photo']['exception'];
                                         $default['message'] = $message;
                                     }
-                                    unset($GLOBALS['from_user_chat_photo']);
+                                    unset($MadelineProto->from_user_chat_photo);
                                 } else {
-                                    $message = $responses['set_chat_photo']['sorry'];
+                                    $message = $MadelineProto->responses['set_chat_photo']['sorry'];
                                     $default['message'] = $message;
-                                    unset($GLOBALS['from_user_chat_photo']);
+                                    unset($MadelineProto->from_user_chat_photo);
                                 }
                             } else {
-                                $message = $responses['set_chat_photo']['sorry'];
+                                $message = $MadelineProto->responses['set_chat_photo']['sorry'];
                                 $default['message'] = $message;
-                                unset($GLOBALS['from_user_chat_photo']);
+                                unset($MadelineProto->from_user_chat_photo);
                             }
                         }
                     } else {
-                        global $from_user_chat_photo;
-                        $from_user_chat_photo = $fromid;
-                        $message = $responses['set_chat_photo']['ready'];
+                        $MadelineProto->from_user_chat_photo = $fromid;
+                        $message = $MadelineProto->responses['set_chat_photo']['ready'];
                         $default['message'] = $message;
                     }
                 }
@@ -119,12 +118,11 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
 function set_chat_title($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['set_chat_title']['mods'];
+        $mods = $MadelineProto->responses['set_chat_title']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -147,18 +145,18 @@ function set_chat_title($update, $MadelineProto, $msg)
                                 ['channel' => $ch_id, 'title' => $msg ]
                             );
                             \danog\MadelineProto\Logger::log($editTitle);
-                            $str = $responses['set_chat_title']['success'];
+                            $str = $MadelineProto->responses['set_chat_title']['success'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         } catch (Exception $e) {
-                            $message = $responses['set_chat_title']['fail'];
+                            $message = $MadelineProto->responses['set_chat_title']['fail'];
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['set_chat_title']['help'];
+                        $message = $MadelineProto->responses['set_chat_title']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -178,12 +176,11 @@ function set_chat_title($update, $MadelineProto, $msg)
 function set_chat_username($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['set_chat_title']['mods'];
+        $mods = $MadelineProto->responses['set_chat_title']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -208,30 +205,30 @@ function set_chat_username($update, $MadelineProto, $msg)
                                 ['channel' => $ch_id, 'username' => $msg ]
                                 );
                                 \danog\MadelineProto\Logger::log($changeUsername);
-                                $str = $responses['set_chat_username']['clear'];
+                                $str = $MadelineProto->responses['set_chat_username']['clear'];
                                 $repl = array(
                                     "title" => $title
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             } else {
                                 $changeUsername = $MadelineProto->channels->updateUsername(
                                     ['channel' => $ch_id, 'username' => $msg ]
                                 );
                                 \danog\MadelineProto\Logger::log($changeUsername);
-                                $str = $responses['set_chat_username']['success'];
+                                $str = $MadelineProto->responses['set_chat_username']['success'];
                                 $repl = array(
                                     "msg" => $msg
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
                         } catch (Exception $e) {
-                            $message = $responses['set_chat_username']['fail'];
+                            $message = $MadelineProto->responses['set_chat_username']['fail'];
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['set_chat_username']['help'];
+                        $message = $MadelineProto->responses['set_chat_username']['help'];
                         $default['message'] = $message;
                     }
                 }

@@ -75,7 +75,21 @@ if (!isset($MadelineProto)) {
         ['length'] : 5) + 1
     );
     $authorization = $MadelineProto->complete_phone_login($code);
-    \danog\MadelineProto\Logger::log($authorization);
+    
+        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+        if ($authorization['_'] === 'account.noPassword') {
+            throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
+        }
+        if ($authorization['_'] === 'account.password') {
+            \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
+            $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+        }
+        if ($authorization['_'] === 'account.needSignup') {
+            \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
+            $authorization = $MadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+        }
+
+    \danog\MadelineProto\Logger::log([$authorization]);
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize(
         'session.madeline',
@@ -87,9 +101,12 @@ if (!isset($MadelineProto)) {
         'session.madeline'
     );
 }
-$responses_file = file_get_contents("responses.json");
-$responses = json_decode($responses_file, true);
-$engine = new StringTemplate\Engine;
+$MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+$MadelineProto->engine = new StringTemplate\Engine;
+$MadelineProto->flooder = [];
+$pool = new Pool(100);
+$work = [];
+$curwork = 0;
 $offset = 0;
 while (true) {
     $updates = $MadelineProto->API->get_updates(
@@ -108,8 +125,8 @@ while (true) {
                 var_dump($update);
             }
             if (is_peeruser($update, $MadelineProto)) {
-                $NewMessage = new NewMessage($update, $MadelineProto);
-                $NewMessage->start();
+                $work[$curwork] = new NewMessage($update, $MadelineProto);
+                $pool->submit($work[$curwork]++);
             }
         break;
 
@@ -120,18 +137,14 @@ while (true) {
                 var_dump($update);
             }
             if (is_supergroup($update, $MadelineProto)) {
-                $command = check_locked($update, $MadelineProto);
-                $check = new Exec($command);
-                $check->start();
-                $command = check_flood($update, $MadelineProto);
-                $check = new Exec($command);
-                $check->start();
+                check_locked($update, $MadelineProto);
+                check_flood($update, $MadelineProto);
                 $NewChannelMessage = new NewChannelMessage($update, $MadelineProto);
-                $NewChannelMessage->start();
+                $pool->submit($NewChannelMessage);
                 if (array_key_exists('action', $update['update']['message'])) {
-                    $NewChannelMessageAction =
+                    $work[$curwork] =
                         new NewChannelMessageAction($update, $MadelineProto);
-                    $NewChannelMessageAction->start();
+                    $pool->submit($work[$curwork]++);
                 }
             }
         }

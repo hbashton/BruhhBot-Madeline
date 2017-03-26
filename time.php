@@ -25,7 +25,7 @@ define('CONST_SERVER_DATEFORMAT', 'l, j - H:i:s');
 
 function gettime($update, $MadelineProto, $area)
 {
-    global $responses, $engine;
+    
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -68,20 +68,20 @@ function gettime($update, $MadelineProto, $area)
             $api_responsej = json_decode($api_response->body, true);
             $ctime = now($api_responsej['timeZoneId']);
             $timezone = $api_responsej['timeZoneId'];
-            $str = $responses['gettime']['success'];
+            $str = $MadelineProto->responses['gettime']['success'];
             $repl = array(
                 "timezone" => $timezone,
                 "ctime" => $ctime
             );
-            $message = $engine->render($str, $repl);
+            $message = $MadelineProto->engine->render($str, $repl);
             $message = str_replace("_", " ", $message);
             $default['message'] = $message;
         } else {
-            $str = $responses['gettime']['fail'];
+            $str = $MadelineProto->responses['gettime']['fail'];
             $repl = array(
                 "area" => $area
             );
-            $message = $engine->render($str, $repl);;
+            $message = $MadelineProto->engine->render($str, $repl);;
             $default['message'] = $message;
         }
         if (isset($default['message'])) {

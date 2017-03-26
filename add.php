@@ -3,12 +3,11 @@
 function add_group($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['add_group']['mods'];
+        $mods = $MadelineProto->responses['add_group']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -22,14 +21,14 @@ function add_group($update, $MadelineProto)
             if (!in_array($ch_id, $chatlist)) {
                 array_push($chatlist, $ch_id);
                 file_put_contents('chatlist.json', json_encode($chatlist));
-                $str = $responses['add_group']['added'];
+                $str = $MadelineProto->responses['add_group']['added'];
                 $repl = array("title" => $title);
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             } else {
-                $str = $responses['add_group']['already'];
+                $str = $MadelineProto->responses['add_group']['already'];
                 $repl = array("title" => $title);
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
         }
@@ -47,12 +46,11 @@ function add_group($update, $MadelineProto)
 function rm_group($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['rm_group']['mods'];
+        $mods = $MadelineProto->responses['rm_group']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -72,14 +70,14 @@ function rm_group($update, $MadelineProto)
                     unset($chatlist[$key]);
                 }
                 file_put_contents('chatlist.json', json_encode($chatlist));
-                $str = $responses['rm_group']['removed'];
+                $str = $MadelineProto->responses['rm_group']['removed'];
                 $repl = array("title" => $title);
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             } else {
-                $str = $responses['rm_group']['not_there'];
+                $str = $MadelineProto->responses['rm_group']['not_there'];
                 $repl = array("title" => $title);
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
         }

@@ -20,12 +20,11 @@
 function promoteme($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['promoteme']['mods'];
+        $mods = $MadelineProto->responses['promoteme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -46,40 +45,40 @@ function promoteme($update, $MadelineProto, $msg)
                         if (!in_array($userid, $promoted[$ch_id])) {
                             array_push($promoted[$ch_id], $userid);
                             file_put_contents('promoted.json', json_encode($promoted));
-                            $str = $responses['promoteme']['success'];
+                            $str = $MadelineProto->responses['promoteme']['success'];
                             $repl = array(
                                 "mention" => $mention,
                                 "title" => $title
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         } else {
-                            $str = $responses['promoteme']['already'];
+                            $str = $MadelineProto->responses['promoteme']['already'];
                             $repl = array(
                                 "mention" => $mention,
                                 "title" => $title
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
                         $promoted[$ch_id] = [];
                         array_push($promoted[$ch_id], $userid);
                         file_put_contents('promoted.json', json_encode($promoted));
-                        $str = $responses['promoteme']['success'];
+                        $str = $MadelineProto->responses['promoteme']['success'];
                         $repl = array(
                             "mention" => $mention,
                             "title" => $title
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     }
                 } else {
-                    $str = $responses['promoteme']['idk'];
+                    $str = $MadelineProto->responses['promoteme']['idk'];
                     $repl = array(
                         "msg" => $msg
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             }
@@ -97,13 +96,12 @@ function promoteme($update, $MadelineProto, $msg)
 
 function demoteme($update, $MadelineProto, $msg)
 {
-    global $responses, $engine;
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
         $mods = "Wow. Mr. I'm not admin over here is trying to DEMOTE people.";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -129,37 +127,37 @@ function demoteme($update, $MadelineProto, $msg)
                             unset($promoted[$ch_id][$key]);
                         }
                         file_put_contents('promoted.json', json_encode($promoted));
-                        $str = $responses['demoteme']['success'];
+                        $str = $MadelineProto->responses['demoteme']['success'];
                         $repl = array(
                             "mention" => $mention,
                             "title" => $title
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     } else {
-                        $str = $responses['demoteme']['fail'];
+                        $str = $MadelineProto->responses['demoteme']['fail'];
                         $repl = array(
                             "mention" => $mention,
                             "title" => $title
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     }
                 } else {
-                    $str = $responses['demoteme']['success'];
+                    $str = $MadelineProto->responses['demoteme']['success'];
                     $repl = array(
                         "mention" => $mention,
                         "title" => $title
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $str = $responses['demoteme']['idk'];
+                $str = $MadelineProto->responses['demoteme']['idk'];
                 $repl = array(
                     "msg" => $msg
                 );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
         }

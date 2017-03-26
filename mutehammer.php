@@ -20,12 +20,11 @@
 function muteme($update, $MadelineProto, $msg, $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['muteme']['mods'];
+        $mods = $MadelineProto->responses['muteme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -41,7 +40,7 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                             $userid = $id[1];
                         }
                         if (isset($userid)) {
-                            $mutemod = $responses['muteme']['mutemod'];
+                            $mutemod = $MadelineProto->responses['muteme']['mutemod'];
                             if (!is_admin_mod(
                                 $update,
                                 $MadelineProto,
@@ -62,18 +61,18 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                             'mutelist.json',
                                             json_encode($mutelist)
                                         );
-                                        $str = $responses['muteme']['success'];
+                                        $str = $MadelineProto->responses['muteme']['success'];
                                         $repl = array(
                                             "mention" => $mention
                                         );
-                                        $message = $engine->render($str, $repl);
+                                        $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     } else {
-                                        $str = $responses['muteme']['already'];
+                                        $str = $MadelineProto->responses['muteme']['already'];
                                         $repl = array(
                                             "mention" => $mention
                                         );
-                                        $message = $engine->render($str, $repl);
+                                        $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
 
                                     }
@@ -84,24 +83,24 @@ function muteme($update, $MadelineProto, $msg, $send = true)
                                         'mutelist.json',
                                         json_encode($mutelist)
                                     );
-                                    $str = $responses['muteme']['success'];
+                                    $str = $MadelineProto->responses['muteme']['success'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
                             }
                         } else {
-                            $str = $responses['muteme']['idk'];
+                            $str = $MadelineProto->responses['muteme']['idk'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['muteme']['help'];
+                        $message = $MadelineProto->responses['muteme']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -121,11 +120,10 @@ function unmuteme($update, $MadelineProto, $msg)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
-        $mods = $responses['unmuteme']['mods'];
+        $mods = $MadelineProto->responses['unmuteme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -159,31 +157,31 @@ function unmuteme($update, $MadelineProto, $msg)
                                         'mutelist.json',
                                         json_encode($mutelist)
                                     );
-                                    $str = $responses['unmuteme']['success'];
+                                    $str = $MadelineProto->responses['unmuteme']['success'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 } else {
-                                    $str = $responses['unmuteme']['already'];
+                                    $str = $MadelineProto->responses['unmuteme']['already'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
                             } else {
-                                $str = $responses['unmuteme']['already'];
+                                $str = $MadelineProto->responses['unmuteme']['already'];
                                 $repl = array(
                                     "mention" => $mention
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
                         }
                     } else {
-                        $message = $responses['unmuteme']['help'];
+                        $message = $MadelineProto->responses['unmuteme']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -203,12 +201,11 @@ function unmuteme($update, $MadelineProto, $msg)
 function muteall($update, $MadelineProto, $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['muteall']['mods'];
+        $mods = $MadelineProto->responses['muteall']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -229,10 +226,10 @@ function muteall($update, $MadelineProto, $send = true)
                                 'mutelist.json',
                                 json_encode($mutelist)
                             );
-                            $message = $responses['muteall']['success'];
+                            $message = $MadelineProto->responses['muteall']['success'];
                             $default['message'] = $message;
                         } else {
-                            $message = $responses['muteall']['already'];
+                            $message = $MadelineProto->responses['muteall']['already'];
                             $default['message'] = $message;
                         }
                     } else {
@@ -242,7 +239,7 @@ function muteall($update, $MadelineProto, $send = true)
                             'mutelist.json',
                             json_encode($mutelist)
                         );
-                        $message = $responses['muteall']['success'];
+                        $message = $MadelineProto->responses['muteall']['success'];
                         $default['message'] = $message;
                     }
                 }
@@ -261,11 +258,10 @@ function unmuteall($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
-        $mods = $responses['unmuteall']['mods'];
+        $mods = $MadelineProto->responses['unmuteall']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $userid = "all";
         $default = array(
@@ -292,14 +288,14 @@ function unmuteall($update, $MadelineProto)
                                 'mutelist.json',
                                 json_encode($mutelist)
                             );
-                            $message = $responses['unmuteall']['success'];
+                            $message = $MadelineProto->responses['unmuteall']['success'];
                             $default['message'] = $message;
                         } else {
-                            $message = $responses['unmuteall']['already'];
+                            $message = $MadelineProto->responses['unmuteall']['already'];
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['unmuteall']['already'];
+                        $message = $MadelineProto->responses['unmuteall']['already'];
                         $default['message'] = $message;
                     }
                 }
@@ -321,10 +317,9 @@ function getmutelist($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -341,27 +336,27 @@ function getmutelist($update, $MadelineProto)
                         $username = catch_id($update, $MadelineProto, $key)[2];
                         $mention = html_mention($username, $key);
                         if (!isset($message)) {
-                            $str = $responses['getmutelist']['header'];
+                            $str = $MadelineProto->responses['getmutelist']['header'];
                             $repl = array(
                                 "title" => $title
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $message = $message."$mention - $key\r\n";
                         } else {
                             $message = $message."$mention - $key\r\n";
                         }
                     }
                 } else {
-                    $message = $responses['getmutelist']['dictatorship'];
+                    $message = $MadelineProto->responses['getmutelist']['dictatorship'];
                     $default['message'] = $message;
                 }
             }
             if (!isset($message)) {
-                $str = $responses['getmutelist']['none'];
+                $str = $MadelineProto->responses['getmutelist']['none'];
                 $repl = array(
                     "title" => $title
                 );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             } else {
                 $default['message'] = $message;

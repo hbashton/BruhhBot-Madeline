@@ -6,7 +6,7 @@ function get_settings($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         if (from_admin_mod($update, $MadelineProto)) {
-            $title = $chat['title'];
+            $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $peer = $chat['peer'];
             $default = array(

@@ -67,6 +67,7 @@ function parse_chat_data($update, $MadelineProto)
             $MadelineProto,
             -100 . $update['update']['message']['to_id']['channel_id']
         );
+if (!isset($info['id'])) var_dump($info);
         $peer = $info['id'];
         $title = $info['title'];
         $ch_id = $info['id'];
@@ -236,18 +237,21 @@ function create_mention($offset, $username, $userid, $full = true)
 
 function html_mention($username, $userid)
 {
+    $username = htmlentities($username);
     $mention = "<a href=\"mention:$userid\">$username</a>";
     return($mention);
 }
 
 function html_bold($text)
 {
+    $text = htmlentities($text);
     $bold = "<b>$text</b>";
     return($bold);
 }
 
 function markdown($text, $style)
 {
+    $text = htmlentities($text);
     switch ($style) {
     case 'bold':
         $text = "*$text*";

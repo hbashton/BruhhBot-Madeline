@@ -19,7 +19,6 @@
  */
 function saveme($update, $MadelineProto, $msg, $name)
 {
-    global $responses, $engine;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -44,7 +43,7 @@ function saveme($update, $MadelineProto, $msg, $name)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html',
             );
-        $mods = $responses['saveme']['mods'];
+        $mods = $MadelineProto->responses['saveme']['mods'];
         if ($peerUSER
             or from_admin_mod($update, $MadelineProto, $mods, true)
         ) {
@@ -61,7 +60,7 @@ function saveme($update, $MadelineProto, $msg, $name)
             }
             if (strlen($msg) < 2000) {
                 if ($name && $msg) {
-                    $name = cb($name);
+                    $name = htmlentities(cb($name));
                     var_dump(strlen($msg));
                     $codename = "<code>$name</code>";
                     check_json_array('saved.json', $ch_id);
@@ -76,26 +75,26 @@ function saveme($update, $MadelineProto, $msg, $name)
                         }
                         $saved[$ch_id][$name] = $msg;
                         file_put_contents('saved.json', json_encode($saved));
-                        $str = $responses['saveme']['success'];
+                        $str = $MadelineProto->responses['saveme']['success'];
                         $repl = array(
                             "name" => $name
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     } else {
                         $saved[$ch_id] = [];
                         $saved[$ch_id]["from"] = [];
                         $saved[$ch_id][$name] = $msg;
                         file_put_contents('saved.json', json_encode($saved));
-                        $str = $responses['saveme']['success'];
+                        $str = $MadelineProto->responses['saveme']['success'];
                         $repl = array(
                             "name" => $name
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     }
                 } else {
-                    $message = $responses['saveme']['help'];
+                    $message = $MadelineProto->responses['saveme']['help'];
                     $default['message'] = $message;
                 }
                 if (isset($default['message'])) {
@@ -185,7 +184,7 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
-    global $responses, $engine;
+
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -204,7 +203,7 @@ function savefrom($update, $MadelineProto, $name)
         $peerUSER = false;
     }
     $replyto = $update['update']['message']['id'];
-    $mods = $responses['savefrom']['mods'];
+    $mods = $MadelineProto->responses['savefrom']['mods'];
     $default = array(
         'peer' => $peer,
         'reply_to_msg_id' => $replyto,
@@ -229,11 +228,11 @@ function savefrom($update, $MadelineProto, $name)
                         unset($saved[$ch_id][$name]);
                     }
                     file_put_contents('saved.json', json_encode($saved));
-                    $str = $responses['savefrom']['success'];
+                    $str = $MadelineProto->responses['savefrom']['success'];
                     $repl = array(
                         "name" => $name
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 } else {
                     $saved[$ch_id] = [];
@@ -242,15 +241,15 @@ function savefrom($update, $MadelineProto, $name)
                     $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
                     $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
                     file_put_contents('saved.json', json_encode($saved));
-                    $str = $responses['savefrom']['success'];
+                    $str = $MadelineProto->responses['savefrom']['success'];
                     $repl = array(
                         "name" => $name
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = $responses['savefrom']['help'];
+                $message = $MadelineProto->responses['savefrom']['help'];
                 $default['message'] = $message;
             }
         }
@@ -281,7 +280,7 @@ function saved_get($update, $MadelineProto)
     if (is_supergroup($update, $MadelineProto)) {
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $cont = true;
         $peerUSER = false;
@@ -382,7 +381,7 @@ function save_clear($update, $MadelineProto, $msg)
                 or from_admin_mod($update, $MadelineProto, $mods, true)
             ) {
                 if ($msg) {
-                    $msg = cb($msg);
+                    $msg = htmlentities(cb($msg));
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
                     $saved = json_decode($file, true);

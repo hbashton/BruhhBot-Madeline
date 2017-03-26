@@ -2,7 +2,7 @@
 
 function start_message($update, $MadelineProto)
 {
-    global $responses, $engine;
+    
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,

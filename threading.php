@@ -1,6 +1,6 @@
 <?php
 
-class NewMessage extends Thread
+class NewMessage extends Threaded
 {
     private $update;
     private $MadelineProto;
@@ -11,6 +11,7 @@ class NewMessage extends Thread
     }
     public function run()
     {
+        require_once 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         if (array_key_exists('message', $update['update']['message'])) {
@@ -149,7 +150,7 @@ class NewMessage extends Thread
     }
 }
 
-class NewChannelMessage extends Thread
+class NewChannelMessage extends Threaded
 {
     private $update;
     private $MadelineProto;
@@ -160,17 +161,53 @@ class NewChannelMessage extends Thread
     }
     public function run()
     {
+        require_once 'require_exceptions.php';
+
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
-        $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+        $fromid = cache_from_user_info($update, $MadelineProto);
+if (!isset($fromid['bot_api_id'])) var_dump($fromid);
+        $fromid = $fromid['bot_api_id'];
         if (array_key_exists('message', $update['update']['message'])
             && is_string($update['update']['message']['message'])
         ) {
             if (is_supergroup($update, $MadelineProto)) {
-                $command = new CheckMuted($update, $MadelineProto);
-                $command->start();
-                $command->join();
-                if ($command->muted) {
+                
+        $chat = parse_chat_data($update, $MadelineProto);
+        $msg_id = $update['update']['message']['id'];
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        if (is_moderated($ch_id)) {
+            if (is_supergroup($update, $MadelineProto)) {
+                check_json_array('mutelist.json', $ch_id);
+                $file = file_get_contents("mutelist.json");
+                $mutelist = json_decode($file, true);
+                $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (!from_admin_mod($update, $MadelineProto)) {
+                        if (array_key_exists($ch_id, $mutelist)) {
+                            if (in_array($fromid, $mutelist[$ch_id])
+                                or in_array("all", $mutelist[$ch_id])
+                            ) {
+                                try {
+                                    $delete = $MadelineProto->
+                                    channels->deleteMessages(
+                                        ['channel' => $peer,
+                                        'id' => [$msg_id]]
+                                    );
+                                    \danog\MadelineProto\Logger::log($delete);
+                                } catch (Exception $e) {
+                                }
+                                $this->muted = true;
+                            } else {
+                                $this->muted = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+                if ($this->muted) {
                     return;
                 }
                 $chat = parse_chat_data($update, $MadelineProto);
@@ -236,13 +273,13 @@ class NewChannelMessage extends Thread
                         }
                     }
                 }
-                if (isset($GLOBALS['from_user_chat_photo'])) {
+                if (isset($MadelineProto->from_user_chat_photo)) {
                     set_chat_photo($update, $MadelineProto, false);
                 }
-                if (isset($GLOBALS['wait_for_whoban'])) {
+                if (isset($MadelineProto->wait_for_whoban)) {
                     whoban($update, $MadelineProto);
                 }
-                if (isset($GLOBALS['wait_for_whobanall'])) {
+                if (isset($MadelineProto->wait_for_whobanall)) {
                     whobanall($update, $MadelineProto);
                 }
                 if (strlen($update['update']['message']['message']) !== 0) {
@@ -552,7 +589,7 @@ class NewChannelMessage extends Thread
 }
 
 
-class NewChannelMessageAction extends Thread
+class NewChannelMessageAction extends Threaded
 {
     private $update;
     private $MadelineProto;
@@ -563,6 +600,8 @@ class NewChannelMessageAction extends Thread
     }
     public function run()
     {
+        require_once 'require_exceptions.php';
+
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         switch ($update['update']['message']['action']['_']) {
@@ -600,7 +639,7 @@ function NewChatAddUser($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -725,7 +764,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -850,7 +889,7 @@ function NewChatDeleteUser($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         if (is_moderated($ch_id)) {
             $bot_id = $MadelineProto->
@@ -900,55 +939,4 @@ function NewChatDeleteUser($update, $MadelineProto)
 }
 
 
-class CheckMuted extends Thread
-{
-    private $update;
-    private $MadelineProto;
-    public function __construct($update, $MadelineProto)
-    {
-        $this->update = $update;
-        $this->MadelineProto = $MadelineProto;
-    }
-    public function run()
-    {
-        $update = $this->update;
-        $MadelineProto = $this->MadelineProto;
-        $chat = parse_chat_data($update, $MadelineProto);
-        $msg_id = $update['update']['message']['id'];
-        $peer = $chat['peer'];
-        $ch_id = $chat['id'];
-        if (is_moderated($ch_id)) {
-            if (is_supergroup($update, $MadelineProto)) {
-                check_json_array('mutelist.json', $ch_id);
-                $file = file_get_contents("mutelist.json");
-                $mutelist = json_decode($file, true);
-                $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-                if (is_bot_admin($update, $MadelineProto)) {
-                    if (!from_admin_mod($update, $MadelineProto)) {
-                        if (array_key_exists($ch_id, $mutelist)) {
-                            if (in_array($fromid, $mutelist[$ch_id])
-                                or in_array("all", $mutelist[$ch_id])
-                            ) {
-                                try {
-                                    $delete = $MadelineProto->
-                                    channels->deleteMessages(
-                                        ['channel' => $peer,
-                                        'id' => [$msg_id]]
-                                    );
-                                    \danog\MadelineProto\Logger::log($delete);
-                                    $thred = new Exec($delete);
-                                    $thred->start();
-                                    $thred->join();
-                                } catch (Exception $e) {
-                                }
-                                $this->muted = true;
-                            } else {
-                                $this->muted = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+

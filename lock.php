@@ -21,12 +21,11 @@
 function lockme($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['lockme']['mods'];
+        $mods = $MadelineProto->responses['lockme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -67,15 +66,15 @@ function lockme($update, $MadelineProto, $msg)
                         }
                     }
                 } else {
-                    $str = $responses['lockme']['invalid'];
+                    $str = $MadelineProto->responses['lockme']['invalid'];
                     $repl = array(
                         "msg" => $msg
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = $responses['lockme']['help'];
+                $message = $MadelineProto->responses['lockme']['help'];
                 $default['message'] = $message;
             }
         }
@@ -93,12 +92,11 @@ function lockme($update, $MadelineProto, $msg)
 function unlockme($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['unlockme']['mods'];
+        $mods = $MadelineProto->responses['unlockme']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -144,19 +142,19 @@ function unlockme($update, $MadelineProto, $msg)
                         }
                     }
                 } else {
-                    $str = $responses['unlockme']['invalid'];
+                    $str = $MadelineProto->responses['unlockme']['invalid'];
                     $repl = array(
                         "msg" => $msg
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $str = $responses['unlockme']['help'];
+                $str = $MadelineProto->responses['unlockme']['help'];
                 $repl = array(
                     "msg" => $msg
                 );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
         }
@@ -173,13 +171,12 @@ function unlockme($update, $MadelineProto, $msg)
 
 function setflood($update, $MadelineProto, $msg)
 {
-    global $responses, $engine;
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['setflood']['mods'];
+        $mods = $MadelineProto->responses['setflood']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -196,34 +193,34 @@ function setflood($update, $MadelineProto, $msg)
                         if (array_key_exists($ch_id, $locked)) {
                             $locked[$ch_id]['floodlimit'] = (int) $msg;
                             file_put_contents('locked.json', json_encode($locked));
-                            $str = $responses['setflood']['success'];
+                            $str = $MadelineProto->responses['setflood']['success'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         } else {
                             $locked[$ch_id] = [];
                             $locked[$ch_id]['floodlimit'] = (int) $msg;
                             file_put_contents('locked.json', json_encode($locked));
-                            $str = $responses['setflood']['success'];
+                            $str = $MadelineProto->responses['setflood']['success'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     }
                 } else {
-                    $str = $responses['setflood']['invalid'];
+                    $str = $MadelineProto->responses['setflood']['invalid'];
                     $repl = array(
                         "msg" => $msg
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
             } else {
-                $message = $responses['setflood']['help'];
+                $message = $MadelineProto->responses['setflood']['help'];
                 $default['message'] = $message;
             }
         }

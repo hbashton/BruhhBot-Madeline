@@ -28,9 +28,9 @@ function get_user_stats($update, $MadelineProto, $user)
                 $id = $catch[1];
                 $user_data = user_specific_data($update, $MadelineProto, $id);
                 $id = $user_data['id'];
-                $firstname = $user_data['firstname'];
+                $firstname = htmlentities($user_data['firstname']);
                 if (array_key_exists('lastname', $user_data)) {
-                    $lastname = $user_data['lastname'];
+                    $lastname = htmlentities($user_data['lastname']);
                 }
                 if (array_key_exists('username', $user_data)) {
                     $username = $user_data['username'];
@@ -53,7 +53,7 @@ function get_user_stats($update, $MadelineProto, $user)
                     foreach ($banned as $key => $value) {
                         var_dump($value);
                         if ($value !== []) {
-                            $title = $value['title'];
+                            $title = htmlentities($value['title']);
                             $chatid = $value['id'];
                             if (!isset($ban)) {
                                 $ban = "\r\n<b>Banned from:</b>\r\n$title [$chatid]\r\n";

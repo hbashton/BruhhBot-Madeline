@@ -21,7 +21,6 @@
 function create_new_supergroup($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
-        global $responses, $engine;
         $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
             $msg_id = $update['update']['message']['id'];
@@ -69,7 +68,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
                         'role' => $channelRoleModerator]
                     );
                 } else {
-                    $message = $responses['create_new_supergroup']['missing_info'];
+                    $message = $MadelineProto->responses['create_new_supergroup']['missing_info'];
                     $default['message'] = $message;
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
@@ -79,7 +78,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
                     }
                 }
             } else {
-                $message = $responses['create_new_supergroup']['missing_info'];
+                $message = $MadelineProto->responses['create_new_supergroup']['missing_info'];
                 $default['message'] = $message;
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
@@ -95,12 +94,11 @@ function create_new_supergroup($update, $MadelineProto, $msg)
 function export_new_invite($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['export_new_invite']['mods'];
+        $mods = $MadelineProto->responses['export_new_invite']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -115,18 +113,18 @@ function export_new_invite($update, $MadelineProto)
                             ['channel' => $peer]
                         );
                         $link = $exportInvite['link'];
-                        $str = $responses['export_new_invite']['link'];
+                        $str = $MadelineProto->responses['export_new_invite']['link'];
                         $repl = array(
                             "link" => $link
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                         $sentMessage = $MadelineProto->messages->sendMessage(
                             $default
                         );
                         \danog\MadelineProto\Logger::log($sentMessage);
                     } catch (Exception $e) {
-                        $message = $responses['export_new_invite']['exception'];
+                        $message = $MadelineProto->responses['export_new_invite']['exception'];
                         $default['message'] = $message;
                         $sentMessage = $MadelineProto->messages->sendMessage(
                             $default
@@ -142,9 +140,8 @@ function export_new_invite($update, $MadelineProto)
 function public_toggle($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['public_toggle']['mods'];
+        $mods = $MadelineProto->responses['public_toggle']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
@@ -163,22 +160,22 @@ function public_toggle($update, $MadelineProto, $msg)
                                 $MadelineProto->channels->toggleInvites(
                                     ['channel' => $peer, 'enabled' => true ]
                                 );
-                                $message = $responses['public_toggle']['on'];
+                                $message = $MadelineProto->responses['public_toggle']['on'];
                                 $default['message'] = $message;
                             }
                             if ($msg == "off") {
                                 $MadelineProto->channels->toggleInvites(
                                     ['channel' => $peer, 'enabled' => false ]
                                 );
-                                $message = $responses['public_toggle']['off'];
+                                $message = $MadelineProto->responses['public_toggle']['off'];
                                 $default['message'] = $message;
                             }
                         } catch (Exception $e) {
-                            $message = $responses['public_toggle']['exception'];
+                            $message = $MadelineProto->responses['public_toggle']['exception'];
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['public_toggle']['help'];
+                        $message = $MadelineProto->responses['public_toggle']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -196,12 +193,11 @@ function public_toggle($update, $MadelineProto, $msg)
 function invite_user($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
         $msg_id = $update['update']['message']['id'];
-        $mods = $responses['invite_user']['mods'];
+        $mods = $MadelineProto->responses['invite_user']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -224,23 +220,23 @@ function invite_user($update, $MadelineProto, $msg)
                                     ['channel' => $peer, 'users' => [$userid] ]
                                 );
                             } catch (Exception $e) {
-                                $str = $responses['invite_user']['exception'];
+                                $str = $MadelineProto->responses['invite_user']['exception'];
                                 $repl = array(
                                     "mention" => $mention
                                 );
-                                $message = $engine->render($str, $repl);
+                                $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
                         } else {
-                            $str = $responses['invite_user']['idk'];
+                            $str = $MadelineProto->responses['invite_user']['idk'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                     } else {
-                        $message = $responses['invite_user']['help'];
+                        $message = $MadelineProto->responses['invite_user']['help'];
                         $default['message'] = $message;
                     }
                 }

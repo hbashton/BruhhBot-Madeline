@@ -17,17 +17,6 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-class Exec extends Thread
-{
-    public function __construct($command)
-    {
-        $this->command = $command;
-    }
-    public function run()
-    {
-        $this->command;
-    }
-}
 
 function check_locked($update, $MadelineProto)
 {
@@ -90,9 +79,6 @@ function check_locked($update, $MadelineProto)
                                         ['channel' => $peer,
                                         'id' => [$msg_id]]
                                     );
-                                    $thred = new Exec($delete);
-                                    $thred->start();
-                                    $thred->join();
                                 }
                             }
                         }
@@ -110,9 +96,6 @@ function check_locked($update, $MadelineProto)
                                                 ['channel' => $peer,
                                                 'id' => [$msg_id]]
                                             );
-                                            $thred = new Exec($delete);
-                                            $thred->start();
-                                            $thred->join();
                                         }
                                     }
                                 }
@@ -130,7 +113,6 @@ function check_flood($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
         try {
-            global $responses, $engine;
             $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
             $ch_id = $chat['id'];
@@ -144,13 +126,11 @@ function check_flood($update, $MadelineProto)
                     if (in_array('flood', $locked[$ch_id])) {
                         if (is_bot_admin($update, $MadelineProto)) {
                             if (from_admin_mod($update, $MadelineProto)) {
-                                global $flooder;
-                                $flooder['num'] = 0;
-                                $flooder['user'] = $fromid;
+                                $MadelineProto->flooder['num'] = 0;
+                                $MadelineProto->flooder['user'] = $fromid;
                             }
-                            if (!empty($GLOBALS['flooder'])) {
-                                $flooder = $GLOBALS['flooder'];
-                                if ($fromid == $flooder['user']) {
+                            if (!empty($MadelineProto->flooder)) {
+                                if ($fromid == $MadelineProto->flooder['user']) {
                                     $id = catch_id(
                                         $update,
                                         $MadelineProto,
@@ -159,9 +139,8 @@ function check_flood($update, $MadelineProto)
                                     if ($id[0]) {
                                         $username = $id[2];
                                     }
-                                    $GLOBALS['flooder']['num'] = $flooder['num'] + 1;
-                                    $num = $GLOBALS['flooder']['num'];
-                                    if ($num >= $locked[$ch_id]['floodlimit']) {
+                                    $MadelineProto->flooder['num']++;
+                                    if ($MadelineProto->flooder['num'] >= $locked[$ch_id]['floodlimit']) {
                                         if (!from_admin_mod($update, $MadelineProto)) {
                                             $kick = $MadelineProto->
                                             channels->kickFromChannel(
@@ -170,11 +149,11 @@ function check_flood($update, $MadelineProto)
                                                 'kicked' => true]
                                             );
                                             $mention = html_mention($username, $fromid);
-                                            $str = $responses['check_flood']['kick'];
+                                            $str = $MadelineProto->responses['check_flood']['kick'];
                                             $repl = array(
                                                 "mention" => $mention
                                             );
-                                            $message = $engine->render($str, $repl);
+                                            $message = $MadelineProto->engine->render($str, $repl);
                                             if (isset($message)) {
                                                 $sentMessage = $MadelineProto->
                                                 messages->sendMessage(
@@ -192,17 +171,16 @@ function check_flood($update, $MadelineProto)
                                                     $sentMessage
                                                 );
                                             }
-                                            unset($GLOBALS['flooder']);
+                                            $MadelineProto->flooder = [];
                                         }
                                     }
                                 } else {
-                                    $GLOBALS['flooder']['user'] = $fromid;
+                                    $MadelineProto->flooder['user'] = $fromid;
                                 }
                             } else {
-                                global $flooder;
-                                $flooder = [];
-                                $flooder['user'] = $fromid;
-                                $flooder['num'] = 0;
+                                $MadelineProto->flooder = [];
+                                $MadelineProto->flooder['user'] = $fromid;
+                                $MadelineProto->flooder['num'] = 0;
                             }
                         }
                     }

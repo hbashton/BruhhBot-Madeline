@@ -20,12 +20,12 @@
 function addadmin($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $msg_id = $update['update']['message']['id'];
         $mods = "Only my master can promote new admins";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -40,11 +40,11 @@ function addadmin($update, $MadelineProto, $msg)
                         $userid = $id[1];
                         $username = $id[2];
                     } else {
-                        $str = $responses['addadmin']['idk'];
+                        $str = $MadelineProto->responses['addadmin']['idk'];
                         $repl = array(
                             "msg" => $msg
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     }
                     if (isset($userid)) {
@@ -57,17 +57,17 @@ function addadmin($update, $MadelineProto, $msg)
                                 ['channel' => $peer, 'user_id' => $userid,
                                 'role' => $channelRoleModerator ]
                             );
-                            $str = $responses['addadmin']['success'];
+                            $str = $MadelineProto->responses['addadmin']['success'];
                             $repl = array(
                                 "mention" => $mention,
                                 "title" => $title
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                             \danog\MadelineProto\Logger::log($editadmin);
 
                         } catch (Exception $e) {
-                            $message = $responses['addadmin']['exception'];
+                            $message = $MadelineProto->responses['addadmin']['exception'];
                             $default['message'] = $message;
                         }
                     }
@@ -87,12 +87,12 @@ function addadmin($update, $MadelineProto, $msg)
 function rmadmin($update, $MadelineProto, $msg)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $msg_id = $update['update']['message']['id'];
         $mods = "Only my master can humiliate someone like this";
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -107,11 +107,11 @@ function rmadmin($update, $MadelineProto, $msg)
                         $userid = $id[1];
                         $username = $id[2];
                     } else {
-                        $str = $responses['rmadmin']['idk'];
+                        $str = $MadelineProto->responses['rmadmin']['idk'];
                         $repl = array(
                             "msg" => $msg
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     }
                     if (isset($userid)) {
@@ -123,15 +123,15 @@ function rmadmin($update, $MadelineProto, $msg)
                                 'role' => $channelRoleEmpty ]
                             );
                             \danog\MadelineProto\Logger::log($editadmin);
-                            $str = $responses['rmadmin']['success'];
+                            $str = $MadelineProto->responses['rmadmin']['success'];
                             $repl = array(
                                 "mention" => $mention,
                                 "title" => $title
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         } catch (Exception $e) {
-                            $message = $responses['rmadmin']['exception'];
+                            $message = $MadelineProto->responses['rmadmin']['exception'];
                             $default['message'] = $message;
                         }
                     }
@@ -150,28 +150,28 @@ function rmadmin($update, $MadelineProto, $msg)
 }
 function idme($update, $MadelineProto, $msg)
 {
-    global $responses, $engine;
+    
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-        $str = $responses['idme']['peeruser'];
+        $str = $MadelineProto->responses['idme']['peeruser'];
         $repl = array(
             "peer" => $peer
         );
-        $noid = $engine->render($str, $repl);
+        $noid = $MadelineProto->engine->render($str, $repl);
         $cont = true;
     }
     if (is_supergroup($update, $MadelineProto)) {
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
-        $str = $responses['idme']['supergroup'];
+        $str = $MadelineProto->responses['idme']['supergroup'];
         $tg_id = str_replace("-100", "", $ch_id);
         $repl = array(
             "title" => $title,
             "ch_id" => $tg_id
         );
-        $noid = $engine->render($str, $repl);
+        $noid = $MadelineProto->engine->render($str, $repl);
         $cont = true;
     }
     $msg_id = $update['update']['message']['id'];
@@ -187,20 +187,20 @@ function idme($update, $MadelineProto, $msg)
                 $username = $id[2];
                 $userid = $id[1];
                 $mention = html_mention($username, $userid);
-                $str = $responses['idme']['idmessage'];
+                $str = $MadelineProto->responses['idme']['idmessage'];
                 $repl = array(
                     "mention" => $mention,
                     "userid" => $userid
                 );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
             if (!isset($message)) {
-                $str = $responses['idme']['idk'];
+                $str = $MadelineProto->responses['idme']['idk'];
                 $repl = array(
                     "msg" => $msg
                 );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
         } else {
@@ -221,11 +221,11 @@ function idme($update, $MadelineProto, $msg)
 function adminlist($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -256,11 +256,11 @@ function adminlist($update, $MadelineProto)
             if ($mod) {
                 $mention = html_mention($username, $id);
                 if (!isset($message)) {
-                    $str = $responses['adminlist']['header'];
+                    $str = $MadelineProto->responses['adminlist']['header'];
                     $repl = array(
                         "title" => $title
                     );
-                    $message = $engine->render($str, $repl);
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $message = $message."$mention - $id\r\n";
                 } else {
                     $message = $message."$mention - $id\r\n";
@@ -281,10 +281,10 @@ function modlist($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
         $default = array(
             'peer' => $peer,
@@ -300,11 +300,11 @@ function modlist($update, $MadelineProto)
                     $username = catch_id($update, $MadelineProto, $key)[2];
                     $mention = html_mention($username, $key);
                     if (!isset($message)) {
-                        $str = $responses['modlist']['header'];
+                        $str = $MadelineProto->responses['modlist']['header'];
                         $repl = array(
                             "title" => $title
                         );
-                        $message = $engine->render($str, $repl);
+                        $message = $MadelineProto->engine->render($str, $repl);
                         $message = $message."$mention - $key\r\n";
                         $default['message'] = $message;
                     } else {
@@ -314,11 +314,11 @@ function modlist($update, $MadelineProto)
                 }
             }
             if (!isset($message)) {
-                $str = $responses['modlist']['none'];
+                $str = $MadelineProto->responses['modlist']['none'];
                         $repl = array(
                             "title" => $title
                         );
-                $message = $engine->render($str, $repl);
+                $message = $MadelineProto->engine->render($str, $repl);
                 $default['message'] = $message;
             }
         }
@@ -337,12 +337,12 @@ function pinmessage($update, $MadelineProto, $silent)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
-        $mods = $responses['pinmessage']['mods'];
+        
+        $mods = $MadelineProto->responses['pinmessage']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
-        $title = $chat['title'];
+        $title = htmlentities($chat['title']);
         $peer2 = cache_get_info(
             $update,
             $MadelineProto,
@@ -377,7 +377,7 @@ function pinmessage($update, $MadelineProto, $silent)
                                 'channel' => $peer,
                                 'id' => $pin_id ]
                             );
-                            $message = $responses['pinmessage']['success'];
+                            $message = $MadelineProto->responses['pinmessage']['success'];
                             $default['message'] = $message;
                             \danog\MadelineProto\Logger::log($pin);
                             $message2 = "User $mention pinned a message in <b>$title</b> - $tg_id";
@@ -396,7 +396,7 @@ function pinmessage($update, $MadelineProto, $silent)
                         } catch (Exception $e) {
                         }
                     } else {
-                        $message = $responses['pinmessage']['help'];
+                        $message = $MadelineProto->responses['pinmessage']['help'];
                         $default['message'] = $message;
                     }
                 }
@@ -415,7 +415,7 @@ function delmessage($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
@@ -465,9 +465,10 @@ function delmessage($update, $MadelineProto)
 
 function delmessage_user($update, $MadelineProto, $msg)
 {
+    
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
@@ -485,11 +486,11 @@ function delmessage_user($update, $MadelineProto, $msg)
                             $userid = $id[1];
                             $username = $id[2];
                         } else {
-                            $str = $responses['delmessage_user']['idk'];
+                            $str = $MadelineProto->responses['delmessage_user']['idk'];
                             $repl = array(
                                 "msg" => $msg
                             );
-                            $message = $engine->render($str, $repl);
+                            $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         }
                         if (isset($userid)) {
@@ -501,16 +502,16 @@ function delmessage_user($update, $MadelineProto, $msg)
                                         'user_id' => $userid]
                                     );
                                     \danog\MadelineProto\Logger::log($delete);
-                                    $str = $responses['delmessage_user']['success'];
+                                    $str = $MadelineProto->responses['delmessage_user']['success'];
                                     $repl = array(
                                         "mention" => $mention
                                     );
-                                    $message = $engine->render($str, $repl);
+                                    $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 } catch (Exception $e) {
                                 }
                             } else {
-                                $message = $responses['delmessage_user']['mod'];
+                                $message = $MadelineProto->responses['delmessage_user']['mod'];
                                 $default['message'] = $message;
                             }
                         }
@@ -533,7 +534,7 @@ function delmessage_user($update, $MadelineProto, $msg)
 function leave_setting($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
-        global $responses, $engine;
+        
         $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
             $msg_id = $update['update']['message']['id'];
@@ -550,37 +551,37 @@ function leave_setting($update, $MadelineProto, $msg)
                     $leave = json_decode($file, true);
                     if ($msg == "on") {
                         if (in_array("on", $leave)) {
-                            $message = $responses['leave_setting']['already_on'];
+                            $message = $MadelineProto->responses['leave_setting']['already_on'];
                         } else {
                             if (isset($leave[0])) {
                                 unset($leave[0]);
                             }
                             $leave[0] = "on";
-                            $message = $responses['leave_setting']['on'];
+                            $message = $MadelineProto->responses['leave_setting']['on'];
                             $default['message'] = $message;
                         }
                     } else {
                         if (in_array("off", $leave)) {
-                            $message = $responses['leave_setting']['already_off'];
+                            $message = $MadelineProto->responses['leave_setting']['already_off'];
                         } else {
                             if (isset($leave[0])) {
                                 unset($leave[0]);
                             }
                             $leave[0] = "off";
-                            $message = $responses['leave_setting']['off'];
+                            $message = $MadelineProto->responses['leave_setting']['off'];
                             $default['message'] = $message;
                         }
                     }
                 } else {
-                    $message = $responses['leave_setting']['help'];
+                    $message = $MadelineProto->responses['leave_setting']['help'];
                     $default['message'] = $message;
                 }
             } else {
-                $message = $responses['leave_setting']['help'];
+                $message = $MadelineProto->responses['leave_setting']['help'];
                 $default['message'] = $message;
             }
         } else {
-            $message = $responses['leave_setting']['fuck_off'];
+            $message = $MadelineProto->responses['leave_setting']['fuck_off'];
             $default['message'] = $message;
         }
         if (isset($default['message'])) {
@@ -598,7 +599,7 @@ function pinalert($update, $MadelineProto)
     $chat = parse_chat_data($update, $MadelineProto);
     $ch_id = $chat['id'];
     $chatpeer = $chat['peer'];
-    $title = $chat['title'];
+    $title = htmlentities($chat['title']);
     $msgid = $update['update']['message']['id'];
     $pin_id = $update['update']['message']['reply_to_msg_id'];
     $peer = cache_get_info(
