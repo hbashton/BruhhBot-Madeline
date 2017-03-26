@@ -417,16 +417,16 @@ function getbanlist($update, $MadelineProto)
                     $id = catch_id($update, $MadelineProto, $key);
                     if ($id[0]) {
                         $username = $id[2];
-                        $mention = html_mention($username, $key);
+                        $mention = $username;
                         if (!isset($message)) {
                             $str = $MadelineProto->responses['getbanlist']['header'];
                             $repl = array(
                                 "title" => $title
                             );
                             $message = $MadelineProto->engine->render($str, $repl);
-                            $message = $message."$mention - $key\r\n";
+                            $message = $message."[x] $mention - $key\r\n";
                         } else {
-                            $message = $message."$mention - $key\r\n";
+                            $message = $message."[x] $mention - $key\r\n";
                         }
                     }
                 }
@@ -706,7 +706,7 @@ function getgbanlist($update, $MadelineProto)
             foreach ($gbanlist as $i => $key) {
                 $id = $i;
                 $username = $key;
-                $mention = html_mention($username, $id);
+                $mention = $username;
                 if (!isset($message)) {
                     $str = $MadelineProto->responses['getgbanlist']['header'];
                     $repl = array(
@@ -715,16 +715,16 @@ function getgbanlist($update, $MadelineProto)
                     $message = $MadelineProto->engine->render($str, $repl);
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = $message."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
+                        $message = $message."[x] $mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
                     } else {
-                        $message = $message."$mention - $id\n";
+                        $message = $message."[x] $mention - $id\n";
                     }
                 } else {
                     if (array_key_exists($id, $reasons)) {
                         $reason = $reasons[$id];
-                        $message = $message."$mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
+                        $message = $message."[x] $mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
                     } else {
-                        $message = $message."$mention - $id\n";
+                        $message = $message."[x] $mention - $id\n";
                     }
                 }
             }
