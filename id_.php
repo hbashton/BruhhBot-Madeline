@@ -19,62 +19,59 @@
  */
 function catch_id($update, $MadelineProto, $user)
 {
-
-    $user_ = cache_get_info($update, $MadelineProto, $user);
-    if ($user_) {
-        try {
-            if (array_key_exists(
-                'username', $user_['User']
-            )
-            ) {
-                $username = $user_['User']['username'];
-            } elseif (array_key_exists(
-                'first_name', $user_['User']
-            )
-            ) {
-                $username = $user_['User']['first_name'];
-            } else {
-                $username = "no-name-user";
-            }
-            $userid = $user_['bot_api_id'];
-            $return = array(true, $userid, $username);
-        } catch (Exception $e) {
-            return array(false);
-        }
-        if (!isset($return)); {
-            if (array_key_exists('entities', $update['update']['message'])) {
-                foreach ($update['update']['message']['entities'] as $key) {
-                    if (array_key_exists('user_id', $key)) {
-                        try {
-                            $userid = $key['user_id'];
-                            $user_ = cache_get_info($update, $MadelineProto, $userid);
-                            if (array_key_exists(
-                                'username', $user_['User']
-                            )
-                            ) {
-                                $username = $user_['User']['username'];
-                            } elseif (array_key_exists(
-                                'first_name', $user_['User']
-                            )
-                            ) {
-                                $username = $user_['User']['first_name'];
-                            } else {
-                                $username = "no-name-user";
-                            }
-                            $userid = $user_['bot_api_id'];
-                            break;
-                        } catch (Exception $e) {
-                            return array(false);
-                        }
+    if (array_key_exists('entities', $update['update']['message'])) {
+        foreach ($update['update']['message']['entities'] as $key) {
+            if (array_key_exists('user_id', $key)) {
+                try {
+                    $userid = $key['user_id'];
+                    $user_ = cache_get_info($update, $MadelineProto, $userid);
+                    if (array_key_exists(
+                        'username', $user_['User']
+                    )
+                    ) {
+                        $username = $user_['User']['username'];
+                    } elseif (array_key_exists(
+                        'first_name', $user_['User']
+                    )
+                    ) {
+                        $username = $user_['User']['first_name'];
+                    } else {
+                        $username = "no-name-user";
                     }
+                    $userid = $user_['bot_api_id'];
+                    break;
+                } catch (Exception $e) {
+                    return array(false);
                 }
             }
         }
-        if (isset($userid)) {
-            return array(true, $userid, $username);
-        } else {
-            return array(false);
+    }
+    if (!isset($userid)) {
+        $user_ = cache_get_info($update, $MadelineProto, $user);
+        if ($user_) {
+            try {
+                if (array_key_exists(
+                    'username', $user_['User']
+                )
+                ) {
+                    $username = $user_['User']['username'];
+                } elseif (array_key_exists(
+                    'first_name', $user_['User']
+                )
+                ) {
+                    $username = $user_['User']['first_name'];
+                } else {
+                    $username = "no-name-user";
+                }
+                $userid = $user_['bot_api_id'];
+                $return = array(true, $userid, $username);
+            } catch (Exception $e) {
+                return array(false);
+            }
         }
+    }
+    if (isset($userid)) {
+        return array(true, $userid, $username);
     } else {
         return array(false);
     }
