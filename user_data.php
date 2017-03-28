@@ -2,6 +2,7 @@
 
 function get_user_stats($update, $MadelineProto, $user) 
 {
+    $msg_id = $update['update']['message']['id'];
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -16,13 +17,13 @@ function get_user_stats($update, $MadelineProto, $user)
         $cont = true;
     }
     if (isset($cont)) {
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
+        );
         if ($user !== "") {
             $msg_id = $update['update']['message']['id'];
-            $default = array(
-                'peer' => $peer,
-                'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
             $catch = catch_id($update, $MadelineProto, $user);
             if ($catch[0]) {
                 $id = $catch[1];
@@ -79,6 +80,7 @@ function get_user_stats($update, $MadelineProto, $user)
         }
         if (isset($message)) {
             $default['message'] = $message;
+            var_dump($default);
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );
