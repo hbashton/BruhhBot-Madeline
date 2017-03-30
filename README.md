@@ -11,7 +11,7 @@ You will also need to register your account and retrieve your Telegram MTProto A
 Install php and it's required extensions
 
 ```
-sudo apt-get install -y php7.0 php7.0-common php7.0-mbstring php7.0-xml
+sudo apt-get install -y composer php7.0 php7.0-common php7.0-mbstring php7.0-xml
 ```
 ### Installing
 
