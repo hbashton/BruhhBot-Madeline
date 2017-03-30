@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function addadmin($update, $MadelineProto, $msg)
+function addadmin($update, $MadelineProto, $msg = "")
 {
     if (is_supergroup($update, $MadelineProto)) {
         
@@ -35,56 +35,58 @@ function addadmin($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto, $mods, true)) {
-                    $id = catch_id($update, $MadelineProto, $msg);
-                    if ($id[0]) {
-                        $userid = $id[1];
-                        $username = $id[2];
-                    } else {
-                        $str = $MadelineProto->responses['addadmin']['idk'];
-                        $repl = array(
-                            "msg" => $msg
-                        );
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
-                    }
-                    if (isset($userid)) {
-                        $mention = html_mention($username, $userid);
-                        $channelRoleModerator = [
-                            '_' => 'channelRoleModerator',
-                        ];
-                        try {
-                            $editadmin = $MadelineProto->channels->editAdmin(
-                                ['channel' => $peer, 'user_id' => $userid,
-                                'role' => $channelRoleModerator ]
-                            );
-                            $str = $MadelineProto->responses['addadmin']['success'];
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) { 
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                            $username = $id[2];
+                        } else {
+                            $str = $MadelineProto->responses['addadmin']['idk'];
                             $repl = array(
-                                "mention" => $mention,
-                                "title" => $title
+                                "msg" => $msg
                             );
                             $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
-                            \danog\MadelineProto\Logger::log($editadmin);
-
-                        } catch (Exception $e) {
-                            $message = $MadelineProto->responses['addadmin']['exception'];
-                            $default['message'] = $message;
                         }
-                    }
-                    if (isset($default['message'])) {
-                        $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
-                    }
-                    if (isset($sentMessage)) {
-                        \danog\MadelineProto\Logger::log($sentMessage);
+                        if (isset($userid)) {
+                            $mention = html_mention($username, $userid);
+                            $channelRoleModerator = [
+                                '_' => 'channelRoleModerator',
+                            ];
+                            try {
+                                $editadmin = $MadelineProto->channels->editAdmin(
+                                    ['channel' => $peer, 'user_id' => $userid,
+                                    'role' => $channelRoleModerator ]
+                                );
+                                $str = $MadelineProto->responses['addadmin']['success'];
+                                $repl = array(
+                                    "mention" => $mention,
+                                    "title" => $title
+                                );
+                                $message = $MadelineProto->engine->render($str, $repl);
+                                $default['message'] = $message;
+                                \danog\MadelineProto\Logger::log($editadmin);
+
+                            } catch (Exception $e) {
+                                $message = $MadelineProto->responses['addadmin']['exception'];
+                                $default['message'] = $message;
+                            }
+                        }
+                        if (isset($default['message'])) {
+                            $sentMessage = $MadelineProto->messages->sendMessage(
+                                $default
+                            );
+                        }
+                        if (isset($sentMessage)) {
+                            \danog\MadelineProto\Logger::log($sentMessage);
+                        }
                     }
                 }
             }
         }
     }
 }
-function rmadmin($update, $MadelineProto, $msg)
+function rmadmin($update, $MadelineProto, $msg = "")
 {
     if (is_supergroup($update, $MadelineProto)) {
         
@@ -102,43 +104,45 @@ function rmadmin($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto, $mods, true)) {
-                    $id = catch_id($update, $MadelineProto, $msg);
-                    if ($id[0]) {
-                        $userid = $id[1];
-                        $username = $id[2];
-                    } else {
-                        $str = $MadelineProto->responses['rmadmin']['idk'];
-                        $repl = array(
-                            "msg" => $msg
-                        );
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
-                    }
-                    if (isset($userid)) {
-                        try {
-                            $mention = html_mention($username, $userid);
-                            $channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
-                            $editadmin = $MadelineProto->channels->editAdmin(
-                                ['channel' => $peer, 'user_id' => $userid,
-                                'role' => $channelRoleEmpty ]
-                            );
-                            \danog\MadelineProto\Logger::log($editadmin);
-                            $str = $MadelineProto->responses['rmadmin']['success'];
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
+                        $id = catch_id($update, $MadelineProto, $msg);
+                        if ($id[0]) {
+                            $userid = $id[1];
+                            $username = $id[2];
+                        } else {
+                            $str = $MadelineProto->responses['rmadmin']['idk'];
                             $repl = array(
-                                "mention" => $mention,
-                                "title" => $title
+                                "msg" => $msg
                             );
                             $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
-                        } catch (Exception $e) {
-                            $message = $MadelineProto->responses['rmadmin']['exception'];
-                            $default['message'] = $message;
                         }
-                    }
-                    if (isset($default['message'])) {
-                        $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
+                        if (isset($userid)) {
+                            try {
+                                $mention = html_mention($username, $userid);
+                                $channelRoleEmpty = ['_' => 'channelRoleEmpty', ];
+                                $editadmin = $MadelineProto->channels->editAdmin(
+                                    ['channel' => $peer, 'user_id' => $userid,
+                                    'role' => $channelRoleEmpty ]
+                                );
+                                \danog\MadelineProto\Logger::log($editadmin);
+                                $str = $MadelineProto->responses['rmadmin']['success'];
+                                $repl = array(
+                                    "mention" => $mention,
+                                    "title" => $title
+                                );
+                                $message = $MadelineProto->engine->render($str, $repl);
+                                $default['message'] = $message;
+                            } catch (Exception $e) {
+                                $message = $MadelineProto->responses['rmadmin']['exception'];
+                                $default['message'] = $message;
+                            }
+                        }
+                        if (isset($default['message'])) {
+                            $sentMessage = $MadelineProto->messages->sendMessage(
+                                $default
+                            );
+                        }
                     }
                 }
                 if (isset($sentMessage)) {
@@ -148,7 +152,7 @@ function rmadmin($update, $MadelineProto, $msg)
         }
     }
 }
-function idme($update, $MadelineProto, $msg)
+function idme($update, $MadelineProto, $msg = "")
 {
     
     if (is_peeruser($update, $MadelineProto)) {
@@ -181,7 +185,7 @@ function idme($update, $MadelineProto, $msg)
         'parse_mode' => 'html'
         );
     if (isset($cont)) {
-        if (!empty($msg)) {
+        if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
             $id = catch_id($update, $MadelineProto, $msg);
             if ($id[0]) {
                 $username = $id[2];
@@ -463,7 +467,7 @@ function delmessage($update, $MadelineProto)
     }
 }
 
-function delmessage_user($update, $MadelineProto, $msg)
+function delmessage_user($update, $MadelineProto, $msg = "")
 {
     
     $msg_id = $update['update']['message']['id'];
@@ -480,7 +484,7 @@ function delmessage_user($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto, true)) {
                 if (from_admin_mod($update, $MadelineProto)) {
-                    if ($msg) {
+                    if ($msg or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];

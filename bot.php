@@ -119,10 +119,6 @@ while (true) {
         $offset = $update['update_id'] + 1;
         switch ($update['update']['_']) {
         case 'updateNewMessage':
-            $res = json_encode($update, JSON_PRETTY_PRINT);
-            if ($res == '') {
-                $res = var_export($update, true);
-            }
             if ($dumpme) {
                 var_dump($update);
             }

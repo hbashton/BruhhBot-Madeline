@@ -19,6 +19,7 @@
  */
 function catch_id($update, $MadelineProto, $user)
 {
+    $msg_id = $update['update']['message']['id'];
     if (array_key_exists('entities', $update['update']['message'])) {
         foreach ($update['update']['message']['entities'] as $key) {
             if (array_key_exists('user_id', $key)) {
@@ -46,7 +47,7 @@ function catch_id($update, $MadelineProto, $user)
             }
         }
     }
-    if (!isset($userid)) {
+    if (!isset($userid) && !empty($user)) {
         $user_ = cache_get_info($update, $MadelineProto, $user);
         if ($user_) {
             try {
@@ -68,6 +69,39 @@ function catch_id($update, $MadelineProto, $user)
             } catch (Exception $e) {
                 return array(false);
             }
+        }
+    }
+    if (!isset($userid) && is_supergroup($update, $MadelineProto) && array_key_exists('reply_to_msg_id', $update['update']['message'])) {
+        try {
+            $msg_id = $update['update']['message']['reply_to_msg_id'];
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$msg_id]]);
+            if (is_array($message)) {
+                if (array_key_exists('messages', $message)) {
+                    $userid = $message['messages'][0]['from_id'];
+                    $user_ = cache_get_info($update, $MadelineProto, $userid);
+                    if ($user_) {
+                        if (array_key_exists(
+                            'username', $user_['User']
+                        )
+                        ) {
+                            $username = $user_['User']['username'];
+                        } elseif (array_key_exists(
+                            'first_name', $user_['User']
+                        )
+                        ) {
+                            $username = $user_['User']['first_name'];
+                        } else {
+                            $username = "no-name-user";
+                        }
+                        $userid = $user_['bot_api_id'];
+                        $return = array(true, $userid, $username);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            return array(false);
         }
     }
     if (isset($userid)) {

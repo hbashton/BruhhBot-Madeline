@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function muteme($update, $MadelineProto, $msg, $send = true)
+function muteme($update, $MadelineProto, $msg = "", $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
@@ -34,7 +34,7 @@ function muteme($update, $MadelineProto, $msg, $send = true)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
@@ -116,7 +116,7 @@ function muteme($update, $MadelineProto, $msg, $send = true)
 }
 
 
-function unmuteme($update, $MadelineProto, $msg)
+function unmuteme($update, $MadelineProto, $msg = "")
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
@@ -133,7 +133,7 @@ function unmuteme($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];

@@ -875,7 +875,6 @@ function NewChatDeleteUser($update, $MadelineProto)
 {
     $user_id = $update['update']['message']['action']['user_id'];
     if (is_supergroup($update, $MadelineProto)) {
-        $user_id = $update['update']['message']['from_id'];
         $id = catch_id(
             $update,
             $MadelineProto,

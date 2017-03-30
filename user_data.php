@@ -22,7 +22,7 @@ function get_user_stats($update, $MadelineProto, $user)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html'
         );
-        if ($user !== "") {
+        if ($user !== "" or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
             $msg_id = $update['update']['message']['id'];
             $catch = catch_id($update, $MadelineProto, $user);
             if ($catch[0]) {

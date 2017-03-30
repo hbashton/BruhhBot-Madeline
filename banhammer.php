@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function banme($update, $MadelineProto, $msg, $send = true)
+function banme($update, $MadelineProto, $msg = "", $send = true)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
@@ -34,7 +34,7 @@ function banme($update, $MadelineProto, $msg, $send = true)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
@@ -139,7 +139,7 @@ function banme($update, $MadelineProto, $msg, $send = true)
 }
 
 
-function unbanme($update, $MadelineProto, $msg)
+function unbanme($update, $MadelineProto, $msg = "")
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
@@ -156,7 +156,7 @@ function unbanme($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
@@ -240,7 +240,7 @@ function unbanme($update, $MadelineProto, $msg)
 }
 
 
-function kickhim($update, $MadelineProto, $msg)
+function kickhim($update, $MadelineProto, $msg = "")
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
@@ -257,7 +257,7 @@ function kickhim($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
@@ -455,7 +455,7 @@ function getbanlist($update, $MadelineProto)
     }
 }
 
-function unbanall($update, $MadelineProto, $msg)
+function unbanall($update, $MadelineProto, $msg = "")
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
@@ -471,7 +471,7 @@ function unbanall($update, $MadelineProto, $msg)
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
@@ -543,7 +543,7 @@ function unbanall($update, $MadelineProto, $msg)
     }
 }
 
-function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $confident = false)
+function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, $confident = false)
 {
     if (is_supergroup($update, $MadelineProto)) {
         $msg_id = $update['update']['message']['id'];
@@ -561,7 +561,7 @@ function banall($update, $MadelineProto, $msg, $reason = "", $send = true, $conf
             var_dump(is_bot_admin($update, $MadelineProto));
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
-                    if ($msg) {
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
