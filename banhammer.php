@@ -558,7 +558,6 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
             );
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_moderated($ch_id)) {
-            var_dump(is_bot_admin($update, $MadelineProto));
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto)) {
                     if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
@@ -641,6 +640,8 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                     $default['message'] = $message;
                                     $all = false;
                                 }
+                            } else {
+                                return;
                             }
                         } else {
                             $str = $MadelineProto->responses['banall']['idk'];

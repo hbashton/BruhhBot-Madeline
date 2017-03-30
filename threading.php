@@ -355,21 +355,24 @@ if (!isset($fromid['bot_api_id'])) var_dump($fromid);
                         case 'banall':
 
                             unset($msg_arr[0]);
-                            if (isset($msg_arr[1])) {
-                                $msg = $msg_arr[1];
-                                unset($msg_arr[1]);
-                            } else {
-                                $msg = "";
-                            }
                             if (!empty($msg_arr)) {
                                 $last = key(array_slice($msg_arr, -1, 1, TRUE));
                                 if ($msg_arr[$last] == "silent") {
                                     $silent = false;
+                                    unset($msg_arr[$last]);
                                 } else {
                                     $silent = true;
                                 }
                             } else {
                                 $silent = true;
+                            }
+                            if (!empty($msg_arr)) {
+                                if (isset($msg_arr[1])) {
+                                    $msg = $msg_arr[1];
+                                    unset($msg_arr[1]);
+                                } else {
+                                    $msg = "";
+                                }
                             }
                             $reason = implode(" ", $msg_arr);
                             banall($update, $MadelineProto, $msg, $reason,$silent);
