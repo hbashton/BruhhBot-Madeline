@@ -141,10 +141,10 @@ class NewMessage extends Threaded
                         break;
                     }
                 }
-                if (array_key_exists("fwd_from", $update['update']['message'])) {
-                    $fwd_id = $update['update']['message']['fwd_from']['from_id'];
-                    get_user_stats($update, $MadelineProto, $fwd_id);
-                }
+            }
+            if (array_key_exists("fwd_from", $update['update']['message'])) {
+                $fwd_id = $update['update']['message']['fwd_from']['from_id'];
+                get_user_stats($update, $MadelineProto, $fwd_id);
             }
         }
     }
