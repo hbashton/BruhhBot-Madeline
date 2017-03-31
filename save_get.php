@@ -221,9 +221,20 @@ function savefrom($update, $MadelineProto, $name)
                     if (!array_key_exists("from", $saved[$ch_id])) {
                         $saved[$ch_id]["from"] = [];
                     }
+                    $bot_id = $MadelineProto->bot_id;
+                    $forwardMessage = $MadelineProto->messages->forwardMessages(
+                        ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' =>
+                        $bot_id ]
+                    );
+                    foreach ($forwardMessage['updates'] as $i) {
+                        if ($i['_'] == "updateMessageID") {
+                            $fwd_id = $i['id'];
+                            $fwd_chat = $bot_id;
+                        }
+                    }
                     $saved[$ch_id]["from"][$name] = [];
-                    $saved[$ch_id]["from"][$name]["chat"] = $ch_id;
-                    $saved[$ch_id]["from"][$name]["msgid"] = $msg_id;
+                    $saved[$ch_id]["from"][$name]["chat"] = $fwd_chat;
+                    $saved[$ch_id]["from"][$name]["msgid"] = $fwd_id;
                     if (array_key_exists($name, $saved[$ch_id])) {
                         unset($saved[$ch_id][$name]);
                     }

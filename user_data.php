@@ -16,7 +16,7 @@ function get_user_stats($update, $MadelineProto, $user)
         $peer = $chat['peer'];
         $cont = true;
     }
-    if (isset($cont)) {
+    if (!$update['update']['message']['out'] && isset($cont)) {
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
