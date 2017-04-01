@@ -176,6 +176,7 @@ function check_flood($update, $MadelineProto)
                                     }
                                 } else {
                                     $MadelineProto->flooder['user'] = $fromid;
+                                    $MadelineProto->flooder['num'] = 0;
                                 }
                             } else {
                                 $MadelineProto->flooder = [];
