@@ -355,7 +355,6 @@ if (!isset($fromid['bot_api_id'])) var_dump($fromid);
                             break;
 
                         case 'banall':
-
                             unset($msg_arr[0]);
                             if (!empty($msg_arr)) {
                                 $last = key(array_slice($msg_arr, -1, 1, TRUE));
@@ -375,6 +374,9 @@ if (!isset($fromid['bot_api_id'])) var_dump($fromid);
                                 } else {
                                     $msg = "";
                                 }
+                            }
+                            if ($msg == "banall") {
+                                $msg = "";
                             }
                             $reason = implode(" ", $msg_arr);
                             banall($update, $MadelineProto, $msg, $reason,$silent);

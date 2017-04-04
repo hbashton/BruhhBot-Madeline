@@ -672,14 +672,40 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
         if (!isset($all)) {
             $all = true;
         }
-        if ($send && $all && isset($message)) {
-            send_to_moderated($MadelineProto, $message, [$ch_id]);
+        if (!isset($MadelineProto->timestamp)) {
+            $MadelineProto->timestamp = [];
         }
-        if (isset($userid)) {
-            ban_from_moderated($MadelineProto, $userid, [$ch_id]);
+        if (!isset($MadelineProto->timestamp['banall'])) {
+            $MadelineProto->timestamp['banall'] = time();
         }
-        if ($confident) {
-            ban_from_moderated($MadelineProto, $msg, [$ch_id]);
+        $diff = time() - $MadelineProto->timestamp['banall'];
+        if ($diff > 1800) {
+            if ($send && $all && isset($message)) {
+                send_to_moderated($MadelineProto, $message, [$ch_id]);
+            }
+            if (isset($userid)) {
+                ban_from_moderated($MadelineProto, $userid, [$ch_id]);
+            }
+            if ($confident) {
+                ban_from_moderated($MadelineProto, $msg, [$ch_id]);
+            }
+        } else {
+            if ($msg != "" && isset($userid)) {
+                $timetowait = 1800 - $diff;
+                $msg_id = $update['update']['message']['id'];
+                $chat = parse_chat_data($update, $MadelineProto);
+                $peer = $chat['peer'];
+                $ch_id = $chat['id'];
+                $default = array(
+                    'peer' => $peer,
+                    'reply_to_msg_id' => $msg_id,
+                    'message' => "Please wait $timetowait seconds before using !banall. The user has been added to the gbanlist"
+                );
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
         }
     }
 }
