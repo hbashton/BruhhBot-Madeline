@@ -24,6 +24,7 @@ require 'vendor/spatie/emoji/src/Emoji.php';
 require_once 'add.php';
 require_once 'arabic.php';
 require_once 'banhammer.php';
+require_once 'bot_api.php';
 require_once 'cache.php';
 require_once 'check_msg.php';
 require_once 'data_parse.php';
@@ -45,68 +46,85 @@ require_once 'user_data.php';
 require_once 'weather.php';
 require_once 'who_functions.php';
 if (file_exists('session.madeline')) {
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-    Requests::register_autoloader();
+    try {
+        $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+    } catch (Exception $e) {}
+}
+if (file_exists('bot.madeline')) {
+    try {
+        $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
+    } catch (Exception $e) {}
 }
 if (file_exists('.env')) {
     $dotenv = new Dotenv\Dotenv(__DIR__);
     $dotenv->load();
 }
+
 if (isset($argv[1])) {
     $dumpme = true;
 } else {
     $dumpme = false;
 }
-$settings = json_decode(getenv('MTPROTO_SETTINGS'), true) ?: [];
+$settings = [];
 
-if (!isset($MadelineProto)) {
-    $MadelineProto = new \danog\MadelineProto\API($settings);
-    $checkedPhone = $MadelineProto->auth->checkPhone(
+if (!isset($uMadelineProto)) {
+    $uMadelineProto = new \danog\MadelineProto\API($settings);
+    $checkedPhone = $uMadelineProto->auth->checkPhone(
         [
             'phone_number'     => getenv('MTPROTO_NUMBER'),
         ]
     );
     \danog\MadelineProto\Logger::log($checkedPhone);
-    $sentCode = $MadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
+    $sentCode = $uMadelineProto->phone_login(getenv('MTPROTO_NUMBER'));
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
     $code = fgets(
         STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']
         ['length'] : 5) + 1
     );
-    $authorization = $MadelineProto->complete_phone_login($code);
-    
+    $authorization = $uMadelineProto->complete_phone_login($code);
+
         \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
         if ($authorization['_'] === 'account.noPassword') {
             throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
         }
         if ($authorization['_'] === 'account.password') {
             \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
-            $authorization = $MadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+            $authorization = $uMadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
         }
         if ($authorization['_'] === 'account.needSignup') {
             \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
-            $authorization = $MadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+            $authorization = $uMadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
         }
 
     \danog\MadelineProto\Logger::log([$authorization]);
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
     echo 'Wrote '.\danog\MadelineProto\Serialization::serialize(
         'session.madeline',
-        $MadelineProto
+        $uMadelineProto
     ).' bytes'.PHP_EOL;
 
     echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
-    $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
+    $uMadelineProto = \danog\MadelineProto\Serialization::deserialize(
         'session.madeline'
     );
+    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+}
+if (!isset($MadelineProto)) {
+    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
 }
 $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
 $MadelineProto->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
+$MadelineProto->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
+$MadelineProto->uMadelineProto = $uMadelineProto;
 //var_dump($MadelineProto->get_pwr_chat('@pwrtelegramgroup'));
-
+Requests::register_autoloader();
 $pool = new Pool(100);
 
 $offset = 0;
@@ -145,7 +163,7 @@ while (true) {
         }
     }
     \danog\MadelineProto\Serialization::serialize(
-        'session.madeline',
+        'bot.madeline',
         $MadelineProto
     ).PHP_EOL;
 }

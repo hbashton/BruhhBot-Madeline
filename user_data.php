@@ -52,7 +52,6 @@ function get_user_stats($update, $MadelineProto, $user)
                 }
                 if (isset($banned)) {
                     foreach ($banned as $key => $value) {
-                        var_dump($value);
                         if ($value !== []) {
                             $title = htmlentities($value['title']);
                             $chatid = $value['id'];

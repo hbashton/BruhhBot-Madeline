@@ -105,7 +105,6 @@ function user_specific_data($update, $MadelineProto, $user)
         }
         $isbanned = is_banned_anywhere($update, $MadelineProto, $userid);
         if ($isbanned[0]) {
-            var_dump($isbanned, true);
             unset($isbanned[0]);
             foreach ($isbanned as $key => $value) {
                 $chat = cache_get_info($update, $MadelineProto, $value);
@@ -140,7 +139,6 @@ function user_specific_data($update, $MadelineProto, $user)
         if (isset($gbanned)) {
             $fwd_array['gbanned'] = $gbanned;
         }
-        var_dump($fwd_array);
         return($fwd_array);
     } else {
         return false;
@@ -186,7 +184,6 @@ function is_banned_anywhere($update, $MadelineProto, $user)
         if (!isset($chats)) {
             $chats = [false];
         }
-        var_dump($chats);
         return($chats);
     } else {
         return false;

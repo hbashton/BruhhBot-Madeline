@@ -50,6 +50,7 @@ function saveme($update, $MadelineProto, $msg, $name)
             if ($name) {
                 if ($name == "from") {
                     if ($msg) {
+                        $msg = $MadelineProto->utf8ize($msg);
                         savefrom($update, $MadelineProto, $msg);
                         return;
                     } else {
@@ -61,7 +62,7 @@ function saveme($update, $MadelineProto, $msg, $name)
             if (strlen($msg) < 2000) {
                 if ($name && $msg) {
                     $name = htmlentities(cb($name));
-                    var_dump(strlen($msg));
+                    $msg = $MadelineProto->utf8ize($msg);
                     $codename = "<code>$name</code>";
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
@@ -123,11 +124,13 @@ function getme($update, $MadelineProto, $name)
         $peerUSER = true;
     }
     if (is_supergroup($update, $MadelineProto)) {
-        $chat = parse_chat_data($update, $MadelineProto);
-        $peer = $chat['peer'];
-        $ch_id = $chat['id'];
-        $cont = true;
-        $peerUSER = false;
+        if (bot_present($update, $MadelineProto, true)) {
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $ch_id = $chat['id'];
+            $cont = true;
+            $peerUSER = false;
+        }
     }
     if (!$update['update']['message']['out'] && $cont) {
         $name = cb($name);
@@ -183,7 +186,7 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
-
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -221,10 +224,23 @@ function savefrom($update, $MadelineProto, $name)
                         $saved[$ch_id]["from"] = [];
                     }
                     $bot_id = $MadelineProto->bot_id;
-                    $forwardMessage = $MadelineProto->messages->forwardMessages(
-                        ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' =>
-                        $bot_id ]
-                    );
+                    try {
+                        $forwardMessage = $MadelineProto->messages->forwardMessages(
+                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' =>
+                            $bot_id]
+                        );
+                    } catch (Exception $e) {
+                        $bot_api_id = $MadelineProto->bot_api_id;
+                        $oK = $MadelineProto->messages->sendMessage(
+                            array(
+                            'peer' => $bot_api_id,
+                            'message' => 'hi')
+                        );
+                        $forwardMessage = $MadelineProto->messages->forwardMessages(
+                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' =>
+                            $bot_id]
+                        );
+                    }
                     foreach ($forwardMessage['updates'] as $i) {
                         if ($i['_'] == "updateMessageID") {
                             $fwd_id = $i['id'];
@@ -359,7 +375,7 @@ function saved_get($update, $MadelineProto)
     }
 }
 
-function save_clear($update, $MadelineProto, $msg) 
+function save_clear($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
