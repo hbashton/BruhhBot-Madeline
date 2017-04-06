@@ -195,34 +195,6 @@ function is_bot_admin($update, $MadelineProto, $send = false)
                 $mod = false;
             }
             if ($mod) {
-                foreach ($admins['participants'] as $key) {
-                    if (array_key_exists('user', $key)) {
-                        $id = $key['user']['id'];
-                    } else {
-                        if (array_key_exists('bot', $key)) {
-                            $id = $key['bot']['id'];
-                        }
-                    }
-                    if ($id == $bot_api_id) {
-                        if (array_key_exists("role", $key)) {
-                            if ($key['role'] == "moderator"
-                                or $key['role'] == "creator"
-                            ) {
-                                $mod = true;
-                                break;
-                            } else {
-                                $mod = false;
-                                break;
-                            }
-                        } else {
-                            $mod = false;
-                            break;
-                        }
-                    }
-                    $mod = false;
-                }
-            }
-            if ($mod) {
                 return true;
             } else {
                 if ($send) {

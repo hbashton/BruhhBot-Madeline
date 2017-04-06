@@ -257,5 +257,9 @@
         "mods":"Only mods get to save messages. You don't fit that criteria.",
         "success":"Message <code>{name}</code> has been saved",
         "help":"Save a message by reply with <code>/save from name</code>"
+    },
+    "bot_present":
+    {
+        "not":"Please add {botname}. It's my helper, without it I don't function properly."
     }
 }

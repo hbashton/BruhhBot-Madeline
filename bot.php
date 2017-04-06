@@ -120,6 +120,7 @@ if (!isset($MadelineProto)) {
 $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
+$MadelineProto->is_bot_present = [];
 $MadelineProto->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
 $MadelineProto->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
 $MadelineProto->uMadelineProto = $uMadelineProto;
@@ -129,9 +130,10 @@ $pool = new Pool(100);
 
 $offset = 0;
 while (true) {
+    $MadelineProto->uMadelineProto = $uMadelineProto;
     $updates = $MadelineProto->API->get_updates(
         ['offset' => $offset,
-        'limit' => 50000, 'timeout' => 0]
+        'limit' => 50, 'timeout' => 0]
     );
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1;
@@ -162,8 +164,6 @@ while (true) {
             }
         }
     }
-    \danog\MadelineProto\Serialization::serialize(
-        'bot.madeline',
-        $MadelineProto
-    ).PHP_EOL;
+    \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;
+    \danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).PHP_EOL;
 }

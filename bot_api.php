@@ -5,9 +5,13 @@ function bot_present($update, $MadelineProto, $silent = false)
     try {
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
+        if (array_key_exists($peer, $MadelineProto->is_bot_present)) {
+            $diff = time() - $MadelineProto->is_bot_present[$peer]["timestamp"];
+            if ($diff < 600) return $MadelineProto->is_bot_present[$peer]["return"];
+        }
         $uMadelineProto = $MadelineProto->uMadelineProto;
-        $api_user = $uMadelineProto->channels->getParticipant(['channel' => $peer, 'user_id' => $MadelineProto->bot_api_id]);
-        $bot_user = $uMadelineProto->channels->getParticipant(['channel' => $peer, 'user_id' => $MadelineProto->bot_id]);
+        $uMadelineProto->messages->setTyping(['peer' => $peer, 'action' => ['_' => 'sendMessageTypingAction']]);
+        $MadelineProto->is_bot_present[$peer] = ["timestamp" => time(), "return" => true];
         return true;
     } catch (Exception $e) {
         if (!$silent) {
@@ -25,6 +29,7 @@ function bot_present($update, $MadelineProto, $silent = false)
             );
             \danog\MadelineProto\Logger::log($sentMessage);
         }
+        $MadelineProto->is_bot_present[$peer] = ["timestamp" => time(), "return" => true];
         return false;
     }
     if (!$silent) {
@@ -42,5 +47,6 @@ function bot_present($update, $MadelineProto, $silent = false)
         );
         \danog\MadelineProto\Logger::log($sentMessage);
     }
+    $MadelineProto->is_bot_present[$peer] = ["timestamp" => time(), "return" => true];
     return false;
 }
