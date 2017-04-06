@@ -641,7 +641,7 @@ function NewChatAddUser($update, $MadelineProto)
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
     $user_id = $update['update']['message']['action']['users'][0];
-    if (bot_present($update, $MadelineProto)) {
+    if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
                 $update,
@@ -891,7 +891,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
 
 function NewChatDeleteUser($update, $MadelineProto)
 {
-    if (bot_present($update, $MadelineProto)) {
+    if (bot_present($update, $MadelineProto, true)) {
     $user_id = $update['update']['message']['action']['user_id'];
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
