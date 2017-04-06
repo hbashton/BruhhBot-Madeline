@@ -20,24 +20,38 @@ To deploy BruhhBot, let's clone it to the computer we want to use it on
 ```
 git clone --recursive https://github.com/hbashton/BruhhBot-Madeline.git
 ```
-Run the included init script
 
-```
-./init.sh
-```
 Create a .env file using [the one provided](.env.example) as a template
 
 Grab your weather API key using [OpenWeather](https://openweathermap.org/api) and place in the .env file
 
+Obtain an API key from [@BotFather](http://telegram.me/botfather)
+
+
 Finally, deploy your bot
 
 ```
-php bot.php
+./init.sh
 ```
+## FAQ
 
+What do the values in [.env.example](.env.example) stand for?
+
+Well, here's a breakdown:
+
+| Item          | Type           | Description  |
+| ------------- |:--------------:| ------------:|
+`MTPROTO_NUMBER` | (int) | The phone number you used to sign the bot up to telegram
+`MTPROTO_SETTINGS` | (json) | Your API ID and HASH (I'm not using these right now, but I require them if I decide to do so in the future
+`MASTER_USERNAME` | (string) | Your username
+`SUDO` | (array) |An array of User ID's that are considered "sudo" users, and can control the bot just like you
+`WEATHER_KEY` | (string) | Obtained from [OpenWeather](https://openweathermap.org/api)
+`BOT_USERNAME` | (string) | The username of your bot created with a phone number
+`BOT_TOKEN` | (string) | Your API token received from [@BotFather](http://telegram.me/botfather)
+`BOT_API_USERNAME` | (string) | The username you assigned to your bot from [@BotFather](http://telegram.me/botfather)
 ## PLEASE READ THIS!
 
-Your session, where you're logged in, is saved in session.madeline (in the root of your bot directory).
+Your session, where you're logged in, is saved in session.madeline and bot.madeline (in the root of your bot directory).
 Sometimes, inevitably, the bot gets killed before fully writing to the file. In this case, you will need to remove it and rerun the bot.
 
 ## Support

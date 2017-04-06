@@ -65,6 +65,7 @@ if (isset($argv[1])) {
 } else {
     $dumpme = false;
 }
+
 $settings = [];
 
 if (!isset($uMadelineProto)) {
@@ -141,8 +142,8 @@ $MadelineProto->responses = json_decode(file_get_contents("responses.json"), tru
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
 $MadelineProto->API->is_bot_present = [];
-$MadelineProto->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
-$MadelineProto->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
+$MadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
+$MadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
 $MadelineProto->API->uMadelineProto = $uMadelineProto;
 
 //var_dump($MadelineProto->get_pwr_chat('@pwrtelegramgroup'));
@@ -151,6 +152,7 @@ $pool = new Pool(100);
 
 $offset = 0;
 while (true) {
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $updates = $MadelineProto->API->get_updates(
         ['offset' => $offset,
         'limit' => 50, 'timeout' => 0]
@@ -166,8 +168,6 @@ while (true) {
                 $pool->submit(new NewMessage($update, $MadelineProto));
             }
         break;
-
-
         case 'updateNewChannelMessage':
             $res = json_encode($update, JSON_PRETTY_PRINT);
             if ($dumpme) {
@@ -185,5 +185,5 @@ while (true) {
         }
     }
     \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;
-    \danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto->API->uMadelineProto).PHP_EOL;
+    \danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).PHP_EOL;
 }

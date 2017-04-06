@@ -57,7 +57,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
                         getenv('MASTER_USERNAME')
                     )
                     ['bot_api_id'];
-                    $bot_api_id = $MadelineProto->bot_api_id;
+                    $bot_api_id = $MadelineProto->API->bot_api_id;
                     $channel_id = -100 . $newgroup['updates'][1]['channel_id'];
                     $invite_master = $uMadelineProto->channels->inviteToChannel(
                         ['channel' => $channel_id,

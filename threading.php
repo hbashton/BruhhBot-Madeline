@@ -711,8 +711,12 @@ function NewChatAddUser($update, $MadelineProto)
                         );
                     }
                 }
-                $bot_id = $MadelineProto->bot_id;
-                if ($mention !== $bot_id && empty($default['message'])) {
+                $bot_id = $MadelineProto->API->bot_id;
+                $bot_api_id = $MadelineProto->API->bot_api_id;
+                if ($mention == $bot_id) {
+                    $MadelineProto->API->is_bot_present[$peer] = ["timestamp" => time(), "return" => true];
+                }
+                if ($mention !== $bot_api_id && empty($default['message'])) {
                         $mention2 = html_mention($username, $mention);
                         $message = "Hi $mention2, welcome to <b>$title</b>";
                         $default['message'] = $message;
@@ -837,7 +841,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
                         );
                     }
                 }
-                $bot_id = $MadelineProto->bot_id;
+                $bot_id = $MadelineProto->API->bot_id;
                 if ($mention !== $bot_id && empty($default['message'])) {
                         $mention2 = html_mention($username, $mention);
                         $message = "Hi $mention2, welcome to <b>$title</b>";
@@ -909,7 +913,7 @@ function NewChatDeleteUser($update, $MadelineProto)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             if (is_moderated($ch_id)) {
-                $bot_id = $MadelineProto->bot_id;
+                $bot_id = $MadelineProto->API->bot_id;
                 if ($mention !== $bot_id && empty($default['message'])) {
                     $userid = $update
                     ['update']['message']['action']['user_id'];
@@ -929,7 +933,7 @@ function NewChatDeleteUser($update, $MadelineProto)
                         $MadelineProto,
                         getenv('MASTER_USERNAME')
                     );
-                    if ($mention == $master['bot_api_id'] or $mention == $MadelineProto->bot_id) {
+                    if ($mention == $master['bot_api_id'] or $mention == $MadelineProto->API->bot_id) {
                         $leave = $MadelineProto->
                         channels->leaveChannel(
                             ['channel' => $ch_id]
