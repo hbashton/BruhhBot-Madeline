@@ -36,7 +36,7 @@ function addadmin($update, $MadelineProto, $msg = "")
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_master($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $uMadelineProto = $MadelineProto->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
                             $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
@@ -51,13 +51,12 @@ function addadmin($update, $MadelineProto, $msg = "")
                             }
                             if (isset($userid)) {
                                 $mention = html_mention($username, $userid);
-                                $channelRoleModerator = [
-                                    '_' => 'channelRoleModerator',
+                                $channelRoleEditor = [
+                                    '_' => 'channelRoleEditor',
                                 ];
-                                try {
                                     $editadmin = $uMadelineProto->channels->editAdmin(
                                         ['channel' => $peer, 'user_id' => $userid,
-                                        'role' => $channelRoleModerator ]
+                                        'role' => $channelRoleEditor ]
                                     );
                                     $str = $MadelineProto->responses['addadmin']['success'];
                                     $repl = array(
@@ -67,11 +66,6 @@ function addadmin($update, $MadelineProto, $msg = "")
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                     \danog\MadelineProto\Logger::log($editadmin);
-
-                                } catch (Exception $e) {
-                                    $message = $MadelineProto->responses['addadmin']['exception'];
-                                    $default['message'] = $message;
-                                }
                             }
                             if (isset($default['message'])) {
                                 $sentMessage = $MadelineProto->messages->sendMessage(
@@ -107,7 +101,7 @@ function rmadmin($update, $MadelineProto, $msg = "")
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_master($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $uMadelineProto = $MadelineProto->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
                             $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
@@ -381,7 +375,7 @@ function pinmessage($update, $MadelineProto, $silent)
                         )
                         ) {
                             if (bot_present($update, $MadelineProto)) {
-                                $uMadelineProto = $MadelineProto->uMadelineProto;
+                                $uMadelineProto = $MadelineProto->API->uMadelineProto;
                                 try {
                                     $pin_id = $update['update']['message']['reply_to_msg_id'];
                                     $pin = $uMadelineProto->
@@ -446,7 +440,7 @@ function delmessage($update, $MadelineProto)
                             $update['update']['message']
                         )
                         ) {
-                            $uMadelineProto = $MadelineProto->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
                             try {
                                 $del_id = $update['update']['message']['reply_to_msg_id'];
                                 $delete = $uMadelineProto->channels->deleteMessages(
@@ -494,7 +488,7 @@ function delmessage_user($update, $MadelineProto, $msg = "")
                 if (is_bot_admin($update, $MadelineProto, true)) {
                     if (from_admin_mod($update, $MadelineProto)) {
                         if ($msg) {
-                            $uMadelineProto = $MadelineProto->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
                             $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];

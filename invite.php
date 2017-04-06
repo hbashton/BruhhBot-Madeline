@@ -23,7 +23,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
     if (is_peeruser($update, $MadelineProto)) {
         $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
-            $uMadelineProto = $MadelineProto->uMadelineProto;
+            $uMadelineProto = $MadelineProto->API->uMadelineProto;
             $msg_id = $update['update']['message']['id'];
             $default = array(
             'peer' => $userid,
@@ -44,7 +44,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
                     }
                 }
                 if ($title && $about) {
-                    $channelRoleModerator = ['_' => 'channelRoleModerator', ];
+                    $channelRoleEditor = ['_' => 'channelRoleEditor', ];
                     $newgroup = $uMadelineProto->channels->createChannel(
                         ['broadcast' => true,
                         'megagroup' => true,
@@ -67,7 +67,12 @@ function create_new_supergroup($update, $MadelineProto, $msg)
                     $editadmin = $uMadelineProto->channels->editAdmin(
                         ['channel' => $channel_id,
                         'user_id' => $master,
-                        'role' => $channelRoleModerator]
+                        'role' => $channelRoleEditor]
+                    );
+                    $editadmin = $uMadelineProto->channels->editAdmin(
+                        ['channel' => $channel_id,
+                        'user_id' => $bot_api_id,
+                        'role' => $channelRoleEditor]
                     );
                 } else {
                     $message = $MadelineProto->responses['create_new_supergroup']['missing_info'];
@@ -112,7 +117,8 @@ function export_new_invite($update, $MadelineProto)
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         try {
-                            $exportInvite = $MadelineProto->channels->exportInvite(
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $exportInvite = $uMadelineProto->channels->exportInvite(
                                 ['channel' => $peer]
                             );
                             $link = $exportInvite['link'];
@@ -161,15 +167,16 @@ function public_toggle($update, $MadelineProto, $msg)
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) && in_array($msg, $arr)) {
                             try {
+                                $uMadelineProto = $MadelineProto->API->uMadelineProto;
                                 if ($msg == "on") {
-                                    $MadelineProto->channels->toggleInvites(
+                                    $uMadelineProto->channels->toggleInvites(
                                         ['channel' => $peer, 'enabled' => true ]
                                     );
                                     $message = $MadelineProto->responses['public_toggle']['on'];
                                     $default['message'] = $message;
                                 }
                                 if ($msg == "off") {
-                                    $MadelineProto->channels->toggleInvites(
+                                    $uMadelineProto->channels->toggleInvites(
                                         ['channel' => $peer, 'enabled' => false ]
                                     );
                                     $message = $MadelineProto->responses['public_toggle']['off'];
@@ -223,7 +230,8 @@ function invite_user($update, $MadelineProto, $msg)
                             $mention = html_mention($username, $userid);
                             if (isset($userid)) {
                                 try {
-                                    $inviteuser = $MadelineProto->channels->inviteToChannel(
+                                    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                                    $inviteuser = $uMadelineProto->channels->inviteToChannel(
                                         ['channel' => $peer, 'users' => [$userid] ]
                                     );
                                 } catch (Exception $e) {

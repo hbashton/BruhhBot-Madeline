@@ -111,26 +111,46 @@ if (!isset($uMadelineProto)) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
+    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize(
+        'bot.madeline',
+        $MadelineProto
+    ).' bytes'.PHP_EOL;
+
+    echo 'Deserializing MadelineProto from bot.madeline...'.PHP_EOL;
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
+        'bot.madeline'
+    );
 }
 if (!isset($MadelineProto)) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
+    echo 'Wrote '.\danog\MadelineProto\Serialization::serialize(
+        'bot.madeline',
+        $MadelineProto
+    ).' bytes'.PHP_EOL;
+
+    echo 'Deserializing MadelineProto from bot.madeline...'.PHP_EOL;
+    $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
+        'bot.madeline'
+    );
 }
 $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
-$MadelineProto->is_bot_present = [];
+$MadelineProto->API->is_bot_present = [];
 $MadelineProto->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
 $MadelineProto->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
-$MadelineProto->uMadelineProto = $uMadelineProto;
+$MadelineProto->API->uMadelineProto = $uMadelineProto;
+
 //var_dump($MadelineProto->get_pwr_chat('@pwrtelegramgroup'));
 Requests::register_autoloader();
 $pool = new Pool(100);
 
 $offset = 0;
 while (true) {
-    $MadelineProto->uMadelineProto = $uMadelineProto;
     $updates = $MadelineProto->API->get_updates(
         ['offset' => $offset,
         'limit' => 50, 'timeout' => 0]
@@ -165,5 +185,5 @@ while (true) {
         }
     }
     \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;
-    \danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).PHP_EOL;
+    \danog\MadelineProto\Serialization::serialize('session.madeline', $MadelineProto->API->uMadelineProto).PHP_EOL;
 }

@@ -1,5 +1,5 @@
 {
-"types":["gif", "sticker", "video", "photo", "audio", "arabic", "contacts", "geo", "files", "flood"],
+"types":["gif", "sticker", "video", "photo", "audio", "utf", "arabic", "contacts", "geo", "files", "flood"],
 "settings_template":
     {
     "gif":"Gifs",
@@ -11,7 +11,8 @@
     "geo":"Geo",
     "contacts":"Contacts",
     "files":"Files",
-    "flood":"Flood"
+    "flood":"Flood",
+    "utf":"UTF-8"
     },
 "lock":
     {
@@ -25,6 +26,7 @@
     "contacts":"<b>Contact messages</b> are now locked",
     "files":"<b>All File types</b> are now locked",
     "flood":"<b>Flooding</b> is now locked. By default the limit is 10",
+    "utf":"<b>UTF</b> is now locked. Only UTF-8 characters are allowed.",
     "already":
         {
         "gif":"<b>Gifs</b> are already locked",
@@ -36,7 +38,8 @@
         "geo":"<b>Geo messages</b> are already locked",
         "contacts":"<b>Contact messages</b> are already locked",
         "files":"<b>All File types</b> are already locked",
-        "flood":"<b>Flooding</b> is already locked"
+        "flood":"<b>Flooding</b> is already locked",
+        "utf":"<b>UTF</b> is already locked."
         }
     },
 "unlock":
@@ -51,6 +54,7 @@
     "contacts":"<b>Contact messages</b> are now unlocked",
     "files":"<b>All File types</b> are now unlocked",
     "flood":"<b>Flooding</b> is now unlocked",
+    "utf":"<b>UTF</b> is now unlocked.",
     "already":
         {
         "gif":"<b>Gifs</b> are already unlocked",
@@ -62,7 +66,8 @@
         "geo":"<b>Geo messages</b> are already unlocked",
         "contacts":"<b>Contact messages</b> are already unlocked",
         "files":"<b>All File types</b> are alreday unlocked",
-        "flood":"<b>Flooding</b> is already unlocked"
+        "flood":"<b>Flooding</b> is already unlocked",
+        "utf":"<b>UTF</b> is already unlocked."
         }
     }
 }

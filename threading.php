@@ -14,7 +14,7 @@ class NewMessage extends Threaded
         require_once 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
-        $uMadelineProto = $MadelineProto->uMadelineProto;
+        $uMadelineProto = $MadelineProto->API->uMadelineProto;
         if (array_key_exists('message', $update['update']['message'])) {
             if ($update['update']['message']['message'] !== '') {
                 $first_char = substr(
@@ -168,7 +168,7 @@ class NewChannelMessage extends Threaded
 
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
-        $uMadelineProto = $MadelineProto->uMadelineProto;
+        $uMadelineProto = $MadelineProto->API->uMadelineProto;
         $fromid = cache_from_user_info($update, $MadelineProto);
         if (!isset($fromid['bot_api_id'])) var_dump($fromid);
         $fromid = $fromid['bot_api_id'];
@@ -378,6 +378,7 @@ class NewChannelMessage extends Threaded
                             }
                             $reason = implode(" ", $msg_arr);
                             banall($update, $MadelineProto, $msg, $reason,$silent);
+                            var_dump(true);
                             break;
 
                         case 'mute':
@@ -550,6 +551,12 @@ class NewChannelMessage extends Threaded
                             set_chat_title($update, $MadelineProto, $msg);
                             break;
 
+                        case 'setabout':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            set_chat_about($update, $MadelineProto, $msg);
+                            break;
+
                         case 'newlink':
                             export_new_invite($update, $MadelineProto);
                             break;
@@ -631,7 +638,7 @@ class NewChannelMessageAction extends Threaded
 
 function NewChatAddUser($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
     $user_id = $update['update']['message']['action']['users'][0];
     if (bot_present($update, $MadelineProto)) {
@@ -758,7 +765,7 @@ function NewChatAddUser($update, $MadelineProto)
 
 function NewChatJoinedByLink($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $user_id = $update['update']['message']['from_id'];
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {

@@ -2,7 +2,7 @@
 
 function add_group($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -48,7 +48,7 @@ function add_group($update, $MadelineProto)
 
 function rm_group($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];

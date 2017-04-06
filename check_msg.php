@@ -20,7 +20,7 @@
 
 function check_locked($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             $chat = parse_chat_data($update, $MadelineProto);
@@ -99,6 +99,20 @@ function check_locked($update, $MadelineProto)
                                     }
                                 }
                             }
+                            if (!check_utf8($update['update']['message']['message'])) {
+                                check_json_array('locked.json', $ch_id);
+                                $file = file_get_contents("locked.json");
+                                $locked = json_decode($file, true);
+                                if (array_key_exists($ch_id, $locked)) {
+                                    if (in_array('utf', $locked[$ch_id])) {
+                                        $delete = $uMadelineProto->
+                                        channels->deleteMessages(
+                                            ['channel' => $peer,
+                                            'id' => [$msg_id]]
+                                        );
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -110,7 +124,7 @@ function check_locked($update, $MadelineProto)
 
 function check_flood($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             try {

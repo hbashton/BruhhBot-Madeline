@@ -19,7 +19,7 @@
  */
 function banme($update, $MadelineProto, $msg = "", $send = true)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -47,7 +47,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                 $banmod = $MadelineProto->responses['banme']['banmod'];
                                 if (!is_admin_mod(
                                     $update,
-                                    $uMadelineProto,
+                                    $MadelineProto,
                                     $userid,
                                     $banmod,
                                     $send
@@ -146,7 +146,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
 
 function unbanme($update, $MadelineProto, $msg = "")
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -250,12 +250,12 @@ function unbanme($update, $MadelineProto, $msg = "")
 
 function kickhim($update, $MadelineProto, $msg = "")
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
             $mods = $MadelineProto->responses['kickhim']['mods'];
-            $chat = parse_chat_data($update, $uMadelineProto);
+            $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
@@ -265,10 +265,10 @@ function kickhim($update, $MadelineProto, $msg = "")
                 'parse_mode' => 'html',
             );
             if (is_moderated($ch_id)) {
-                if (is_bot_admin($update, $uMadelineProto)) {
-                    if (from_admin_mod($update, $uMadelineProto, $mods, true)) {
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $id = catch_id($update, $uMadelineProto, $msg);
+                            $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
                             }
@@ -276,7 +276,7 @@ function kickhim($update, $MadelineProto, $msg = "")
                                 $kickmod = $MadelineProto->responses['kickhim']['kickmod'];
                                 if (!is_admin_mod(
                                     $update,
-                                    $uMadelineProto,
+                                    $MadelineProto,
                                     $userid,
                                     $kickmod,
                                     true
@@ -349,11 +349,11 @@ function kickhim($update, $MadelineProto, $msg = "")
 
 function kickme($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
-            $chat = parse_chat_data($update, $uMadelineProto);
+            $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
             $ch_id = $chat['id'];
             $title = htmlentities($chat['title']);
@@ -362,11 +362,11 @@ function kickme($update, $MadelineProto)
                 'reply_to_msg_id' => $msg_id,
                 'parse_mode' => 'html',
             );
-            $userid = cache_from_user_info($update, $uMadelineProto)['bot_api_id'];
+            $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_moderated($ch_id)) {
-                if (is_bot_admin($update, $uMadelineProto)) {
-                    if (!from_admin_mod($update, $uMadelineProto)) {
-                        $id = catch_id($update, $uMadelineProto, $userid);
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (!from_admin_mod($update, $MadelineProto)) {
+                        $id = catch_id($update, $MadelineProto, $userid);
                         $username = $id[2];
                         $mention = html_mention($username, $userid);
                         try {
@@ -411,11 +411,11 @@ function kickme($update, $MadelineProto)
 
 function getbanlist($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
-            $chat = parse_chat_data($update, $uMadelineProto);
+            $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
@@ -474,11 +474,11 @@ function getbanlist($update, $MadelineProto)
 
 function unbanall($update, $MadelineProto, $msg = "")
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
-            $chat = parse_chat_data($update, $uMadelineProto);
+            $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
@@ -488,10 +488,10 @@ function unbanall($update, $MadelineProto, $msg = "")
                 'parse_mode' => 'html',
             );
             if (is_moderated($ch_id)) {
-                if (is_bot_admin($update, $uMadelineProto)) {
-                    if (from_master($update, $uMadelineProto)) {
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (from_master($update, $MadelineProto)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $id = catch_id($update, $uMadelineProto, $msg);
+                            $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
                             }
@@ -565,11 +565,11 @@ function unbanall($update, $MadelineProto, $msg = "")
 
 function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, $confident = false)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
-            $chat = parse_chat_data($update, $uMadelineProto);
+            $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
@@ -578,12 +578,12 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                 'reply_to_msg_id' => $msg_id,
                 'parse_mode' => 'html'
                 );
-            $fromid = cache_from_user_info($update, $uMadelineProto)['bot_api_id'];
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_moderated($ch_id)) {
-                if (is_bot_admin($update, $uMadelineProto)) {
-                    if (from_master($update, $uMadelineProto)) {
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (from_master($update, $MadelineProto)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $id = catch_id($update, $uMadelineProto, $msg);
+                            $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
                             }
@@ -591,7 +591,7 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                 $banmod = $MadelineProto->responses['banall']['banmod'];
                                 if (!is_admin_mod(
                                     $update,
-                                    $uMadelineProto,
+                                    $MadelineProto,
                                     $userid,
                                     $banmod,
                                     $send
@@ -715,7 +715,7 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                 if ($msg != "" && isset($userid)) {
                     $timetowait = 1800 - $diff;
                     $msg_id = $update['update']['message']['id'];
-                    $chat = parse_chat_data($update, $uMadelineProto);
+                    $chat = parse_chat_data($update, $MadelineProto);
                     $peer = $chat['peer'];
                     $ch_id = $chat['id'];
                     $default = array(

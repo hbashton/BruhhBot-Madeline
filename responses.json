@@ -233,6 +233,13 @@
         "fail":"I could not change the title.",
         "help":"Use <code>/setname title</code> to change the chat name"
     },
+    "set_chat_about":
+    {
+        "mods":"Only mods can change this chat's about!",
+        "success":"About successfully changed to {msg}",
+        "fail":"I could not change the About.",
+        "help":"Use <code>/setabout \"about\" </code> to change the chat name (must be in double quotes!)"
+    },
     "set_chat_username":
     {
         "mods":"Only mods can change this chat's username!",

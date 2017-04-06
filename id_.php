@@ -19,7 +19,6 @@
  */
 function catch_id($update, $MadelineProto, $user)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
     $msg_id = $update['update']['message']['id'];
     if (array_key_exists('entities', $update['update']['message'])) {
         foreach ($update['update']['message']['entities'] as $key) {
@@ -77,7 +76,7 @@ function catch_id($update, $MadelineProto, $user)
             $msg_id = $update['update']['message']['reply_to_msg_id'];
             $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
-            $message = $uMadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$msg_id]]);
+            $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$msg_id]]);
             if (is_array($message)) {
                 if (array_key_exists('messages', $message)) {
                     $userid = $message['messages'][0]['from_id'];

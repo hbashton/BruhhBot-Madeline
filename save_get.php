@@ -130,6 +130,8 @@ function getme($update, $MadelineProto, $name)
             $ch_id = $chat['id'];
             $cont = true;
             $peerUSER = false;
+        } else {
+            $cont = false;
         }
     }
     if (!$update['update']['message']['out'] && $cont) {
@@ -186,7 +188,7 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
