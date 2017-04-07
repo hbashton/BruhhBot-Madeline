@@ -130,6 +130,12 @@ class NewMessage extends Threaded
                         );
                         break;
 
+                    case 'broadcast':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        broadcast_to_all($update, $MadelineProto, $msg);
+                        break;
+
                     case 'end':
                         if (from_master($update, $MadelineProto)) {
                             \danog\MadelineProto\Serialization::serialize(
