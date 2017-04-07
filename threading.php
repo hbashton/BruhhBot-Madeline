@@ -713,9 +713,7 @@ function NewChatAddUser($update, $MadelineProto)
                 }
                 $bot_id = $MadelineProto->API->bot_id;
                 $bot_api_id = $MadelineProto->API->bot_api_id;
-                if ($mention == $bot_id) {
-                    $MadelineProto->API->is_bot_present[$peer] = ["timestamp" => time(), "return" => true];
-                }
+                unset($MadelineProto->API->is_bot_present[$peer]);
                 if ($mention !== $bot_api_id && empty($default['message'])) {
                         $mention2 = html_mention($username, $mention);
                         $message = "Hi $mention2, welcome to <b>$title</b>";

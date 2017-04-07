@@ -236,6 +236,7 @@ function adminlist($update, $MadelineProto)
                 'parse_mode' => 'html'
                 );
             $admins = cache_get_chat_info($update, $MadelineProto);
+            var_dump($admins);
             foreach ($admins['participants'] as $key) {
                 if (array_key_exists('user', $key)) {
                     $id = $key['user']['id'];
@@ -248,6 +249,7 @@ function adminlist($update, $MadelineProto)
                 if (array_key_exists("role", $key)) {
                     if ($key['role'] == "moderator"
                         or $key['role'] == "creator"
+                        or $key['role'] == "editor"
                     ) {
                         $mod = true;
                     } else {
