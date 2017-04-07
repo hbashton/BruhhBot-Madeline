@@ -131,6 +131,12 @@ class NewMessage extends Threaded
                         );
                         break;
 
+                    case 'broadcast':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        broadcast_to_all($update, $MadelineProto, $msg);
+                        break;
+                            
                     case 'end':
                         if (from_master($update, $MadelineProto)) {
                             \danog\MadelineProto\Serialization::serialize(
@@ -170,7 +176,9 @@ class NewChannelMessage extends Threaded
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;
         $fromid = cache_from_user_info($update, $MadelineProto);
-        if (!isset($fromid['bot_api_id'])) var_dump($fromid);
+        if (!isset($fromid['bot_api_id'])) {
+            return;
+        }
         $fromid = $fromid['bot_api_id'];
         if (array_key_exists('message', $update['update']['message'])
             && is_string($update['update']['message']['message'])

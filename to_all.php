@@ -63,3 +63,28 @@ function unban_from_moderated($MadelineProto, $userid, $except = []) {
         }
     }
 }
+
+function broadcast_to_all($update, $MadelineProto, $msg, $except = []) {
+    if (from_master($update, $MadelineProto)) {
+        check_json_array('chatlist.json', false, false);
+        $file = file_get_contents("chatlist.json");
+        $chatlist = json_decode($file, true);
+        foreach ($chatlist as $peer) {
+            if (!in_array($peer, $except)) {
+                $default = array(
+                    'peer' => $peer,
+                    'message' => $msg,
+                    'parse_mode' => 'html',
+                );
+                try {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                } catch (Exception $e) {
+                    continue;
+                }
+            }
+        }
+    }
+}
