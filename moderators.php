@@ -73,6 +73,7 @@ function from_admin($update, $MadelineProto, $str = "", $send = false)
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator"
+                    or $key['role'] == 'editor'
                 ) {
                     $mod = true;
                     break;
@@ -120,6 +121,7 @@ function is_admin($update, $MadelineProto, $userid, $send = false)
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator"
+                    or $key['role'] == 'editor'
                 ) {
                     $mod = true;
                     break;
@@ -171,6 +173,7 @@ function is_bot_admin($update, $MadelineProto, $send = false)
                 if (array_key_exists("role", $key)) {
                     if ($key['role'] == "moderator"
                         or $key['role'] == "creator"
+                        or $key['role'] == 'editor'
                     ) {
                         $mod = true;
                         break;

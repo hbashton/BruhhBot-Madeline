@@ -249,6 +249,7 @@ function adminlist($update, $MadelineProto)
             if (array_key_exists("role", $key)) {
                 if ($key['role'] == "moderator"
                     or $key['role'] == "creator"
+                    or $key['role'] == 'editor'
                 ) {
                     $mod = true;
                 } else {

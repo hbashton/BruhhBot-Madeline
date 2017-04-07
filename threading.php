@@ -174,7 +174,7 @@ class NewChannelMessage extends Threaded
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $fromid = cache_from_user_info($update, $MadelineProto);
-if (!isset($fromid['bot_api_id'])) var_dump($fromid);
+if (!isset($fromid['bot_api_id'])) return;
         $fromid = $fromid['bot_api_id'];
         if (array_key_exists('message', $update['update']['message'])
             && is_string($update['update']['message']['message'])
