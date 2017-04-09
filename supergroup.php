@@ -526,7 +526,7 @@ function delmessage_user($update, $MadelineProto, $msg = "")
                                 }
                             }
                         } else {
-                            $message = $reponses['delmessage_user']['help'];
+                            $message = $responses['delmessage_user']['help'];
                             $default['message'] = $message;
                         }
                     }
@@ -587,7 +587,7 @@ function purgemessage($update, $MadelineProto)
                                 unset($default['message']);
                             } catch (Exception $e) {}
                         } else {
-                            $message = $reponses['purgemessage']['help'];
+                            $message = $responses['purgemessage']['help'];
                             $default['message'] = $message;
                         }
                     }
