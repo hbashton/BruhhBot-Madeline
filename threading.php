@@ -354,6 +354,10 @@ if (!isset($fromid['bot_api_id'])) return;
                             }
                             break;
 
+                        case 'purge':
+                            purgemessage($update, $MadelineProto);
+                            break;
+
                         case 'ban':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);

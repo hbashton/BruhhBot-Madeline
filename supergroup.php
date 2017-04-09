@@ -20,7 +20,7 @@
 function addadmin($update, $MadelineProto, $msg = "")
 {
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $msg_id = $update['update']['message']['id'];
         $mods = "Only my master can promote new admins";
         $chat = parse_chat_data($update, $MadelineProto);
@@ -35,7 +35,7 @@ function addadmin($update, $MadelineProto, $msg = "")
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master($update, $MadelineProto, $mods, true)) {
-                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) { 
+                    if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                         $id = catch_id($update, $MadelineProto, $msg);
                         if ($id[0]) {
                             $userid = $id[1];
@@ -89,7 +89,7 @@ function addadmin($update, $MadelineProto, $msg = "")
 function rmadmin($update, $MadelineProto, $msg = "")
 {
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $msg_id = $update['update']['message']['id'];
         $mods = "Only my master can humiliate someone like this";
         $chat = parse_chat_data($update, $MadelineProto);
@@ -154,7 +154,7 @@ function rmadmin($update, $MadelineProto, $msg = "")
 }
 function idme($update, $MadelineProto, $msg = "")
 {
-    
+
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         $str = $MadelineProto->responses['idme']['peeruser'];
@@ -225,7 +225,7 @@ function idme($update, $MadelineProto, $msg = "")
 function adminlist($update, $MadelineProto)
 {
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $msg_id = $update['update']['message']['id'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
@@ -286,7 +286,7 @@ function modlist($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $title = htmlentities($chat['title']);
@@ -342,7 +342,7 @@ function pinmessage($update, $MadelineProto, $silent)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $mods = $MadelineProto->responses['pinmessage']['mods'];
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
@@ -420,7 +420,7 @@ function delmessage($update, $MadelineProto)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
@@ -470,10 +470,10 @@ function delmessage($update, $MadelineProto)
 
 function delmessage_user($update, $MadelineProto, $msg = "")
 {
-    
+
     $msg_id = $update['update']['message']['id'];
     if (is_supergroup($update, $MadelineProto)) {
-        
+
         $chat = parse_chat_data($update, $MadelineProto);
         $peer = $chat['peer'];
         $ch_id = $chat['id'];
@@ -536,10 +536,63 @@ function delmessage_user($update, $MadelineProto, $msg = "")
     }
 }
 
+function purgemessage($update, $MadelineProto)
+{
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $default = array(
+            'peer' => $peer,
+            'reply_to_msg_id' => $msg_id
+        );
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto, true)) {
+                if (from_admin_mod($update, $MadelineProto)) {
+                    if (array_key_exists(
+                        "reply_to_msg_id",
+                        $update['update']['message']
+                    )
+                    ) {
+                        try {
+                            $del_id = $update['update']['message']['reply_to_msg_id'];
+                            $default['message'] = "Deleting all messages after $del_id..";
+                            $sentMessage = $MadelineProto->messages->sendMessage(
+                                $default
+                            );
+                            \danog\MadelineProto\Logger::log($sentMessage);
+                            foreach ($sentMessage['updates'] as $messageObject) {
+                                if (!array_key_exists('_', $messageObject)) return;
+                                if ($messageObject["_"] == "updateMessageID") {
+                                    $newMessageID = $messageObject['id'];
+                                    break;
+                                }
+                            }
+                            $delete = $MadelineProto->channels->deleteMessages(
+                                ['channel' => $peer,
+                                'id' => range($del_id, $newMessageID)]
+                            );
+                            \danog\MadelineProto\Logger::log($delete);
+                            unset($default['message']);
+                        } catch (Exception $e) {}
+                    }
+                }
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
+            }
+        }
+    }
+}
+
 function leave_setting($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
-        
+
         $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
             $msg_id = $update['update']['message']['id'];
