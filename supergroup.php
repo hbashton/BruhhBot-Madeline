@@ -457,7 +457,7 @@ function delmessage($update, $MadelineProto)
                                 \danog\MadelineProto\Logger::log($delete);
                             } catch (Exception $e) {}
                         } else {
-                            $message = $repsonses['delmessage']['help'];
+                            $message = $MadelineProto->responses['delmessage']['help'];
                             $default['message'] = $message;
                         }
                     }
@@ -526,7 +526,7 @@ function delmessage_user($update, $MadelineProto, $msg = "")
                                 }
                             }
                         } else {
-                            $message = $responses['delmessage_user']['help'];
+                            $message = $MadelineProto->responses['delmessage_user']['help'];
                             $default['message'] = $message;
                         }
                     }
@@ -552,7 +552,8 @@ function purgemessage($update, $MadelineProto)
             $ch_id = $chat['id'];
             $default = array(
                 'peer' => $peer,
-                'reply_to_msg_id' => $msg_id
+                'reply_to_msg_id' => $msg_id,
+                'parse_mode' => 'html'
             );
             $mods = $MadelineProto->responses['purgemessage']['mods'];
 
@@ -587,7 +588,7 @@ function purgemessage($update, $MadelineProto)
                                 unset($default['message']);
                             } catch (Exception $e) {}
                         } else {
-                            $message = $responses['purgemessage']['help'];
+                            $message = $MadelineProto->responses['purgemessage']['help'];
                             $default['message'] = $message;
                         }
                     }
