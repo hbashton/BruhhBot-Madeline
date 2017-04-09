@@ -34,9 +34,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                 'parse_mode' => 'html',
                 );
             if (is_moderated($ch_id)) {
-                var_dump(1);
                 if (is_bot_admin($update, $MadelineProto)) {
-                    var_dump(2);
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                             $id = catch_id($update, $MadelineProto, $msg);

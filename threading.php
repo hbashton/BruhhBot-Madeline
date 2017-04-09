@@ -136,7 +136,7 @@ class NewMessage extends Threaded
                         $msg = implode(" ", $msg_arr);
                         broadcast_to_all($update, $MadelineProto, $msg);
                         break;
-                            
+
                     case 'end':
                         if (from_master($update, $MadelineProto)) {
                             \danog\MadelineProto\Serialization::serialize(
@@ -171,7 +171,6 @@ class NewChannelMessage extends Threaded
     public function run()
     {
         require_once 'require_exceptions.php';
-
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;
@@ -902,7 +901,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
 function NewChatDeleteUser($update, $MadelineProto)
 {
     if (bot_present($update, $MadelineProto, true)) {
-    $user_id = $update['update']['message']['action']['user_id'];
+        $user_id = $update['update']['message']['action']['user_id'];
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
                 $update,
@@ -934,12 +933,7 @@ function NewChatDeleteUser($update, $MadelineProto)
                         $username = $id[2];
                         $mention = $id[1];
                     }
-                    $master = cache_get_info(
-                        $update,
-                        $MadelineProto,
-                        getenv('MASTER_USERNAME')
-                    );
-                    if ($mention == $master['bot_api_id'] or $mention == $MadelineProto->API->bot_id) {
+                    if ($mention == $MadelineProto->API->bot_id) {
                         $leave = $MadelineProto->
                         channels->leaveChannel(
                             ['channel' => $ch_id]

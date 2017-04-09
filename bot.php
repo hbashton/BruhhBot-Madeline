@@ -69,7 +69,7 @@ if (isset($argv[1])) {
 $settings = [];
 
 if (!isset($uMadelineProto)) {
-    $uMadelineProto = new \danog\MadelineProto\API($settings);
+    $uMadelineProto = new \danog\MadelineProto\API();
     $checkedPhone = $uMadelineProto->auth->checkPhone(
         [
             'phone_number'     => getenv('MTPROTO_NUMBER'),
@@ -109,7 +109,7 @@ if (!isset($uMadelineProto)) {
     $uMadelineProto = \danog\MadelineProto\Serialization::deserialize(
         'session.madeline'
     );
-    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $MadelineProto = new \danog\MadelineProto\API();
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
     echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
@@ -124,7 +124,7 @@ if (!isset($uMadelineProto)) {
     );
 }
 if (!isset($MadelineProto)) {
-    $MadelineProto = new \danog\MadelineProto\API($settings);
+    $MadelineProto = new \danog\MadelineProto\API();
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
     echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
@@ -155,7 +155,7 @@ while (true) {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $updates = $MadelineProto->API->get_updates(
         ['offset' => $offset,
-        'limit' => 50, 'timeout' => 0]
+        'limit' => 50000, 'timeout' => 0]
     );
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1;
