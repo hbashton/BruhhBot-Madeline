@@ -547,9 +547,10 @@ function purgemessage($update, $MadelineProto)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id
         );
+        $mods = $MadelineProto->responses['purgemessage']['mods'];
         if (is_moderated($ch_id)) {
             if (is_bot_admin($update, $MadelineProto, true)) {
-                if (from_admin_mod($update, $MadelineProto)) {
+                if (from_admin($update, $MadelineProto, $mods, true)) {
                     if (array_key_exists(
                         "reply_to_msg_id",
                         $update['update']['message']
@@ -576,6 +577,9 @@ function purgemessage($update, $MadelineProto)
                             \danog\MadelineProto\Logger::log($delete);
                             unset($default['message']);
                         } catch (Exception $e) {}
+                    } else {
+                        $message = $reponses['purgemessage']['help'];
+                        $default['message'] = $message;
                     }
                 }
                 if (isset($default['message'])) {

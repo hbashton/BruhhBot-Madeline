@@ -142,6 +142,11 @@
         "mod":"You can't erase the message history of a moderator",
         "help":"Use <code>/del @username</code> to delete the message history of a user"
     },
+    "purgemessage":
+    {
+        "mods":"Only Admins of this group are allowed to purge messages.",
+        "help":"Use <code>/purge</code> in reply to a message to delete it and all messages following it"
+    },
     "leave_setting":
     {
         "on":"If I am added to a group, and you are not present, I will leave automatically.",
