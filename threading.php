@@ -353,6 +353,10 @@ class NewChannelMessage extends Threaded
                             }
                             break;
 
+                        case 'purge':
+                            purgemessage($update, $MadelineProto);
+                            break;
+
                         case 'ban':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);

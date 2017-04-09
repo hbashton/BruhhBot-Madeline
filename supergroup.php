@@ -542,6 +542,62 @@ function delmessage_user($update, $MadelineProto, $msg = "")
     }
 }
 
+function purgemessage($update, $MadelineProto)
+{
+    if (bot_present($update, $MadelineProto)) {
+        if (is_supergroup($update, $MadelineProto)) {
+            $msg_id = $update['update']['message']['id'];
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $ch_id = $chat['id'];
+            $default = array(
+                'peer' => $peer,
+                'reply_to_msg_id' => $msg_id
+            );
+            if (is_moderated($ch_id)) {
+                if (is_bot_admin($update, $MadelineProto, true)) {
+                    if (from_admin_mod($update, $MadelineProto)) {
+                        if (array_key_exists(
+                            "reply_to_msg_id",
+                            $update['update']['message']
+                        )
+                        ) {
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            try {
+                                $del_id = $update['update']['message']['reply_to_msg_id'];
+                                $default['message'] = "Deleting all messages after $del_id..";
+                                $sentMessage = $MadelineProto->messages->sendMessage(
+                                    $default
+                                );
+                                \danog\MadelineProto\Logger::log($sentMessage);
+                                foreach ($sentMessage['updates'] as $messageObject) {
+                                    if (!array_key_exists('_', $messageObject)) return;
+                                    if ($messageObject["_"] == "updateMessageID") {
+                                        $newMessageID = $messageObject['id'];
+                                        break;
+                                    }
+                                }
+                                $delete = $uMadelineProto->channels->deleteMessages(
+                                    ['channel' => $peer,
+                                    'id' => range($del_id, $newMessageID)]
+                                );
+                                \danog\MadelineProto\Logger::log($delete);
+                                unset($default['message']);
+                            } catch (Exception $e) {}
+                        }
+                    }
+                    if (isset($default['message'])) {
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                    }
+                }
+            }
+        }
+    }
+}
+
 function leave_setting($update, $MadelineProto, $msg)
 {
     if (is_peeruser($update, $MadelineProto)) {
