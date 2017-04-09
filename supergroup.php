@@ -592,6 +592,12 @@ function purgemessage($update, $MadelineProto)
                         }
                     }
                 }
+                if (isset($default['message'])) {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
             }
         }
     }
