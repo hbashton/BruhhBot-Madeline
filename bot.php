@@ -57,10 +57,7 @@ if (isset($argv[1])) {
 } else {
     $dumpme = false;
 }
-
-$MTPROTO_SETTINGS={"app_info":{"api_id":6,"api_hash":"eb06d4abfb49dc3eeb1aeb98ae0f581e"},"connection_settings":{"all":{"test_mode":true}}}
-
-$settings = json_decode($MTPROTO_SETTINGS), true) ?: [];
+$settings = [];
 
 if (!isset($MadelineProto)) {
     $MadelineProto = new \danog\MadelineProto\API($settings);
