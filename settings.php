@@ -21,7 +21,6 @@ function get_settings($update, $MadelineProto)
                 $locked = json_decode($file, true);
                 $coniguration = file_get_contents("configuration.json");
                 $cfg = json_decode($coniguration, true);
-                $entity = [];
                 if (array_key_exists($ch_id, $locked)) {
                     foreach ($cfg['settings_template'] as $key => $value) {
                         if (in_array($key, $locked[$ch_id])) {

@@ -136,6 +136,13 @@ class NewMessage extends Threaded
                         $msg = implode(" ", $msg_arr);
                         broadcast_to_all($update, $MadelineProto, $msg);
                         break;
+                        
+                    case 'join':
+                        unset($msg_arr[0]);
+                        $msg = implode(" ", $msg_arr);
+                        if ($msg=="") $msg = false;
+                        import_chat_invite($update, $MadelineProto, $msg);
+                        break;
 
                     case 'end':
                         if (from_master($update, $MadelineProto)) {
