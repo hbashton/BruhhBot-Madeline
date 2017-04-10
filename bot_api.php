@@ -7,7 +7,7 @@ function bot_present($update, $MadelineProto, $silent = false)
         $peer = $chat['peer'];
         if (array_key_exists($peer, $MadelineProto->API->is_bot_present)) {
             $diff = time() - $MadelineProto->API->is_bot_present[$peer]["timestamp"];
-            if ($diff < 600) {
+            if ($diff < 300) {
                 if (!$MadelineProto->API->is_bot_present[$peer]["return"]) {
                     try {
                         if (!$silent) {
