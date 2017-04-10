@@ -174,10 +174,12 @@ function getme($update, $MadelineProto, $name)
                 );
             }
             if (isset($replyid)) {
-                $sentMessage =$MadelineProto->messages->forwardMessages(
-                    ['from_peer' => $replychat, 'id' => [$replyid], 'to_peer' =>
-                    $peer, ]
-                );
+                try {
+                    $sentMessage =$MadelineProto->messages->forwardMessages(
+                        ['from_peer' => $replychat, 'id' => [$replyid], 'to_peer' =>
+                        $peer, ]
+                    );
+                } catch (Exception $e) {}
             }
         }
         if (isset($sentMessage)) {
@@ -228,11 +230,13 @@ function savefrom($update, $MadelineProto, $name)
                     $bot_api_id = $MadelineProto->API->bot_api_id;
                     $bot_id = $MadelineProto->API->bot_id;
                     try {
-                        $forwardMessage = $uMadelineProto->messages->forwardMessages(
-                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $bot_api_id ]
+                        $forwardMessage = $MadelineProto->messages->forwardMessages(
+                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $bot_id ]
                         );
                     } catch (Exception $e) {
-                        return;
+                         $forwardMessage = $uMadelineProto->messages->forwardMessages(
+                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $bot_api_id ]
+                        );
                     }
                     foreach ($forwardMessage['updates'] as $i) {
                         if ($i['_'] == "updateMessageID") {

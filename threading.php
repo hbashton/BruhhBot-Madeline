@@ -28,6 +28,7 @@ class NewMessage extends Threaded
                     );
                     $msg_id = $update['update']['message']['id'];
                     $fromid = $update['update']['message']['from_id'];
+                    if ($fromid == $MadelineProto->API->bot_id or $fromid == $MadelineProto->API->bot_api_id) return;
                     $default = array(
                         'peer' => $fromid,
                         'reply_to_msg_id' => $msg_id,
@@ -60,7 +61,15 @@ class NewMessage extends Threaded
                         }
                     }
                     $msg_id = $update['update']['message']['id'];
+                    $botuser = strtolower(getenv("BOT_API_USERNAME"));
+                    $msg = substr(
+                        $update['update']['message']['message'], 1
+                    );
                     $msg_arr = explode(' ', trim($msg));
+                    $msg = strtolower(substr(
+                        $update['update']['message']['message'], 1
+                    ));
+                    $msg = preg_replace("/$botuser/", "", $msg);
                     switch (strtolower($msg_arr[0])) {
                     case 'start':
                         start_message($update, $MadelineProto);
@@ -310,11 +319,16 @@ class NewChannelMessage extends Threaded
                             getme($update, $MadelineProto, $msg_arr[0]);
                     }
                     if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
+                        $botuser = strtolower(getenv("BOT_API_USERNAME"));
                         $msg = substr(
                             $update['update']['message']['message'], 1
                         );
-                        $msg_id = $update['update']['message']['id'];
                         $msg_arr = explode(' ', trim($msg));
+                        $msg = strtolower(substr(
+                            $update['update']['message']['message'], 1
+                        ));
+                        $msg = preg_replace("/$botuser/", "", $msg);
+                        $msg_id = $update['update']['message']['id'];
                         switch (strtolower($msg_arr[0])) {
                         case 'time':
                             unset($msg_arr[0]);
