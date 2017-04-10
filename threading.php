@@ -70,7 +70,7 @@ class NewMessage extends Threaded
                         $update['update']['message']['message'], 1
                     ));
                     $msg = preg_replace("/$botuser/", "", $msg);
-                    switch (strtolower($msg_arr[0])) {
+                    switch (strtolower($msg)) {
                     case 'start':
                         start_message($update, $MadelineProto);
                         break;
@@ -329,7 +329,7 @@ class NewChannelMessage extends Threaded
                         ));
                         $msg = preg_replace("/$botuser/", "", $msg);
                         $msg_id = $update['update']['message']['id'];
-                        switch (strtolower($msg_arr[0])) {
+                        switch (strtolower($msg)) {
                         case 'time':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
@@ -673,6 +673,7 @@ function NewChatAddUser($update, $MadelineProto)
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
     $user_id = $update['update']['message']['action']['users'][0];
+    unset($MadelineProto->API->is_bot_present[$peer]);
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
@@ -745,7 +746,6 @@ function NewChatAddUser($update, $MadelineProto)
                 }
                 $bot_id = $MadelineProto->API->bot_id;
                 $bot_api_id = $MadelineProto->API->bot_api_id;
-                unset($MadelineProto->API->is_bot_present[$peer]);
                 if ($mention !== $bot_api_id && empty($default['message'])) {
                         $mention2 = html_mention($username, $mention);
                         $message = "Hi $mention2, welcome to <b>$title</b>";
@@ -801,6 +801,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     $user_id = $update['update']['message']['from_id'];
+    unset($MadelineProto->API->is_bot_present[$peer]);
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
@@ -925,6 +926,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
 
 function NewChatDeleteUser($update, $MadelineProto)
 {
+    unset($MadelineProto->API->is_bot_present[$peer]);
     if (bot_present($update, $MadelineProto, true)) {
         $user_id = $update['update']['message']['action']['user_id'];
         if (is_supergroup($update, $MadelineProto)) {
