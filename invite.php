@@ -255,3 +255,37 @@ function invite_user($update, $MadelineProto, $msg)
         }
     }
 }
+
+function import_chat_invite($update, $MadelineProto, $msg)
+{
+    if (is_peeruser($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+        $default = array(
+            'peer' => $userid,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
+            );
+        if ($msg && preg_match_all('/https:\/\/t.me\/joinchat\//', $msg, $matches)) {
+            try {
+                $msg = preg_replace('/https:\/\/t.me\/joinchat\//', "", $msg);
+                $importchat = $MadelineProto->messages->importChatInvite(['hash' => $msg]);
+            } catch (Exception $e) {
+                $message = $MadelineProto->responses['import_chat_invite']['exception'];
+                $default['message'] = $message;
+            }
+        } else {
+            $str = $MadelineProto->responses['import_chat_invite']['help'];
+            $repl = array(
+                "botname" => getenv('BOT_USERNAME')
+            );
+            $message = $MadelineProto->engine->render($str, $repl);
+            $default['message'] = $message;
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        }
+    }
+}

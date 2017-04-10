@@ -96,6 +96,11 @@
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/invite @username</code> to invite someone to this chat!"
     },
+    "import_chat_invite":
+    {
+        "exception":"I can't seem to join with that link. Are you sure you formatted it correctly?",
+        "help":"Use <code>/join [https://t.me/joinchat/(hash)]</code> to add my partner {botname} to this chat!"
+    },
     "addadmin":
     {
         "idk":"I don't know a {msg}, who's that?",
