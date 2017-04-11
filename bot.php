@@ -26,6 +26,8 @@ require_once 'arabic.php';
 require_once 'banhammer.php';
 require_once 'bot_api.php';
 require_once 'cache.php';
+require_once 'callback.php';
+require_once 'callback_handlers.php';
 require_once 'check_msg.php';
 require_once 'data_parse.php';
 require_once 'id_.php';
@@ -181,6 +183,16 @@ while (true) {
                 if (array_key_exists('action', $update['update']['message'])) {
                     $pool->submit(new NewChannelMessageAction($update, $MadelineProto));
                 }
+            }
+        break;
+        case 'updateBotCallbackQuery':
+            $res = json_encode($update, JSON_PRETTY_PRINT);
+            if ($dumpme) {
+                var_dump($update);
+            }
+            if (is_supergroup($update, $MadelineProto) or is_peeruser($update, $MadelineProto)) {
+                $BotCallbackQuery = new BotCallbackQuery($update, $MadelineProto);
+                $pool->submit($BotCallbackQuery);
             }
         }
     }

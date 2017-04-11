@@ -101,6 +101,10 @@
         "exception":"I can't seem to join with that link. Are you sure you formatted it correctly?",
         "help":"Use <code>/join [https://t.me/joinchat/(hash)]</code> to add my partner {botname} to this chat!"
     },
+    "welcome_toggle":
+    {
+        "mods":"Only guys in charge can tell me what to do!"
+    },
     "addadmin":
     {
         "idk":"I don't know a {msg}, who's that?",

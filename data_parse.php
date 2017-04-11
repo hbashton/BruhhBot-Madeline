@@ -43,20 +43,40 @@ function is_moderated($ch_id)
 
 function is_supergroup($update, $MadelineProto)
 {
-    if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
-        return true;
-    } else {
-        return false;
+    if ($update['update']['_'] == "updateNewChannelMessage" or $update['update']['_'] == "updateNewMessage") {
+        if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
+            return true;
+        } else {
+            return false;
+        }
     }
+    if ($update['update']['_'] == "updateBotCallbackQuery") {
+        if ($update['update']['peer']['_'] == 'peerChannel') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return false;
 }
 
 function is_peeruser($update, $MadelineProto)
 {
-    if ($update['update']['message']['to_id']['_'] == "peerUser") {
-        return true;
-    } else {
-        return false;
+    if ($update['update']['_'] == "updateNewChannelMessage" or $update['update']['_'] == "updateNewMessage") {
+        if ($update['update']['message']['to_id']['_'] == 'peerUser') {
+            return true;
+        } else {
+            return false;
+        }
     }
+    if ($update['update']['_'] == "updateBotCallbackQuery") {
+        if ($update['update']['peer']['_'] == 'peerUser') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return false;
 }
 
 function parse_chat_data($update, $MadelineProto)
@@ -79,6 +99,30 @@ if (!isset($info['id'])) var_dump($info);
     }
 }
 
+function parse_query($update, $MadelineProto)
+{
+    if ($update['update']['_'] == "updateBotCallbackQuery") {
+        if ($update['update']['peer']['_'] == 'peerUser') {
+            $peer = $update['update']['peer']['user_id'];
+        }
+        if ($update['update']['peer']['_'] == 'peerChannel') {
+            $peer = -100 . $update['update']['peer']['channel_id'];
+        }
+        $callback_data = json_decode($update['update']['data'], true);
+        $parsed_query = array(
+            "peer" => $peer,
+            "data" => $callback_data,
+            "msg_id" => $update['update']['msg_id'],
+            "user_id" => $update['update']['user_id'],
+            "query_id" => $update['update']['query_id'],
+            "instance" => $update['update']['chat_instance']
+        );
+        return $parsed_query;
+    } else {
+        return false;
+    }
+}
+           
 function user_specific_data($update, $MadelineProto, $user)
 {
     /**

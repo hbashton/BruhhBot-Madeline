@@ -404,7 +404,6 @@ class NewChannelMessage extends Threaded
                             }
                             $reason = implode(" ", $msg_arr);
                             banall($update, $MadelineProto, $msg, $reason,$silent);
-                            var_dump(true);
                             break;
 
                         case 'mute':
@@ -559,6 +558,13 @@ class NewChannelMessage extends Threaded
                             invite_user($update, $MadelineProto, $msg);
                             break;
 
+                        case 'welcome':
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            //if ($msg!="") welcome_callback($update, $MadelineProto, $msg);
+                            welcome_toggle($update, $MadelineProto);
+                            break;
+                            
                         case 'addadmin':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
@@ -669,7 +675,7 @@ function NewChatAddUser($update, $MadelineProto)
     $user_id = $update['update']['message']['action']['users'][0];
     $chat = parse_chat_data($update, $MadelineProto);
     $peer = $chat['peer'];
-    if (array_key_exists($peer, $MadelineProto->API->is_bot_present)) unset($MadelineProto->API->is_bot_present[$peer]);
+    if (isset($MadelineProto->API->is_bot_present[$peer])) unset($MadelineProto->API->is_bot_present[$peer]);
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
@@ -743,14 +749,21 @@ function NewChatAddUser($update, $MadelineProto)
                 $bot_id = $MadelineProto->API->bot_id;
                 $bot_api_id = $MadelineProto->API->bot_api_id;
                 if ($mention !== $bot_api_id && empty($default['message'])) {
-                        $mention2 = html_mention($username, $mention);
-                        $message = "Hi $mention2, welcome to <b>$title</b>";
-                        $default['message'] = $message;
-                        $sentMessage = $MadelineProto->
-                        messages->sendMessage($default);
-                        \danog\MadelineProto\Logger::log(
-                            $sentMessage
-                        );
+                    check_json_array('settings.json', $ch_id);
+                    $file = file_get_contents("settings.json");
+                    $settings = json_decode($file, true);
+                    if (array_key_exists('welcome', $settings[$ch_id])) {
+                        if ($settings[$ch_id]["welcome"]) {
+                            $mention2 = html_mention($username, $mention);
+                            $message = "Hi $mention2, welcome to <b>$title</b>";
+                            $default['message'] = $message;
+                            $sentMessage = $MadelineProto->
+                            messages->sendMessage($default);
+                            \danog\MadelineProto\Logger::log(
+                                $sentMessage
+                            );
+                        }
+                    }
                 } else {
                         $adminid = cache_get_info(
                             $update,
@@ -799,7 +812,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
     $user_id = $update['update']['message']['from_id'];
     $chat = parse_chat_data($update, $MadelineProto);
     $peer = $chat['peer'];
-    if (array_key_exists($peer, $MadelineProto->API->is_bot_present)) unset($MadelineProto->API->is_bot_present[$peer]);
+    if (isset($MadelineProto->API->is_bot_present[$peer])) unset($MadelineProto->API->is_bot_present[$peer]);
     if (bot_present($update, $MadelineProto, true)) {
         if (is_supergroup($update, $MadelineProto)) {
             $id = catch_id(
@@ -872,14 +885,21 @@ function NewChatJoinedByLink($update, $MadelineProto)
                 }
                 $bot_id = $MadelineProto->API->bot_id;
                 if ($mention !== $bot_id && empty($default['message'])) {
-                        $mention2 = html_mention($username, $mention);
-                        $message = "Hi $mention2, welcome to <b>$title</b>";
-                        $default['message'] = $message;
-                        $sentMessage = $MadelineProto->
-                        messages->sendMessage($default);
-                        \danog\MadelineProto\Logger::log(
-                            $sentMessage
-                        );
+                    check_json_array('settings.json', $ch_id);
+                    $file = file_get_contents("settings.json");
+                    $settings = json_decode($file, true);
+                    if (array_key_exists('welcome', $settings[$ch_id])) {
+                        if ($settings[$ch_id]["welcome"]) {
+                            $mention2 = html_mention($username, $mention);
+                            $message = "Hi $mention2, welcome to <b>$title</b>";
+                            $default['message'] = $message;
+                            $sentMessage = $MadelineProto->
+                            messages->sendMessage($default);
+                            \danog\MadelineProto\Logger::log(
+                                $sentMessage
+                            );
+                        }
+                    }
                 } else {
                         $adminid = cache_get_info(
                             $update,
@@ -926,7 +946,7 @@ function NewChatDeleteUser($update, $MadelineProto)
 {
     $chat = parse_chat_data($update, $MadelineProto);
     $peer = $chat['peer'];
-    if (array_key_exists($peer, $MadelineProto->API->is_bot_present)) unset($MadelineProto->API->is_bot_present[$peer]);
+    if (isset($MadelineProto->API->is_bot_present[$peer])) unset($MadelineProto->API->is_bot_present[$peer]);
     if (bot_present($update, $MadelineProto, true)) {
         $user_id = $update['update']['message']['action']['user_id'];
         if (is_supergroup($update, $MadelineProto)) {

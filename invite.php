@@ -193,7 +193,7 @@ function public_toggle($update, $MadelineProto, $msg)
                     }
                 }
             }
-            if (isset($default)) {
+            if (isset($default['message'])) {
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
                 );
@@ -309,6 +309,55 @@ function import_chat_invite($update, $MadelineProto, $msg)
         }
         if (isset($sentMessage)) {
             \danog\MadelineProto\Logger::log($sentMessage);
+        }
+    }
+}
+
+function welcome_toggle($update, $MadelineProto)
+{
+    if (bot_present($update, $MadelineProto)) {
+        if (is_supergroup($update, $MadelineProto)) {
+            $msg_id = $update['update']['message']['id'];
+            $mods = $MadelineProto->responses['welcome_toggle']['mods'];
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $ch_id = $chat['id'];
+            $userid = cache_from_user_info($update, $MadelineProto);
+            if (isset($userid['bot_api_id'])) {
+                $userid = $userid['bot_api_id'];
+            } else {
+                return;
+            }
+            $default = array(
+                'peer' => $peer,
+                'reply_to_msg_id' => $msg_id,
+                'parse_mode' => 'html'
+                );
+            if (is_moderated($ch_id)) {
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                        $default['message'] = "Would you like to welcome users when they join this group?";
+                        $welcomeon = ['_' => 'keyboardButtonCallback', 'text' => "Welcome new users", 'data' => json_encode(array(
+                        "query" => "welcome",
+                        "value" => "on",
+                        "user"  =>  $userid))];
+                        $welcomeoff = ['_' => 'keyboardButtonCallback', 'text' => "Don't welcome new users", 'data' => json_encode(array(
+                        "query" => "welcome",
+                        "value" => "off",
+                        "user"  =>  $userid))];
+                        $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeon], ];
+                        $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeoff], ];
+                        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2], ];
+                        $default['reply_markup'] = $replyInlineMarkup;
+                    }
+                }
+            }
+            if (isset($default['message'])) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
         }
     }
 }
