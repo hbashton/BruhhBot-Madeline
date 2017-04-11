@@ -171,7 +171,6 @@ while (true) {
             }
         break;
         case 'updateNewChannelMessage':
-            $res = json_encode($update, JSON_PRETTY_PRINT);
             if ($dumpme) {
                 var_dump($update);
             }
@@ -186,7 +185,6 @@ while (true) {
             }
         break;
         case 'updateBotCallbackQuery':
-            $res = json_encode($update, JSON_PRETTY_PRINT);
             if ($dumpme) {
                 var_dump($update);
             }
