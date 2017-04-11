@@ -16,7 +16,7 @@ class BotCallbackQuery extends Threaded
         $MadelineProto = $this->MadelineProto;
         if (array_key_exists("data", $update['update'])) {
             $parsed_query = parse_query($update, $MadelineProto);
-            switch ($parsed_query['data']['query']) {
+            switch ($parsed_query['data']['q']) {
                 case 'welcome':
                     welcome_callback($update, $MadelineProto);
                 break;

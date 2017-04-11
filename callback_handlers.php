@@ -8,8 +8,8 @@ function welcome_callback($update, $MadelineProto)
         'id' => $parsed_query['msg_id'],
         'parse_mode' => 'html'
     );
-    if ($parsed_query['data']['user'] != $parsed_query['user_id']) return;
-    if ($parsed_query['data']['value'] == "on") {
+    if ($parsed_query['data']['u'] != $parsed_query['user_id']) return;
+    if ($parsed_query['data']['v'] == "on") {
         check_json_array('settings.json', $default['peer']);
         $file = file_get_contents("settings.json");
         $settings = json_decode($file, true);

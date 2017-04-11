@@ -338,13 +338,13 @@ function welcome_toggle($update, $MadelineProto)
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         $default['message'] = "Would you like to welcome users when they join this group?";
                         $welcomeon = ['_' => 'keyboardButtonCallback', 'text' => "Welcome new users", 'data' => json_encode(array(
-                        "query" => "welcome",
-                        "value" => "on",
-                        "user"  =>  $userid))];
+                        "q" => "welcome",
+                        "v" => "on",
+                        "u" =>  $userid))];
                         $welcomeoff = ['_' => 'keyboardButtonCallback', 'text' => "Don't welcome new users", 'data' => json_encode(array(
-                        "query" => "welcome",
-                        "value" => "off",
-                        "user"  =>  $userid))];
+                        "q" => "welcome",
+                        "v" => "off",
+                        "u" =>  $userid))];
                         $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeon], ];
                         $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeoff], ];
                         $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2], ];
