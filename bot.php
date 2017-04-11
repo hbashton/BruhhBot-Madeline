@@ -155,10 +155,30 @@ $pool = new Pool(100);
 $offset = 0;
 while (true) {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
-    $updates = $MadelineProto->API->get_updates(
-        ['offset' => $offset,
-        'limit' => 50000, 'timeout' => 0]
-    );
+    try {
+        $updates = $MadelineProto->API->get_updates(
+            ['offset' => $offset,
+            'limit' => 50000, 'timeout' => 0]
+        );
+    } catch (Exception $e) {
+        $MadelineProto = new \danog\MadelineProto\API();
+        $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
+        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+        echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
+        echo 'Wrote '.\danog\MadelineProto\Serialization::serialize(
+            'bot.madeline',
+            $MadelineProto
+        ).' bytes'.PHP_EOL;
+
+        echo 'Deserializing MadelineProto from bot.madeline...'.PHP_EOL;
+        $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
+            'bot.madeline'
+        );
+        $updates = $MadelineProto->API->get_updates(
+            ['offset' => $offset,
+            'limit' => 50000, 'timeout' => 0]
+        );
+    }
     foreach ($updates as $update) {
         $offset = $update['update_id'] + 1;
         switch ($update['update']['_']) {

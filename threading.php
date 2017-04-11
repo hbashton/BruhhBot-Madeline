@@ -752,16 +752,18 @@ function NewChatAddUser($update, $MadelineProto)
                     check_json_array('settings.json', $ch_id);
                     $file = file_get_contents("settings.json");
                     $settings = json_decode($file, true);
-                    if (array_key_exists('welcome', $settings[$ch_id])) {
-                        if ($settings[$ch_id]["welcome"]) {
-                            $mention2 = html_mention($username, $mention);
-                            $message = "Hi $mention2, welcome to <b>$title</b>";
-                            $default['message'] = $message;
-                            $sentMessage = $MadelineProto->
-                            messages->sendMessage($default);
-                            \danog\MadelineProto\Logger::log(
-                                $sentMessage
-                            );
+                    if (array_key_exists($ch_id, $settings)) {
+                        if (array_key_exists('welcome', $settings[$ch_id])) {
+                            if ($settings[$ch_id]["welcome"]) {
+                                $mention2 = html_mention($username, $mention);
+                                $message = "Hi $mention2, welcome to <b>$title</b>";
+                                $default['message'] = $message;
+                                $sentMessage = $MadelineProto->
+                                messages->sendMessage($default);
+                                \danog\MadelineProto\Logger::log(
+                                    $sentMessage
+                                );
+                            }
                         }
                     }
                 } else {
@@ -888,16 +890,18 @@ function NewChatJoinedByLink($update, $MadelineProto)
                     check_json_array('settings.json', $ch_id);
                     $file = file_get_contents("settings.json");
                     $settings = json_decode($file, true);
-                    if (array_key_exists('welcome', $settings[$ch_id])) {
-                        if ($settings[$ch_id]["welcome"]) {
-                            $mention2 = html_mention($username, $mention);
-                            $message = "Hi $mention2, welcome to <b>$title</b>";
-                            $default['message'] = $message;
-                            $sentMessage = $MadelineProto->
-                            messages->sendMessage($default);
-                            \danog\MadelineProto\Logger::log(
-                                $sentMessage
-                            );
+                    if (array_key_exists($ch_id, $settings)) {
+                        if (array_key_exists('welcome', $settings[$ch_id])) {
+                            if ($settings[$ch_id]["welcome"]) {
+                                $mention2 = html_mention($username, $mention);
+                                $message = "Hi $mention2, welcome to <b>$title</b>";
+                                $default['message'] = $message;
+                                $sentMessage = $MadelineProto->
+                                messages->sendMessage($default);
+                                \danog\MadelineProto\Logger::log(
+                                    $sentMessage
+                                );
+                            }
                         }
                     }
                 } else {
