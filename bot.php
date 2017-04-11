@@ -197,8 +197,7 @@ while (true) {
             if (is_supergroup($update, $MadelineProto)) {
                 check_locked($update, $MadelineProto);
                 check_flood($update, $MadelineProto);
-                $NewChannelMessage = new NewChannelMessage($update, $MadelineProto);
-                $pool->submit($NewChannelMessage);
+                $pool->submit(new NewChannelMessage($update, $MadelineProto));
                 if (array_key_exists('action', $update['update']['message'])) {
                     $pool->submit(new NewChannelMessageAction($update, $MadelineProto));
                 }
@@ -209,8 +208,7 @@ while (true) {
                 var_dump($update);
             }
             if (is_supergroup($update, $MadelineProto) or is_peeruser($update, $MadelineProto)) {
-                $BotCallbackQuery = new BotCallbackQuery($update, $MadelineProto);
-                $pool->submit($BotCallbackQuery);
+                $pool->submit(new BotCallbackQuery($update, $MadelineProto));
             }
         }
     }
