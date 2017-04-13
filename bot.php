@@ -47,6 +47,8 @@ require_once 'to_all.php';
 require_once 'user_data.php';
 require_once 'weather.php';
 require_once 'who_functions.php';
+
+ini_set('memory_limit', '1000M'); // fix errors
 if (file_exists('session.madeline')) {
     try {
         $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');

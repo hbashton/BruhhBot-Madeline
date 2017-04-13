@@ -433,7 +433,7 @@ class NewChannelMessage extends Threaded
                             break;
 
                         case 'settings':
-                            get_settings($update, $MadelineProto);
+                            settings_menu($update, $MadelineProto);
                             break;
 
                         case 'setflood':
@@ -558,13 +558,6 @@ class NewChannelMessage extends Threaded
                             invite_user($update, $MadelineProto, $msg);
                             break;
 
-                        case 'welcome':
-                            unset($msg_arr[0]);
-                            $msg = implode(" ", $msg_arr);
-                            //if ($msg!="") welcome_callback($update, $MadelineProto, $msg);
-                            welcome_toggle($update, $MadelineProto);
-                            break;
-                            
                         case 'addadmin':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);

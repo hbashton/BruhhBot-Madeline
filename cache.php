@@ -1,17 +1,25 @@
 <?php
 
-function cache_get_info($update, $MadelineProto, $data)
+function cache_get_info($update, $MadelineProto, $data, $chat = false)
 {
     try {
         if (isset($MadelineProto->API->cached_data[$data])) {
             if ((time() - $MadelineProto->API->cached_data[$data]['date']) < 120) {
                 $data_ = $MadelineProto->API->cached_data[$data]['data'];
             } else {
-                $data_ =$MadelineProto->get_info($data);
+                if (!$chat) {
+                    $data_ =$MadelineProto->get_info($data);
+                } else {
+                    $data_ = $MadelineProto->get_pwr_chat($data);
+                }
                 $MadelineProto->API->cached_data[$data] = ['date' => time(), 'data' => $data_];
             }
         } else {
-            $data_ =$MadelineProto->get_info($data);
+            if (!$chat) {
+                $data_ =$MadelineProto->get_info($data);
+            } else {
+                $data_ = $MadelineProto->get_pwr_chat($data);
+            }
             $MadelineProto->API->cached_data[$data] = ['date' => time(), 'data' => $data_];
         }
         return($data_);

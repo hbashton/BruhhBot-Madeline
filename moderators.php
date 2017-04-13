@@ -110,54 +110,62 @@ function from_admin($update, $MadelineProto, $str = "", $send = false)
     }
 }
 
-function is_admin($update, $MadelineProto, $userid, $send = false)
+function is_admin($update, $MadelineProto, $userid, $send = false, $ch_id = false)
 {
-    if (bot_present($update, $MadelineProto, true)) {
-        $admins = cache_get_chat_info($update, $MadelineProto);
-        foreach ($admins['participants'] as $key) {
-            if (array_key_exists('user', $key)) {
-                $id = $key['user']['id'];
+    try {
+        if (bot_present($update, $MadelineProto, true, $ch_id)) {
+            if (!$ch_id) {
+                $admins = cache_get_chat_info($update, $MadelineProto);
             } else {
-                if (array_key_exists('bot', $key)) {
-                    $id = $key['bot']['id'];
-                }
+                $admins = cache_get_info($update, $MadelineProto, $ch_id, true);
             }
-            if ($id == $userid) {
-                if (array_key_exists("role", $key)) {
-                    if ($key['role'] == "moderator"
-                        or $key['role'] == "creator"
-                        or $key['role'] == "editor"
-                    ) {
-                        $mod = true;
-                        break;
+            foreach ($admins['participants'] as $key) {
+                if (array_key_exists('user', $key)) {
+                    $id = $key['user']['id'];
+                } else {
+                    if (array_key_exists('bot', $key)) {
+                        $id = $key['bot']['id'];
+                    }
+                }
+                if ($id == $userid) {
+                    if (array_key_exists("role", $key)) {
+                        if ($key['role'] == "moderator"
+                            or $key['role'] == "creator"
+                            or $key['role'] == "editor"
+                        ) {
+                            $mod = true;
+                            break;
+                        } else {
+                            $mod = false;
+                            break;
+                        }
                     } else {
                         $mod = false;
                         break;
                     }
-                } else {
-                    $mod = false;
-                    break;
                 }
+                $mod = false;
             }
-            $mod = false;
-        }
-        if ($mod or is_master($MadelineProto, $userid)) {
-            return true;
+            if ($mod or is_master($MadelineProto, $userid)) {
+                return true;
+            } else {
+                if ($send) {
+                    $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
+                    ['InputPeer'];
+                    $msg_id = $update['update']['message']['id'];
+                    $message = $str;
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        ['peer' => $peer, 'reply_to_msg_id' =>
+                        $msg_id, 'message' => $message]
+                    );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
+                return false;
+            }
         } else {
-            if ($send) {
-                $peer = $MadelineProto->get_info($update['update']['message']['to_id'])
-                ['InputPeer'];
-                $msg_id = $update['update']['message']['id'];
-                $message = $str;
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    ['peer' => $peer, 'reply_to_msg_id' =>
-                    $msg_id, 'message' => $message]
-                );
-                \danog\MadelineProto\Logger::log($sentMessage);
-            }
             return false;
         }
-    } else {
+    } catch (Exception $e) {
         return false;
     }
 }
@@ -253,10 +261,14 @@ function from_mod($update, $MadelineProto)
     }
 }
 
-function is_mod($update, $MadelineProto, $userid)
+function is_mod($update, $MadelineProto, $userid, $ch_id = false)
 {
-    if (bot_present($update, $MadelineProto, true)) {
-        $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+    if (bot_present($update, $MadelineProto, true, $ch_id)) {
+        
+        if (!$ch_id) {
+            $ch_id = -100 . $update['update']['message']['to_id']['channel_id'];
+        }
+        
         if (!file_exists('promoted.json')) {
             $json_data = [];
             $json_data[$ch_id] = [];
@@ -306,10 +318,17 @@ function from_admin_mod($update, $MadelineProto, $str = "", $send = false)
     }
 }
 
-function is_admin_mod($update, $MadelineProto, $userid, $str = '', $send = false)
+function is_admin_mod($update, $MadelineProto, $userid, $str = '', $send = false, $ch_id = false)
 {
-    if (is_mod($update, $MadelineProto, $userid)
-        or is_admin($update, $MadelineProto, $userid)
+    if (!$ch_id) {
+        $ismod =is_mod($update, $MadelineProto, $userid);
+        $isadmin = is_admin($update, $MadelineProto, $userid);
+    } else {
+        $ismod = is_mod($update, $MadelineProto, $userid, $ch_id);
+        $isadmin = is_admin($update, $MadelineProto, $userid, false, $ch_id);
+    }
+    if ($ismod
+        or $isadmin
         or is_master($MadelineProto, $userid)
     ) {
         if ($send) {

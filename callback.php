@@ -20,6 +20,22 @@ class BotCallbackQuery extends Threaded
                 case 'welcome':
                     welcome_callback($update, $MadelineProto);
                 break;
+                
+                case 'welcome_menu':
+                    welcome_menu($update, $MadelineProto);
+                break;
+                
+                case 'lock':
+                    lock_callback($update, $MadelineProto);
+                break;
+                
+                case 'locked':
+                    locked_menu($update, $MadelineProto);
+                break;
+                
+                case 'back_to_settings':
+                    settings_menu_callback($update, $MadelineProto);
+                break;
             }
         }
     }
