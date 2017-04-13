@@ -127,19 +127,19 @@ function settings_menu($update, $MadelineProto)
                         ];
                         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
                         $rows[] = $row;
+                        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                        $default['reply_markup'] = $replyInlineMarkup;
+                        try {
+                            if (isset($default['message'])) {
+                                $sentMessage = $MadelineProto->messages->sendMessage(
+                                    $default
+                                );
+                                \danog\MadelineProto\Logger::log($sentMessage);
+                            }
+                        } catch (Exception $e) {}
                     }
-                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
-                    $default['reply_markup'] = $replyInlineMarkup;
                 }
             }
-            try {
-                if (isset($default['message'])) {
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                    \danog\MadelineProto\Logger::log($sentMessage);
-                }
-            } catch (Exception $e) {}
         }
     }
 }
@@ -233,9 +233,11 @@ function welcome_menu($update, $MadelineProto)
         check_json_array('settings.json', $default['peer']);
         $file = file_get_contents("settings.json");
         $settings = json_decode($file, true);
-        
+        if (!array_key_exists($default['peer'], $settings)) {
+            $settings[$default['peer']] = [];
+        }
         if (!array_key_exists("welcome", $settings[$default['peer']])) {
-            $settings[$default['peer']] = true;
+            $settings[$default['peer']]['welcome']  = true;
         }
         if ($settings[$default['peer']]["welcome"]) {
             $text = "Welcome new users \xE2\x9C\x85";

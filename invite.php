@@ -287,6 +287,7 @@ function import_chat_invite($update, $MadelineProto, $msg)
                 $uMadelineProto = $MadelineProto->API->uMadelineProto;
                 $msg = preg_replace('/https:\/\/t.me\/joinchat\//', "", $msg);
                 $importchat = $uMadelineProto->messages->importChatInvite(['hash' => $msg]);
+                return;
             } catch (Exception $e) {
                 $message = $MadelineProto->responses['import_chat_invite']['exception'];
                 $default['message'] = $message;
