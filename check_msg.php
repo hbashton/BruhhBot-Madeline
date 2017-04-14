@@ -113,6 +113,20 @@ function check_locked($update, $MadelineProto)
                                     }
                                 }
                             }
+                            if (check_for_links($update, $MadelineProto)) {
+                                check_json_array('locked.json', $ch_id);
+                                $file = file_get_contents("locked.json");
+                                $locked = json_decode($file, true);
+                                if (array_key_exists($ch_id, $locked)) {
+                                    if (in_array('links', $locked[$ch_id])) {
+                                        $delete = $uMadelineProto->
+                                        channels->deleteMessages(
+                                            ['channel' => $peer,
+                                            'id' => [$msg_id]]
+                                        );
+                                    }
+                                }
+                            }
                         }
                     }
                 }

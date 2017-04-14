@@ -47,7 +47,10 @@ function is_master($MadelineProto, $userid)
     if ($userid == $MadelineProto->get_info(
         getenv('MASTER_USERNAME')
     )['bot_api_id']
-    ) {
+        or $userid == $MadelineProto->get_info(
+        getenv('BOT_API_USERNAME')
+    )['bot_api_id']
+     ) {
         return true;
     } else {
         return false;
