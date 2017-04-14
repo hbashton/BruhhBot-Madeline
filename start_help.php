@@ -33,15 +33,19 @@ function start_message($update, $MadelineProto)
         if (isset($default['message'])) {
             if (is_array($message)) {
                 foreach ($message as $value) {
-                    $default['message'] = $value;
+                    try {
+                        $default['message'] = $value;
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                    } catch (Exception $e) {}
+                }
+            } else {
+                try {
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
                     );
-                }
-            } else {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
+                } catch (Exception $e) {}
             }
         }
     }
