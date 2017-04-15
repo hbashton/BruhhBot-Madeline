@@ -67,9 +67,7 @@ function check_for_links($update, $MadelineProto)
     if (array_key_exists('message', $update['update'])) {
         if (array_key_exists('message', $update['update']['message'])) {
             $pattern = '~[a-z]+://\S+~';
-
             if (preg_match_all($pattern, $update['update']['message']['message'], $out)) return true;
-
             if (array_key_exists('entities', $update['update']['message'])) {
                 foreach ($update['update']['message']['entities'] as $entity) {
                     if (isset($entity['_'])) {

@@ -1,0 +1,14 @@
+{
+"gif":"Gif messages are any animated message sent, regardless of filetype",
+"sticker":"Stickers. Locked = Deleted on sight",
+"video":"Compressed videos. To lock uncompressed, see files",
+"photo":"Compressed photos. To lock uncompressed, see files",
+"audio":"Voice messages, music, etc",
+"utf":"Any character not UTF-8 encoded (a little buggy)",
+"arabic":"Any >>Arabic<< character, not Hindi, RTL, etc",
+"links":"Websites, links, even markdown links",
+"contacts":"Shared vCards on telegram",
+"geo":"Location messages",
+"files":"Any uncompressed filetype. This includes all uncompressed audio, photo, and video",
+"flood":"This prevents spam, and will kick any user that goes over the limit. Configure the limit below"
+}

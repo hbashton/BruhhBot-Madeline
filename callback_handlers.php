@@ -119,10 +119,9 @@ function lock_callback($update, $MadelineProto)
         }
         $buttons = [
             ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
-                "q" => "lock",       // query
-                "v" => "$key-$onoff",// value
-                "u" =>  $userid,     // user
-                "c" =>  $ch_id ))],  // chat
+                "q" => "hint",       // query
+                "v" => "$key",       // value
+                "u" =>  $userid))],
             ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
                 "q" => "lock",       // query
                 "v" => "$key-$onoff",// value
@@ -132,6 +131,22 @@ function lock_callback($update, $MadelineProto)
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
         $rows[] = $row;
     }
+    $buttons = [
+            ['_' => 'keyboardButtonCallback', 'text' => "\xe2\xac\x85\xef\xb8\x8f", 'data' => json_encode(array(
+                "q" => "decrease_flood",   // query
+                "u" =>  $userid,           // user
+                "c" =>  $ch_id ))],        // chat
+            ['_' => 'keyboardButtonCallback', 'text' => (string) $locked[$ch_id]['floodlimit'], 'data' => json_encode(array(
+                "q" => "hint",             // query
+                "u" =>  $userid,           // user
+                "v" => "flood"))],
+            ['_' => 'keyboardButtonCallback', 'text' => "\xe2\x9e\xa1\xef\xb8\x8f", 'data' => json_encode(array(
+                "q" => "increase_flood",   // query
+                "u" =>  $userid,           // user
+                "c" =>  $ch_id ))],        // chat
+        ];
+    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+    $rows[] = $row;
     $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
             "q" => "back_to_settings", // query
@@ -148,6 +163,121 @@ function lock_callback($update, $MadelineProto)
             $default
         );
         \danog\MadelineProto\Logger::log($editedMessage);
+    } catch (Exception $e) {}
+}
+
+function increment_flood($update, $MadelineProto, $up = false)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $ch_id = $parsed_query['data']['c'];
+    $userid = $parsed_query['user_id'];
+    $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$id]]);
+    if (!is_array($message)) return;
+    $message = $message['messages'][0]['message'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'id' => $parsed_query['msg_id'],
+        'parse_mode' => 'html',
+        'message' => $message
+    );
+    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
+    $file = file_get_contents("locked.json");
+    $locked = json_decode($file, true);
+    if ($up) {
+        $locked[$ch_id]['floodlimit'] += 1;
+    } else {
+        $locked[$ch_id]['floodlimit'] -= 1;
+    }
+    if ($locked[$ch_id]['floodlimit'] <= 1) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You can't make the floodlimit 1 or below", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
+    $rows = [];
+    $coniguration = file_get_contents("configuration.json");
+    $cfg = json_decode($coniguration, true);
+    foreach ($cfg['settings_template'] as $key => $value) {
+        // check mark \xE2\x9C\x85
+        // cross mark \xE2\x9D\x8C
+        if (in_array($key, $locked[$ch_id])) {
+            $text = "\xE2\x9D\x8C";
+            $onoff = "off";
+        } else {
+            $text = "\xE2\x9C\x85";
+            $onoff = "on";
+        }
+        $buttons = [
+            ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
+                "q" => "hint",       // query
+                "v" => "$key",       // value
+                "u" =>  $userid ))],
+            ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
+                "q" => "lock",       // query
+                "v" => "$key-$onoff",// value
+                "u" =>  $userid,     // user
+                "c" =>  $ch_id ))]   // chat
+        ];
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+    }
+    $buttons = [
+            ['_' => 'keyboardButtonCallback', 'text' => "\xe2\xac\x85\xef\xb8\x8f", 'data' => json_encode(array(
+                "q" => "decrease_flood",   // query
+                "u" =>  $userid,           // user
+                "c" =>  $ch_id ))],        // chat
+            ['_' => 'keyboardButtonCallback', 'text' => (string) $locked[$ch_id]['floodlimit'], 'data' => json_encode(array(
+                "q" => "hint",             // query
+                "u" =>  $userid,           // user
+                "v" => "flood" ))],        // chat
+            ['_' => 'keyboardButtonCallback', 'text' => "\xe2\x9e\xa1\xef\xb8\x8f", 'data' => json_encode(array(
+                "q" => "increase_flood",   // query
+                "u" =>  $userid,           // user
+                "c" =>  $ch_id ))],        // chat
+        ];
+    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+    $rows[] = $row;
+    $buttons = [
+        ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+            "q" => "back_to_settings", // query
+            "u" =>  $userid,           // user
+            "c" =>  $ch_id ))]         // chat
+    ];
+    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+    $rows[] = $row;
+    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+    $default['reply_markup'] = $replyInlineMarkup;
+    file_put_contents('locked.json', json_encode($locked));
+    try {
+        $editedMessage = $MadelineProto->messages->editMessage(
+            $default
+        );
+        \danog\MadelineProto\Logger::log($editedMessage);
+    } catch (Exception $e) {}
+}
+
+function alert_hint($update, $MadelineProto, $up = false)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $userid = $parsed_query['user_id'];
+    $v = $parsed_query['data']['v'];
+    $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$id]]);
+    if (!is_array($message)) return;
+    $message = $message['messages'][0]['message'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'id' => $parsed_query['msg_id'],
+        'parse_mode' => 'html',
+        'message' => $message
+    );
+    try {
+        $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => $MadelineProto->hints[$v], 'cache_time' => 3, ]);
+        \danog\MadelineProto\Logger::log($callbackAnswer);
     } catch (Exception $e) {}
 }
 

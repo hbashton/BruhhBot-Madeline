@@ -143,6 +143,7 @@ if (!isset($MadelineProto)) {
     );
 }
 $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+$MadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
 $MadelineProto->API->is_bot_present = [];

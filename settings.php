@@ -166,6 +166,11 @@ function locked_menu($update, $MadelineProto)
         $cfg = json_decode($coniguration, true);
         if (!array_key_exists($ch_id, $locked)) {
             $locked[$ch_id] = [];
+            file_put_contents('locked.json', json_encode($locked));
+        }
+        if (!isset($locked[$ch_id]["floodlimit"])) {
+            $locked[$ch_id]["floodlimit"] = 10;
+            file_put_contents('locked.json', json_encode($locked));
         }
         foreach ($cfg['settings_template'] as $key => $value) {
             // check mark \xE2\x9C\x85
@@ -179,10 +184,9 @@ function locked_menu($update, $MadelineProto)
             }
             $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
-                    "q" => "lock",       // query
-                    "v" => "$key-$onoff",// value
-                    "u" =>  $userid,     // user
-                    "c" =>  $ch_id ))],  // chat
+                    "q" => "hint",       // query
+                    "v" => "$key",       // value
+                    "u" =>  $userid))],
                 ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
                     "q" => "lock",       // query
                     "v" => "$key-$onoff",// value
@@ -193,13 +197,30 @@ function locked_menu($update, $MadelineProto)
             $rows[] = $row;
         }
         $buttons = [
+                ['_' => 'keyboardButtonCallback', 'text' => "\xe2\xac\x85\xef\xb8\x8f", 'data' => json_encode(array(
+                    "q" => "decrease_flood",   // query
+                    "u" =>  $userid,           // user
+                    "c" =>  $ch_id ))],        // chat
+                ['_' => 'keyboardButtonCallback', 'text' => (string) $locked[$ch_id]['floodlimit'], 'data' => json_encode(array(
+                    "q" =>  "hint",            // query
+                    "v" =>  "flood",           // value
+                    "u" =>  $userid,           // user
+                    "c" =>  $ch_id ))],        // chat
+                ['_' => 'keyboardButtonCallback', 'text' => "\xe2\x9e\xa1\xef\xb8\x8f", 'data' => json_encode(array(
+                    "q" => "increase_flood",   // query
+                    "u" =>  $userid,           // user
+                    "c" =>  $ch_id ))],        // chat
+            ];
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+        $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
                     "q" => "back_to_settings", // query
                     "u" =>  $userid,           // user
                     "c" =>  $ch_id ))]         // chat
             ];
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-            $rows[] = $row;
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
         $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
         $default['reply_markup'] = $replyInlineMarkup;
     }
@@ -269,10 +290,12 @@ function welcome_menu($update, $MadelineProto)
         $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2, $row3], ];
         $default['reply_markup'] = $replyInlineMarkup;
         if (isset($default['message'])) {
-            $sentMessage = $MadelineProto->messages->editMessage(
-                $default
-            );
-            \danog\MadelineProto\Logger::log($sentMessage);
+            try {
+                $sentMessage = $MadelineProto->messages->editMessage(
+                    $default
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            } catch (Exception $e) {}
         }
     }
 }

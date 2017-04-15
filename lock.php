@@ -191,30 +191,34 @@ function setflood($update, $MadelineProto, $msg)
             if (is_moderated($ch_id)) {
                 if (!empty($msg)) {
                     if (is_numeric($msg)) {
-                        if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                            check_json_array('locked.json', $ch_id);
-                            $file = file_get_contents("locked.json");
-                            $locked = json_decode($file, true);
-                            if (array_key_exists($ch_id, $locked)) {
-                                $locked[$ch_id]['floodlimit'] = (int) $msg;
-                                file_put_contents('locked.json', json_encode($locked));
-                                $str = $MadelineProto->responses['setflood']['success'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
-                                $message = $MadelineProto->engine->render($str, $repl);
-                                $default['message'] = $message;
-                            } else {
-                                $locked[$ch_id] = [];
-                                $locked[$ch_id]['floodlimit'] = (int) $msg;
-                                file_put_contents('locked.json', json_encode($locked));
-                                $str = $MadelineProto->responses['setflood']['success'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
-                                $message = $MadelineProto->engine->render($str, $repl);
-                                $default['message'] = $message;
+                        if ($msg > 1) {
+                            if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                                check_json_array('locked.json', $ch_id);
+                                $file = file_get_contents("locked.json");
+                                $locked = json_decode($file, true);
+                                if (array_key_exists($ch_id, $locked)) {
+                                    $locked[$ch_id]['floodlimit'] = (int) $msg;
+                                    file_put_contents('locked.json', json_encode($locked));
+                                    $str = $MadelineProto->responses['setflood']['success'];
+                                    $repl = array(
+                                        "msg" => $msg
+                                    );
+                                    $message = $MadelineProto->engine->render($str, $repl);
+                                    $default['message'] = $message;
+                                } else {
+                                    $locked[$ch_id] = [];
+                                    $locked[$ch_id]['floodlimit'] = (int) $msg;
+                                    file_put_contents('locked.json', json_encode($locked));
+                                    $str = $MadelineProto->responses['setflood']['success'];
+                                    $repl = array(
+                                        "msg" => $msg
+                                    );
+                                    $message = $MadelineProto->engine->render($str, $repl);
+                                    $default['message'] = $message;
+                                }
                             }
+                        } else {
+                            $default['message'] = "Please use a number greater than 1";
                         }
                     } else {
                         $str = $MadelineProto->responses['setflood']['invalid'];
