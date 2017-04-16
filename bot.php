@@ -238,7 +238,7 @@ while (true) {
             if (is_supergroup($update, $MadelineProto)) {
                 if (!array_key_exists("from_id", $update['update']['message'])) break;
                 try {
-                    $user = $uMadelineProto->get_info($update['update']['message']['from_id']);
+                    $user = cache_from_user_info($update, $uMadelineProto);
                 } catch (Exception $e) {
                     break;
                 }
