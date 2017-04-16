@@ -1003,5 +1003,171 @@ function NewChatDeleteUser($update, $MadelineProto)
     }
 }
 
+class NewChannelMessageUserBot extends Threaded
+{
+    private $update;
+    private $MadelineProto;
+    public function __construct($update, $MadelineProto)
+    {
+        $this->update = $update;
+        $this->MadelineProto = $MadelineProto;
+    }
+    public function run()
+    {
+        require_once 'require_exceptions.php';
+        $update = $this->update;
+        $MadelineProto = $this->MadelineProto;
+        $fromid = cache_from_user_info($update, $MadelineProto);
+        if (!isset($fromid['bot_api_id'])) {
+            return;
+        }
+        $fromid = $fromid['bot_api_id'];
+        if (array_key_exists('message', $update['update']['message'])
+            && is_string($update['update']['message']['message'])
+        ) {
+            if (is_supergroup($update, $MadelineProto)) {
 
+        $chat = parse_chat_data($update, $MadelineProto);
+        $msg_id = $update['update']['message']['id'];
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $this->muted = false;
+        if (is_moderated($ch_id) && is_supergroup($update, $MadelineProto) && bot_present($update, $MadelineProto, true, false, true)) {
+            check_json_array('mutelist.json', $ch_id);
+            $file = file_get_contents("mutelist.json");
+            $mutelist = json_decode($file, true);
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (!from_admin_mod($update, $MadelineProto)) {
+                    if (array_key_exists($ch_id, $mutelist)) {
+                        if (in_array($fromid, $mutelist[$ch_id])
+                            or in_array("all", $mutelist[$ch_id])
+                        ) {
+                            try {
+                                $delete = $MadelineProto->
+                                channels->deleteMessages(
+                                    ['channel' => $peer,
+                                    'id' => [$msg_id]]
+                                );
+                                \danog\MadelineProto\Logger::log($delete);
+                            } catch (Exception $e) {
+                            }
+                            $this->muted = true;
+                        } else {
+                            $this->muted = false;
+                        }
+                    }
+                }
+            }
+        }
+                if ($this->muted) {
+                    return;
+                }
+                $chat = parse_chat_data($update, $MadelineProto);
+                $peer = $chat['peer'];
+                $ch_id = $chat['id'];
+                check_json_array('banlist.json', $ch_id);
+                $file = file_get_contents("banlist.json");
+                $banlist = json_decode($file, true);
+                $msg_id = $update['update']['message']['id'];
+                if (is_bot_admin($update, $MadelineProto) && !from_admin_mod($update, $MadelineProto)) {
+                    $default = array(
+                        'peer' => $peer,
+                        'reply_to_msg_id' => $msg_id,
+                    );
+                    check_json_array('gbanlist.json', false, false);
+                    $file = file_get_contents("gbanlist.json");
+                    $gbanlist = json_decode($file, true);
+                    if (array_key_exists($fromid, $gbanlist)) {
+                        try {
+                            $kick = $MadelineProto->
+                            channels->kickFromChannel(
+                                ['channel' => $peer,
+                                'user_id' => $fromid,
+                                'kicked' => true]
+                            );
+                            if (isset($kick)) {
+                                \danog\MadelineProto\Logger::log($kick);
+                            }
+                        } catch (Exception $e) {}
+                    }
+                    if (array_key_exists($ch_id, $banlist)) {
+                        if (in_array($fromid, $banlist[$ch_id])) {
+                            try {
+                                $kick = $MadelineProto->
+                                channels->kickFromChannel(
+                                    ['channel' => $peer,
+                                    'user_id' => $fromid,
+                                    'kicked' => true]
+                                );
+                                if (isset($kick)) {
+                                    \danog\MadelineProto\Logger::log($kick);
+                                }
+                            } catch (Exception $e) {}
+                        }
+                    }
+                }
+                if (strlen($update['update']['message']['message']) !== 0) {
+                    $first_char = substr(
+                        $update['update']['message']['message'][0],
+                        0, 1
+                    );
+                    if (preg_match_all('/#/', $first_char, $matches)) {
+                            $msg = substr(
+                                $update['update']['message']['message'], 1
+                            );
+                            $msg_arr = explode(' ', trim($msg));
+                            getme($update, $MadelineProto, $msg_arr[0]);
+                    }
+                    if (preg_match_all('/[\!\#\/]/', $first_char, $matches)) {
+                        $botuser = strtolower(getenv("BOT_API_USERNAME"));
+                        $msg = substr(
+                            $update['update']['message']['message'], 1
+                        );
+                        $msg_arr = explode(' ', trim($msg));
+                        $msg = preg_replace("/$botuser/", "", strtolower($msg_arr[0]));
+                        $msg_id = $update['update']['message']['id'];
+                        switch ($msg) {
+                        case 'save':
+                            if (isset($msg_arr[1])) {
+                                    $name = $msg_arr[1];
+                                    unset($msg_arr[1]);
+                            } else {
+                                $name = false;
+                            }
+                            unset($msg_arr[0]);
+                            $msg = implode(" ", $msg_arr);
+                            $name_ = strtolower($name);
+                            switch ($name_) {
+                            case 'clear':
+                                save_clear($update, $MadelineProto, $msg);
+                                break;
+                            case 'from':
+                                break;
+                            default:
+                                saveme($update, $MadelineProto, $msg, $name);
+                            }
+                            break;
+
+                        case 'pin':
+                            if (isset($msg_arr[1])) {
+                                $msg = $msg_arr[1];
+                                $msg_ = strtolower($msg);
+                                if ($msg_ = "silent") {
+                                    $silent = true;
+                                } else {
+                                    $silent = false;
+                                }
+                            } else {
+                                $silent = false;
+                            }
+                            pinmessage($update, $MadelineProto, $silent, true);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 

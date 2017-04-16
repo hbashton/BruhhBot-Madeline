@@ -1,6 +1,6 @@
 <?php
 
-function bot_present($update, $MadelineProto, $silent = false, $peer = false)
+function bot_present($update, $MadelineProto, $silent = false, $peer = false, $user = false)
 {
     try {
         if (!$peer) {
@@ -34,8 +34,12 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false)
                 }
             }
         }
-        $uMadelineProto = $MadelineProto->API->uMadelineProto;
-        $uMadelineProto->messages->setTyping(['peer' => $peer, 'action' => ['_' => 'sendMessageTypingAction']]);
+        if (!$user) {
+            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+            $uMadelineProto->messages->setTyping(['peer' => $peer, 'action' => ['_' => 'sendMessageTypingAction']]);
+        } else {
+            $MadelineProto->messages->setTyping(['peer' => $peer, 'action' => ['_' => 'sendMessageTypingAction']]);
+        }
         $MadelineProto->API->is_bot_present[$peer] = ["timestamp" => time(), "return" => true];
         return true;
     } catch (Exception $e) {

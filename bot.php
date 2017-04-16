@@ -150,14 +150,21 @@ $MadelineProto->API->is_bot_present = [];
 $MadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
 $MadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
 $MadelineProto->API->uMadelineProto = $uMadelineProto;
+$MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+$MadelineProto->API->uMadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
+$MadelineProto->API->uMadelineProto->engine = new StringTemplate\Engine;
+$MadelineProto->API->uMadelineProto->flooder = [];
+$MadelineProto->API->uMadelineProto->API->is_bot_present = [];
+$MadelineProto->API->uMadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
+$MadelineProto->API->uMadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
 
 //var_dump($MadelineProto->get_pwr_chat('@pwrtelegramgroup'));
 Requests::register_autoloader();
 $pool = new Pool(100);
 
 $offset = 0;
+$offset_user = 0;
 while (true) {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
     try {
         $updates = $MadelineProto->API->get_updates(
             ['offset' => $offset,
@@ -213,6 +220,39 @@ while (true) {
             if (is_supergroup($update, $MadelineProto) or is_peeruser($update, $MadelineProto)) {
                 $pool->submit(new BotCallbackQuery($update, $MadelineProto));
             }
+        }
+    }
+    try {
+        $updates = $uMadelineProto->API->get_updates(
+            ['offset' => $offset_user,
+            'limit' => 50000, 'timeout' => 0]
+        );
+    } catch (Exception $e) {}
+    foreach ($updates as $update) {
+        $offset_user = $update['update_id'] + 1;
+        switch ($update['update']['_']) {
+        case 'updateNewChannelMessage':
+            if ($dumpme) {
+                var_dump($update);
+            }
+            if (is_supergroup($update, $MadelineProto)) {
+                if (!array_key_exists("from_id", $update['update']['message'])) break;
+                try {
+                    $user = $uMadelineProto->get_info($update['update']['message']['from_id']);
+                } catch (Exception $e) {
+                    break;
+                }
+                if (!array_key_exists("type", $user)) break;
+                if ($user['type'] != "bot") {
+                    $uMadelineProto->flooder['num'] = 0;
+                    $uMadelineProto->flooder['user'] = $update['update']['message']['from_id'];
+                    break;
+                }
+                check_locked_user($update, $uMadelineProto);
+                check_flood_user($update, $uMadelineProto);
+                $pool->submit(new NewChannelMessageUserBot($update, $uMadelineProto));
+            }
+        break;
         }
     }
     \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;

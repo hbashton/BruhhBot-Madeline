@@ -340,7 +340,7 @@ function modlist($update, $MadelineProto)
     }
 }
 
-function pinmessage($update, $MadelineProto, $silent)
+function pinmessage($update, $MadelineProto, $silent, $user = false)
 {
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
@@ -376,34 +376,43 @@ function pinmessage($update, $MadelineProto, $silent)
                             $update['update']['message']
                         )
                         ) {
-                            if (bot_present($update, $MadelineProto)) {
-                                $uMadelineProto = $MadelineProto->API->uMadelineProto;
-                                try {
-                                    $pin_id = $update['update']['message']['reply_to_msg_id'];
+                            if (!$user) {
+                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            }
+                            try {
+                                $pin_id = $update['update']['message']['reply_to_msg_id'];
+                                if (!$user) {
                                     $pin = $uMadelineProto->
                                     channels->updatePinnedMessage(
                                         ['silent' => $silent,
                                         'channel' => $peer,
                                         'id' => $pin_id ]
                                     );
-                                    $message = $MadelineProto->responses['pinmessage']['success'];
-                                    $default['message'] = $message;
-                                    \danog\MadelineProto\Logger::log($pin);
-                                    $message2 = "User $mention pinned a message in <b>$title</b> - $tg_id";
-                                    $default2['message'] = $message2;
-                                    $sentMessage2 = $MadelineProto->messages->sendMessage(
-                                        $default2
+                                } else {
+                                    $pin = $MadelineProto->
+                                    channels->updatePinnedMessage(
+                                        ['silent' => $silent,
+                                        'channel' => $peer,
+                                        'id' => $pin_id ]
                                     );
-                                    \danog\MadelineProto\Logger::log($sentMessage2);
-                                    $forwardMessage = $MadelineProto->messages->forwardMessages([
-                                        'silent' => false,
-                                        'from_peer' => $ch_id,
-                                        'id' => [$pin_id],
-                                        'to_peer' => $peer2]
-                                    );
-                                    \danog\MadelineProto\Logger::log($forwardMessage);
-                                } catch (Exception $e) {}
-                            }
+                                }
+                                $message = $MadelineProto->responses['pinmessage']['success'];
+                                $default['message'] = $message;
+                                \danog\MadelineProto\Logger::log($pin);
+                                $message2 = "User $mention pinned a message in <b>$title</b> - $tg_id";
+                                $default2['message'] = $message2;
+                                $sentMessage2 = $MadelineProto->messages->sendMessage(
+                                    $default2
+                                );
+                                \danog\MadelineProto\Logger::log($sentMessage2);
+                                $forwardMessage = $MadelineProto->messages->forwardMessages([
+                                    'silent' => false,
+                                    'from_peer' => $ch_id,
+                                    'id' => [$pin_id],
+                                    'to_peer' => $peer2]
+                                );
+                                \danog\MadelineProto\Logger::log($forwardMessage);
+                            } catch (Exception $e) {}
                         } else {
                             $message = $MadelineProto->responses['pinmessage']['help'];
                             $default['message'] = $message;
