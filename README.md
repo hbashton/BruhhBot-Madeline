@@ -23,7 +23,7 @@ git clone --recursive https://github.com/hbashton/BruhhBot-Madeline.git
 
 Create a .env file using [the one provided](.env.example) as a template
 
-Grab your weather API key using [OpenWeather](https://openweathermap.org/api) and place in the .env file
+Grab your Weather API key using [DarkSky](https://darksky.net/dev/) and place in the .env file
 
 Obtain an API key from [@BotFather](http://telegram.me/botfather)
 
@@ -45,7 +45,7 @@ Well, here's a breakdown:
 `MTPROTO_SETTINGS` | (json) | Your API ID and HASH (I'm not using these right now, but I require them if I decide to do so in the future
 `MASTER_USERNAME` | (string) | Your username
 `SUDO` | (array) |An array of User ID's that are considered "sudo" users, and can control the bot just like you
-`WEATHER_KEY` | (string) | Obtained from [OpenWeather](https://openweathermap.org/api)
+`WEATHER_KEY` | (string) | Obtained from [DarkSky](https://darksky.net/dev/)
 `BOT_USERNAME` | (string) | The username of your bot created with a phone number
 `BOT_TOKEN` | (string) | Your API token received from [@BotFather](http://telegram.me/botfather)
 `BOT_API_USERNAME` | (string) | The username you assigned to your bot from [@BotFather](http://telegram.me/botfather)
