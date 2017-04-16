@@ -24,6 +24,8 @@ function from_master($update, $MadelineProto, $str = "", $send = false)
     $master = cache_get_info($update, $MadelineProto, getenv('MASTER_USERNAME'));
     if ($user['bot_api_id'] == $master['bot_api_id']
         or in_array($user['bot_api_id'], json_decode(getenv('SUDO'), true))
+        or $user['bot_api_id'] == $MadelineProto->API->bot_api_id
+        or $user['bot_api_id'] == $MadelineProto->API->bot_id
     ) {
         return true;
     } else {

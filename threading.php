@@ -207,24 +207,31 @@ class NewChannelMessage extends Threaded
             $file = file_get_contents("mutelist.json");
             $mutelist = json_decode($file, true);
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            if (isset($update['update']['message']['via_bot_id'])) {
+                $from_users = [$fromid, $update['update']['message']['via_bot_id']];
+            } else {
+                $from_users = [$fromid];
+            }
             if (is_bot_admin($update, $MadelineProto)) {
                 if (!from_admin_mod($update, $MadelineProto)) {
                     if (array_key_exists($ch_id, $mutelist)) {
-                        if (in_array($fromid, $mutelist[$ch_id])
-                            or in_array("all", $mutelist[$ch_id])
-                        ) {
-                            try {
-                                $delete = $uMadelineProto->
-                                channels->deleteMessages(
-                                    ['channel' => $peer,
-                                    'id' => [$msg_id]]
-                                );
-                                \danog\MadelineProto\Logger::log($delete);
-                            } catch (Exception $e) {
+                        foreach ($from_users as $userid) {
+                            if (in_array($userid, $mutelist[$ch_id])
+                                or in_array("all", $mutelist[$ch_id])
+                            ) {
+                                try {
+                                    $delete = $uMadelineProto->
+                                    channels->deleteMessages(
+                                        ['channel' => $peer,
+                                        'id' => [$msg_id]]
+                                    );
+                                    \danog\MadelineProto\Logger::log($delete);
+                                } catch (Exception $e) {}
+                                $this->muted = true;
+                                break;
+                            } else {
+                                $this->muted = false;
                             }
-                            $this->muted = true;
-                        } else {
-                            $this->muted = false;
                         }
                     }
                 }
@@ -1037,24 +1044,31 @@ class NewChannelMessageUserBot extends Threaded
             $file = file_get_contents("mutelist.json");
             $mutelist = json_decode($file, true);
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            if (isset($update['update']['message']['via_bot_id'])) {
+                $from_users = [$fromid, $update['update']['message']['via_bot_id']];
+            } else {
+                $from_users = [$fromid];
+            }
             if (is_bot_admin($update, $MadelineProto)) {
                 if (!from_admin_mod($update, $MadelineProto)) {
                     if (array_key_exists($ch_id, $mutelist)) {
-                        if (in_array($fromid, $mutelist[$ch_id])
-                            or in_array("all", $mutelist[$ch_id])
-                        ) {
-                            try {
-                                $delete = $MadelineProto->
-                                channels->deleteMessages(
-                                    ['channel' => $peer,
-                                    'id' => [$msg_id]]
-                                );
-                                \danog\MadelineProto\Logger::log($delete);
-                            } catch (Exception $e) {
+                        foreach ($from_users as $userid) {
+                            if (in_array($userid, $mutelist[$ch_id])
+                                or in_array("all", $mutelist[$ch_id])
+                            ) {
+                                try {
+                                    $delete = $MadelineProto->
+                                    channels->deleteMessages(
+                                        ['channel' => $peer,
+                                        'id' => [$msg_id]]
+                                    );
+                                    \danog\MadelineProto\Logger::log($delete);
+                                } catch (Exception $e) {}
+                                $this->muted = true;
+                                break;
+                            } else {
+                                $this->muted = false;
                             }
-                            $this->muted = true;
-                        } else {
-                            $this->muted = false;
                         }
                     }
                 }

@@ -248,6 +248,9 @@ while (true) {
                     $uMadelineProto->flooder['user'] = $update['update']['message']['from_id'];
                     break;
                 }
+                if (isset($user['bot_api_id'])) {
+                    if ($user['bot_api_id'] == $MadelineProto->API->bot_api_id) break;
+                }
                 check_locked_user($update, $uMadelineProto);
                 check_flood_user($update, $uMadelineProto);
                 $pool->submit(new NewChannelMessageUserBot($update, $uMadelineProto));
