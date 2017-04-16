@@ -46,7 +46,6 @@ function is_arabic($str) {
     foreach($chars as $char) {
         //$pos = ord($char); we cant use that, its not binary safe
         $pos = uniord($char);
-        echo $char ." --> ".$pos.PHP_EOL;
 
         if($pos >= 1536 && $pos <= 1791) {
             $arabic_count++;
