@@ -301,7 +301,7 @@ function modlist($update, $MadelineProto)
                 check_json_array('promoted.json', $ch_id);
                 $file = file_get_contents("promoted.json");
                 $promoted = json_decode($file, true);
-                if (array_key_exists($ch_id, $promoted)) {
+                if (isset($promoted[$ch_id])) {
                     foreach ($promoted[$ch_id] as $i => $key) {
                         $username = catch_id($update, $MadelineProto, $key)[2];
                         $mention = html_mention($username, $key);

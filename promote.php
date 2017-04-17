@@ -43,7 +43,7 @@ function promoteme($update, $MadelineProto, $msg = "")
                             check_json_array('promoted.json', $ch_id);
                             $file = file_get_contents("promoted.json");
                             $promoted = json_decode($file, true);
-                            if (array_key_exists($ch_id, $promoted)) {
+                            if (isset($promoted[$ch_id])) {
                                 if (!in_array($userid, $promoted[$ch_id])) {
                                     array_push($promoted[$ch_id], $userid);
                                     file_put_contents('promoted.json', json_encode($promoted));
@@ -123,7 +123,7 @@ function demoteme($update, $MadelineProto, $msg = "")
                         check_json_array('promoted.json', $ch_id);
                         $file = file_get_contents("promoted.json");
                         $promoted = json_decode($file, true);
-                        if (array_key_exists($ch_id, $promoted)) {
+                        if (isset($promoted[$ch_id])) {
                             if (in_array($userid, $promoted[$ch_id])) {
                                 if (($key = array_search(
                                     $userid,

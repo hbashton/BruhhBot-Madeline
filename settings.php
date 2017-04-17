@@ -21,7 +21,7 @@ function get_settings($update, $MadelineProto)
                 $locked = json_decode($file, true);
                 $coniguration = file_get_contents("configuration.json");
                 $cfg = json_decode($coniguration, true);
-                if (array_key_exists($ch_id, $locked)) {
+                if (isset($locked[$ch_id])) {
                     foreach ($cfg['settings_template'] as $key => $value) {
                         if (in_array($key, $locked[$ch_id])) {
                             if (!empty($message)) {
@@ -164,7 +164,7 @@ function locked_menu($update, $MadelineProto)
         $locked = json_decode($file, true);
         $coniguration = file_get_contents("configuration.json");
         $cfg = json_decode($coniguration, true);
-        if (!array_key_exists($ch_id, $locked)) {
+        if (!isset($locked[$ch_id])) {
             $locked[$ch_id] = [];
             file_put_contents('locked.json', json_encode($locked));
         }
@@ -254,7 +254,7 @@ function welcome_menu($update, $MadelineProto)
         check_json_array('settings.json', $default['peer']);
         $file = file_get_contents("settings.json");
         $settings = json_decode($file, true);
-        if (!array_key_exists($default['peer'], $settings)) {
+        if (!isset($settings[$default['peer']])) {
             $settings[$default['peer']] = [];
         }
         if (!array_key_exists("welcome", $settings[$default['peer']])) {

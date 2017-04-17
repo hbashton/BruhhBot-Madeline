@@ -56,7 +56,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                     check_json_array('banlist.json', $ch_id);
                                     $file = file_get_contents("banlist.json");
                                     $banlist = json_decode($file, true);
-                                    if (array_key_exists($ch_id, $banlist)) {
+                                    if (isset($banlist[$ch_id])) {
                                         if (!in_array($userid, $banlist[$ch_id])) {
                                             array_push($banlist[$ch_id], $userid);
                                             file_put_contents(
@@ -172,7 +172,7 @@ function unbanme($update, $MadelineProto, $msg = "")
                                 check_json_array('banlist.json', $ch_id);
                                 $file = file_get_contents("banlist.json");
                                 $banlist = json_decode($file, true);
-                                if (array_key_exists($ch_id, $banlist)) {
+                                if (isset($banlist[$ch_id])) {
                                     if (in_array($userid, $banlist[$ch_id])) {
                                         if (($key = array_search(
                                             $userid,
@@ -426,7 +426,7 @@ function getbanlist($update, $MadelineProto)
                 check_json_array('banlist.json', $ch_id);
                 $file = file_get_contents("banlist.json");
                 $banlist = json_decode($file, true);
-                if (array_key_exists($ch_id, $banlist)) {
+                if (isset($banlist[$ch_id])) {
                     foreach ($banlist[$ch_id] as $i => $key) {
                         $id = catch_id($update, $MadelineProto, $key);
                         if ($id[0]) {

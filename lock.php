@@ -42,7 +42,7 @@ function lockme($update, $MadelineProto, $msg)
                             check_json_array('locked.json', $ch_id);
                             $file = file_get_contents("locked.json");
                             $locked = json_decode($file, true);
-                            if (array_key_exists($ch_id, $locked)) {
+                            if (isset($locked[$ch_id])) {
                                 if (!in_array($msg, $locked[$ch_id])) {
                                     if ($msg == "flood") {
                                         $locked[$ch_id]['floodlimit'] = 10;
@@ -115,7 +115,7 @@ function unlockme($update, $MadelineProto, $msg)
                             check_json_array('locked.json', $ch_id);
                             $file = file_get_contents("locked.json");
                             $locked = json_decode($file, true);
-                            if (array_key_exists($ch_id, $locked)) {
+                            if (isset($locked[$ch_id])) {
                                 if (in_array($msg, $locked[$ch_id])) {
                                     if (($key = array_search(
                                         $msg,
@@ -196,7 +196,7 @@ function setflood($update, $MadelineProto, $msg)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (aisset($locked[$ch_id])) {
                                     $locked[$ch_id]['floodlimit'] = (int) $msg;
                                     file_put_contents('locked.json', json_encode($locked));
                                     $str = $MadelineProto->responses['setflood']['success'];

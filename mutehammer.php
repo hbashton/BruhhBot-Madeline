@@ -52,7 +52,7 @@ function muteme($update, $MadelineProto, $msg = "", $send = true)
                         check_json_array('mutelist.json', $ch_id);
                         $file = file_get_contents("mutelist.json");
                         $mutelist = json_decode($file, true);
-                        if (array_key_exists($ch_id, $mutelist)) {
+                        if (isset($mutelist[$ch_id])) {
                             if (!in_array($userid, $mutelist[$ch_id])) {
                                 array_push($mutelist[$ch_id], $userid);
                                 file_put_contents(
@@ -139,7 +139,7 @@ function unmuteme($update, $MadelineProto, $msg = "")
                         check_json_array('mutelist.json', $ch_id);
                         $file = file_get_contents("mutelist.json");
                         $mutelist = json_decode($file, true);
-                        if (array_key_exists($ch_id, $mutelist)) {
+                        if (isset($mutelist[$ch_id])) {
                             if (in_array($userid, $mutelist[$ch_id])) {
                                 if (($key = array_search(
                                     $userid,
@@ -212,7 +212,7 @@ function muteall($update, $MadelineProto, $send = true)
                 check_json_array('mutelist.json', $ch_id);
                 $file = file_get_contents("mutelist.json");
                 $mutelist = json_decode($file, true);
-                if (array_key_exists($ch_id, $mutelist)) {
+                if (isset($mutelist[$ch_id])) {
                     if (!in_array($userid, $mutelist[$ch_id])) {
                         array_push($mutelist[$ch_id], $userid);
                         file_put_contents(
@@ -266,7 +266,7 @@ function unmuteall($update, $MadelineProto)
                 check_json_array('mutelist.json', $ch_id);
                 $file = file_get_contents("mutelist.json");
                 $mutelist = json_decode($file, true);
-                if (array_key_exists($ch_id, $mutelist)) {
+                if (isset($mutelist[$ch_id])) {
                     if (in_array($userid, $mutelist[$ch_id])) {
                         if (($key = array_search(
                             $userid,
@@ -321,7 +321,7 @@ function getmutelist($update, $MadelineProto)
                 check_json_array('mutelist.json', $ch_id);
                 $file = file_get_contents("mutelist.json");
                 $mutelist = json_decode($file, true);
-                if (array_key_exists($ch_id, $mutelist)) {
+                if (isset($mutelist[$ch_id])) {
                     if (!in_array('all', $mutelist[$ch_id])) {
                         foreach ($mutelist[$ch_id] as $i => $key) {
                             $username = catch_id($update, $MadelineProto, $key)[2];

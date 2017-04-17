@@ -72,7 +72,7 @@ function check_locked($update, $MadelineProto)
                         check_json_array('locked.json', $ch_id);
                         $file = file_get_contents("locked.json");
                         $locked = json_decode($file, true);
-                        if (array_key_exists($ch_id, $locked)) {
+                        if (isset($locked[$ch_id])) {
                             if (in_array($type, $locked[$ch_id])) {
                                 $delete = $uMadelineProto->
                                 channels->deleteMessages(
@@ -89,7 +89,7 @@ function check_locked($update, $MadelineProto)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (isset($locked[$ch_id])) {
                                     if (in_array('arabic', $locked[$ch_id])) {
                                         $delete = $uMadelineProto->
                                         channels->deleteMessages(
@@ -103,7 +103,7 @@ function check_locked($update, $MadelineProto)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (isset($locked[$ch_id])) {
                                     if (in_array('utf', $locked[$ch_id])) {
                                         $delete = $uMadelineProto->
                                         channels->deleteMessages(
@@ -117,7 +117,7 @@ function check_locked($update, $MadelineProto)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (isset($locked[$ch_id])) {
                                     if (in_array('links', $locked[$ch_id])) {
                                         $delete = $uMadelineProto->
                                         channels->deleteMessages(
@@ -151,7 +151,7 @@ function check_flood($update, $MadelineProto)
                 $file = file_get_contents("locked.json");
                 $locked = json_decode($file, true);
                 if (is_moderated($ch_id)) {
-                    if (array_key_exists($ch_id, $locked)) {
+                    if (isset($locked[$ch_id])) {
                         if (in_array('flood', $locked[$ch_id])) {
                             if (is_bot_admin($update, $MadelineProto)) {
                                 if (from_admin_mod($update, $MadelineProto)) {
@@ -274,7 +274,7 @@ function check_locked_user($update, $MadelineProto)
                         check_json_array('locked.json', $ch_id);
                         $file = file_get_contents("locked.json");
                         $locked = json_decode($file, true);
-                        if (array_key_exists($ch_id, $locked)) {
+                        if (isset($locked[$ch_id])) {
                             if (in_array($type, $locked[$ch_id])) {
                                 $delete = $MadelineProto->
                                 channels->deleteMessages(
@@ -291,7 +291,7 @@ function check_locked_user($update, $MadelineProto)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (isset($locked[$ch_id])) {
                                     if (in_array('arabic', $locked[$ch_id])) {
                                         $delete = $MadelineProto->
                                         channels->deleteMessages(
@@ -305,7 +305,7 @@ function check_locked_user($update, $MadelineProto)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (isset($locked[$ch_id])) {
                                     if (in_array('utf', $locked[$ch_id])) {
                                         $delete = $MadelineProto->
                                         channels->deleteMessages(
@@ -319,7 +319,7 @@ function check_locked_user($update, $MadelineProto)
                                 check_json_array('locked.json', $ch_id);
                                 $file = file_get_contents("locked.json");
                                 $locked = json_decode($file, true);
-                                if (array_key_exists($ch_id, $locked)) {
+                                if (isset($locked[$ch_id])) {
                                     if (in_array('links', $locked[$ch_id])) {
                                         $delete = $MadelineProto->
                                         channels->deleteMessages(
@@ -352,7 +352,7 @@ function check_flood_user($update, $MadelineProto)
                 $file = file_get_contents("locked.json");
                 $locked = json_decode($file, true);
                 if (is_moderated($ch_id)) {
-                    if (array_key_exists($ch_id, $locked)) {
+                    if (isset($locked[$ch_id])) {
                         if (in_array('flood', $locked[$ch_id])) {
                             if (is_bot_admin($update, $MadelineProto)) {
                                 if (from_admin_mod($update, $MadelineProto)) {

@@ -214,7 +214,7 @@ class NewChannelMessage extends Threaded
             }
             if (is_bot_admin($update, $MadelineProto)) {
                 if (!from_admin_mod($update, $MadelineProto)) {
-                    if (array_key_exists($ch_id, $mutelist)) {
+                    if (isset($mutelist[$ch_id])) {
                         foreach ($from_users as $userid) {
                             if (in_array($userid, $mutelist[$ch_id])
                                 or in_array("all", $mutelist[$ch_id])
@@ -275,7 +275,7 @@ class NewChannelMessage extends Threaded
                             $sentMessage
                         );
                     }
-                    if (array_key_exists($ch_id, $banlist)) {
+                    if (isset($banlist[$ch_id])) {
                         if (in_array($fromid, $banlist[$ch_id])) {
                             try {
                                 $message = "NO! They are NOT allowed here!";
@@ -724,7 +724,7 @@ function NewChatAddUser($update, $MadelineProto)
                 check_json_array('banlist.json', $ch_id);
                 $file = file_get_contents("banlist.json");
                 $banlist = json_decode($file, true);
-                if (array_key_exists($ch_id, $banlist)) {
+                if (isset($banlist[$ch_id])) {
                     if (in_array($mention, $banlist[$ch_id])) {
                         $message = "NO! They are NOT allowed here!";
                         $default['message'] = $message;
@@ -752,7 +752,7 @@ function NewChatAddUser($update, $MadelineProto)
                     check_json_array('settings.json', $ch_id);
                     $file = file_get_contents("settings.json");
                     $settings = json_decode($file, true);
-                    if (array_key_exists($ch_id, $settings)) {
+                    if (isset($settings[$ch_id])) {
                         if (array_key_exists('welcome', $settings[$ch_id])) {
                             if ($settings[$ch_id]["welcome"]) {
                                 $mention2 = html_mention($username, $mention);
@@ -863,7 +863,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
                         $sentMessage
                     );
                 }
-                if (array_key_exists($ch_id, $banlist)) {
+                if (isset($banlist[$ch_id])) {
                     if (in_array($mention, $banlist[$ch_id])) {
                         $message = "NO! They are NOT allowed here!";
                         $default['message'] = $message;
@@ -890,7 +890,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
                     check_json_array('settings.json', $ch_id);
                     $file = file_get_contents("settings.json");
                     $settings = json_decode($file, true);
-                    if (array_key_exists($ch_id, $settings)) {
+                    if (isset($settings[$ch_id])) {
                         if (array_key_exists('welcome', $settings[$ch_id])) {
                             if ($settings[$ch_id]["welcome"]) {
                                 $mention2 = html_mention($username, $mention);
@@ -1051,7 +1051,7 @@ class NewChannelMessageUserBot extends Threaded
             }
             if (is_bot_admin($update, $MadelineProto)) {
                 if (!from_admin_mod($update, $MadelineProto)) {
-                    if (array_key_exists($ch_id, $mutelist)) {
+                    if (isset($mutelist[$ch_id])) {
                         foreach ($from_users as $userid) {
                             if (in_array($userid, $mutelist[$ch_id])
                                 or in_array("all", $mutelist[$ch_id])
@@ -1105,7 +1105,7 @@ class NewChannelMessageUserBot extends Threaded
                             }
                         } catch (Exception $e) {}
                     }
-                    if (array_key_exists($ch_id, $banlist)) {
+                    if (isset($banlist[$ch_id])) {
                         if (in_array($fromid, $banlist[$ch_id])) {
                             try {
                                 $kick = $MadelineProto->

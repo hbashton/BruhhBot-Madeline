@@ -67,7 +67,7 @@ function saveme($update, $MadelineProto, $msg, $name)
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
                     $saved = json_decode($file, true);
-                    if (array_key_exists($ch_id, $saved)) {
+                    if (isset($saved[$ch_id])) {
                         if (!array_key_exists("from", $saved[$ch_id])) {
                             $saved[$ch_id]["from"] = [];
                         }
@@ -145,7 +145,7 @@ function getme($update, $MadelineProto, $name)
         $file = file_get_contents("saved.json");
         $saved = json_decode($file, true);
         $boldname = create_style('bold', 0, $name);
-        if (array_key_exists($ch_id, $saved)) {
+        if (isset($saved[$ch_id])) {
             if ($name !== "from") {
                 foreach ($saved[$ch_id] as $i => $ii) {
                     if (!is_array($i)) {
@@ -223,7 +223,7 @@ function savefrom($update, $MadelineProto, $name)
                 check_json_array('saved.json', $ch_id);
                 $file = file_get_contents("saved.json");
                 $saved = json_decode($file, true);
-                if (array_key_exists($ch_id, $saved)) {
+                if (isset($saved[$ch_id])) {
                     if (!array_key_exists("from", $saved[$ch_id])) {
                         $saved[$ch_id]["from"] = [];
                     }
@@ -317,7 +317,7 @@ function saved_get($update, $MadelineProto)
         check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");
         $saved = json_decode($file, true);
-        if (array_key_exists($ch_id, $saved)) {
+        if (isset($saved[$ch_id])) {
             foreach ($saved[$ch_id] as $i => $ii) {
                 if ($i !== "from") {
                     if (!isset($message)) {
@@ -408,7 +408,7 @@ function save_clear($update, $MadelineProto, $msg)
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
                     $saved = json_decode($file, true);
-                    if (array_key_exists($ch_id, $saved)) {
+                    if (isset($saved[$ch_id])) {
                         if (!array_key_exists("from", $saved[$ch_id])) {
                             $saved[$ch_id]["from"] = [];
                         }

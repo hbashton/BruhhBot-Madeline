@@ -247,7 +247,7 @@ function from_mod($update, $MadelineProto)
         }
         $file = file_get_contents("promoted.json");
         $promoted = json_decode($file, true);
-        if (array_key_exists($ch_id, $promoted)) {
+        if (isset($promoted[$ch_id])) {
             if (in_array($userid, $promoted[$ch_id])) {
                 $mod = true;
             } else {
@@ -281,7 +281,7 @@ function is_mod($update, $MadelineProto, $userid, $ch_id = false)
         }
         $file = file_get_contents("promoted.json");
         $promoted = json_decode($file, true);
-        if (array_key_exists($ch_id, $promoted)) {
+        if (isset($promoted[$ch_id])) {
             if (in_array($userid, $promoted[$ch_id])) {
                 $mod = true;
             } else {
