@@ -90,7 +90,7 @@ function parse_chat_data($update, $MadelineProto)
 
 if (!isset($info['id'])) var_dump($info);
         $peer = $info['id'];
-        $title = $info['title'];
+        $title = $MadelineProto->utf8ize($info['title']);
         $ch_id = $info['id'];
         $chat_array = array(
             'peer' => $peer,
