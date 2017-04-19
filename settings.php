@@ -153,6 +153,7 @@ function locked_menu($update, $MadelineProto)
     $userid = $parsed_query['user_id'];
     $default = array(
         'peer' => $parsed_query['peer'],
+        'id' => $id,
         'parse_mode' => 'html',
         'message' => "Here's the locked settings. Any disabled message type will be deleted when sent.\n\xE2\x9C\x85 => Enabled\n\xE2\x9D\x8C => Disabled"
     );
