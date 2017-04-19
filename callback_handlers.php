@@ -321,3 +321,152 @@ function settings_menu_callback($update, $MadelineProto)
         } catch (Exception $e) {}
     }
 }
+
+function help2_callback($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $userid = $parsed_query['user_id'];
+    $v = $parsed_query['data']['v'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'parse_mode' => 'html'
+    );
+    $rows = [];
+    $rowcount = 0;
+    $file = file_get_contents("start_help.json");
+    $startj = json_decode($file, true);
+    $default['message'] = $startj['menus'][$v];
+    foreach ($startj['commands_help'][$v] as $command => $desc) {
+         if ($rowcount < 2 && $rowcount > 0) {
+             $end = false;
+             $rowcount = 0;
+             $buttons[] =
+                ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
+                    "q" => "help3",
+                    "v" => "$command",
+                    "e" => "$v",
+                    "u" =>  $peer))];
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+            $rows[] = $row;
+         } else {
+             $end = true;
+             $rowcount++;
+             $buttons = [
+                ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
+                    "q" => "help3",
+                    "v" => "$command",
+                    "e" => "$v",
+                    "u" =>  $peer))]
+            ];
+        }
+    }
+    if ($end) {
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+    }
+    $buttons = [
+        ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+            "q" => "back_to_help",
+            "u" =>  $peer))]
+    ];
+    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+    $rows[] = $row;
+    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+    $default['reply_markup'] = $replyInlineMarkup;
+    if (isset($default['message'])) {
+        try {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        } catch (Exception $e) {}
+    }
+}
+
+function help3_callback($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $userid = $parsed_query['user_id'];
+    $v = $parsed_query['data']['v'];
+    $e = $parsed_query['data']['e'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'parse_mode' => 'html'
+    );
+    $rows = [];
+    $buttons = [
+        ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+            "q" => "back_to_help",
+            "u" =>  $peer))]
+    ];
+    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+    $rows[] = $row;
+    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+    $file = file_get_contents("start_help.json");
+    $startj = json_decode($file, true);
+    $default['message'] = $startj['commands_help'][$e][$v];
+    $default['reply_markup'] = $replyInlineMarkup;
+    if (isset($default['message'])) {
+        try {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+        );
+        \danog\MadelineProto\Logger::log($sentMessage);
+    } catch (Exception $e) {}
+}
+}
+
+function help_menu_callback($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $userid = $parsed_query['user_id'];
+    $default = array(
+        'peer' => $peer,
+        'parse_mode' => 'html',
+        'message' => 'You can navigate the help menu to see each command and how it\'s used. All commands can be started with !, /, or #'
+        );
+    $rows = [];
+    $rowcount = 0;
+    $file = file_get_contents("start_help.json");
+    $startj = json_decode($file, true);
+    foreach ($startj['menus'] as $menu => $desc) {
+         if ($rowcount < 2 && $rowcount > 0) {
+             $end = false;
+             $rowcount = 0;
+             $buttons[] =
+                ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
+                    "q" => "help2",
+                    "v" => "$menu",
+                    "u" =>  $peer))];
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+            $rows[] = $row;
+         } else {
+             $end = true;
+             $rowcount++;
+             $buttons = [
+                ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
+                    "q" => "help2",
+                    "v" => "$menu",
+                    "u" =>  $peer))]
+            ];
+        }
+    }
+    if ($end) {
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+    }
+    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+    $default['reply_markup'] = $replyInlineMarkup;
+    try {
+        $sentMessage = $MadelineProto->messages->sendMessage(
+            $default
+        );
+        \danog\MadelineProto\Logger::log($sentMessage);
+    } catch (Exception $e) {}
+}

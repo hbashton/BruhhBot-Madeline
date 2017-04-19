@@ -92,3 +92,4 @@ composer.lock
 !configuration.json
 !responses.json
 !hints.json
+!start_help.json

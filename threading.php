@@ -74,7 +74,7 @@ class NewMessage extends Threaded
                             break;
 
                         case 'help':
-                            start_message($update, $MadelineProto);
+                            help_message($update, $MadelineProto);
                             break;
 
                         case 'time':

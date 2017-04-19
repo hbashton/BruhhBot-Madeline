@@ -1,0 +1,71 @@
+{
+"menus":
+    {
+    "Basics":"<b>Basic Commands</b>\nThese are some of the basic commands, which should be known to most",
+    "Save":"<b>Save Commands</b>\nYou can use these commands to save and retrieve various messages",
+    "AntiSpam":"<b>Lock Commands</b>\nHere you can lock media and other message types from being sent. You can also modify these in settings",
+    "Group":"<b>Group Commands</b>\nUse these commands specifically to moderate and modify your group",
+    "Banhammer":"<b>Banhammer Commands</b>\nBOOM! Wield Char's hammer with pride. Keep spammers out of your chat with these commands",
+    "Mutehammer":"<b>Mute Commands</b>\nKeep annoying chatmembers from talking, and stop OT with the mute commands",
+    "Moderators":"<b>Moderator Commands</b>\nPromote and demote moderators, along with restricting their functions (coming soon)"
+    },
+"commands_help":
+    {
+    "Basics":
+        {
+        "Add":"<b>add</b> - Use this to add a supergroup to my database, and let me moderate it",
+        "Rm":"<b>rm</b> - This will remove a supergroup from my database, and I'll no longer moderate it (although some commands will still be available)",
+        "Settings":"<b>settings</b> - Modify the settings of a group",
+        "Time":"<b>time</b> <code> area</code> - Get the time and date for any given area!",
+        "Weather":"<b>weather</b> <code>area</code> - Get the weather, and temperature, for any given area!",
+        "Stats":"<b>stats</b> <code>[@username|ID|by reply]</code> - Get their name, username, and bot-related information about them",
+        "ID":"<b>id</b> <code>[@username|ID|by reply]</code> - Get a users ID from their username, or vice versa",
+        "Join":"<b>join</b> <code>[invite link]</code> - Invite my partner to the group! <code>Note: the link must be in the format [https://t.me/joinchat/...]</code>"
+        },
+    "Save":
+        {
+        "Save":"<b>save</b> <code>name message</code> - Save <code>message</code> under <code>name</code> to be retrieved later with <code>#name</code>",
+        "SaveFrom":"<b>save</b> <code>from name</code> - Save a message [by reply] under <code>name</code> to be retrieved later with <code>#name</code>",
+        "SaveClear":"<b>save</b> <code>clear name</code> - Clear the saved message under <code>name</code>",
+        "Saved":"<b>saved</b> - Get a list of saved messages!"
+        },
+    "AntiSpam":
+        {
+        "Lock":"<b>lock</b> <code>[lock type]</code> - Lock certain messages, making the bot remove them when they're sent.",
+        "Unlock":"<b>unlock</b> <code>[lock type]</code> - Unlock certain messages, letting people send them as they please",
+        "Setflood":"<b>setflood</b> <code>integer</code> - Set the flood limit. When users cross that limit, if flood is locked, they're kicked.",
+        "Del":"<b>del</b> <code>[by reply]</code> - Delete a message by reply.\n<b>del</b> <code>[@username|ID]</code> - Delete the ENTIRE HISTORY of a user from a chat.",
+        "Purge":"<b>purge</b> <code>[by reply]</code> - Delete all messages after the message you replied to. (Exercise EXTREME caution! You don't wanna lose you're whole chat)."
+        },
+    "Group":
+        {
+        "Pin":"<b>pin</b> <code>[by reply]</code> - Pin a message.\n<b>pin</b> <code>silent</code> - Silently pin a message. Shhhhh.",
+        "Setphoto":"<b>setphoto</b> - Set the group photo!",
+        "Setname":"<b>setname</b> <code>name</code> - Set the group title!",
+        "Setabout":"<b>setabout</b> <code>\"about\"</code> - Change the about section of the group description. You MUST provide <code>\"about\"</code> in double quotes.",
+        "Invite":"<b>invite</b> <code>[@username|ID]</code> - Invite a user to the group! <code>Note: the user must have their privacy settings set to allow the bot to invite them, and the group must allow the bot to add users.</code>",
+        "Adminlist":"<b>adminlist</b> - Get a list of administrators for the group. If you spam this command, you'll just make them mad, so don't use this over and over."
+        },
+    "Banhammer":
+        {
+        "Kick":"<b>kick</b> <code>[@username|ID|by reply]</code> - Kick someone from a group!",
+        "Ban":"<b>ban</b> <code>[@username|ID|by reply]</code> - Ban someone from rejoining a group. They are blocked and added to my banlist, and cannot be added by anyone.",
+        "Unban":"<b>unban</b> <code>[@username|ID|by reply]</code> - Unban someone from a group. They can rejoin or be added at any time.",
+        "Banlist":"<b>banlist</b> - Get a list of all the banned users and ID's for that chat.",
+        "Gbanlist":"<b>gbanlist</b> - Get a list of all the globally banned users and ID's!",
+        "Kickme":"<b>kickme</b> - Ask the bot to kick you (unless your a mod/admin)"
+        },
+    "Mutehammer":
+        {
+        "Mute":"<b>mute</b> <code>[@username|ID|by reply]</code> - Mute a user, so that the bot deletes all their messages as they're sent\n<b>mute</b> <code>all</code> - Mute everyone, minus admins and moderators",
+        "Unmute":"<b>unmute</b> <code>@username/ID</code> - Unmute a user, giving them the right of free speech once more\n<b>unmute</b> <code>all</code> - Unmute everyone, and bring back free speech",
+        "Mutelist":"<b>mutelist</b> - Get a list of the pests that have been silenced in the current chat."
+        },
+    "Moderators":
+        {
+        "Promote":"<b>promote</b> <code>[@username|ID|by reply]</code> - Promote someone to moderator status",
+        "Demote":"<b>demote</b> <code>[@username|ID|by reply]</code> - Demote someone back to user status",
+        "Modlist":"<b>modlist</b> - Get a list of moderators for the current chat."
+        }
+    }
+}

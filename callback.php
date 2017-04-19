@@ -44,6 +44,18 @@ class BotCallbackQuery extends Threaded
                 case 'locked':
                     locked_menu($update, $MadelineProto);
                 break;
+                
+                case 'help2':
+                    help2_callback($update, $MadelineProto);
+                break;
+                
+                case 'help3':
+                    help3_callback($update, $MadelineProto);
+                break;
+                
+                case 'back_to_help':
+                    help_menu_callback($update, $MadelineProto);
+                break;
 
                 case 'back_to_settings':
                     settings_menu_callback($update, $MadelineProto);
