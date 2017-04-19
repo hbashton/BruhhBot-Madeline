@@ -119,9 +119,9 @@
     },
     "idme":
     {
-        "peeruser":"Your Telegram ID is {peer}",
-        "supergroup":"The Telegram ID of <b>{title}</b> is {ch_id}",
-        "idmessage":"The Telegram ID of {mention} is {userid}",
+        "peeruser":"Your Telegram ID is <code>{peer}</code>",
+        "supergroup":"The Telegram ID of <b>{title}</b> is <code>{ch_id}</code>",
+        "idmessage":"The Telegram ID of {mention} is <code>{userid}</code>",
         "idk":"I don't know a {msg}, who's that?"
     },
     "adminlist":
