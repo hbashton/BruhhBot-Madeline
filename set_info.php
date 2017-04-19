@@ -82,7 +82,7 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                                             $default['message'] = $message;
 
                                         } catch (Exception $e) {
-                                            $message = $MadelineProto->responses['set_chat_photo']['exception'];
+                                            $message = $MadelineProto->responses['set_chat_photo']['exception']."\n".$e->getMessage();
                                             $default['message'] = $message;
                                         }
                                         unset($MadelineProto->from_user_chat_photo);
