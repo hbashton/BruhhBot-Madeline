@@ -13,7 +13,13 @@ function welcome_callback($update, $MadelineProto)
         'parse_mode' => 'html',
         'message' => "If you ask me to, I will greet new people!"
     );
-    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
     if (is_moderated($ch_id)) {
         if ($parsed_query['data']['v'] == "on") {
             check_json_array('settings.json', $default['peer']);
@@ -27,7 +33,6 @@ function welcome_callback($update, $MadelineProto)
         $welcomeon = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "welcome",
         "v" => "on",
-        "u" =>  $userid,
         "c" =>  $ch_id))]; 
         if ($parsed_query['data']['v'] == "off") {
             check_json_array('settings.json', $default['peer']);
@@ -41,13 +46,11 @@ function welcome_callback($update, $MadelineProto)
         $welcomeoff = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "welcome",
         "v" => "off",
-        "u" =>  $userid,
         "c" =>  $ch_id))];
         $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeon], ];
         $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeoff], ];
         $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
     "q" => "back_to_settings", // query
-    "u" =>  $userid,           // user
     "c" =>  $ch_id ))];        // chat
         $row3 = ['_' => 'keyboardButtonRow', 'buttons' => [$back] ];
         $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2, $row3], ];
@@ -69,7 +72,7 @@ function lock_callback($update, $MadelineProto)
     $id = $parsed_query['msg_id'];
     $ch_id = $parsed_query['data']['c'];
     $userid = $parsed_query['user_id'];
-    $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$id]]);
+    $message = $MadelineProto->messages->getMessages(['channel' => $peer, 'id' => [$id]]);
     if (!is_array($message)) return;
     $message = $message['messages'][0]['message'];
     $default = array(
@@ -78,7 +81,13 @@ function lock_callback($update, $MadelineProto)
         'parse_mode' => 'html',
         'message' => $message
     );
-    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
     $val = $parsed_query['data']['v'];
     $file = file_get_contents("locked.json");
     $locked = json_decode($file, true);
@@ -120,12 +129,10 @@ function lock_callback($update, $MadelineProto)
         $buttons = [
             ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
                 "q" => "hint",       // query
-                "v" => "$key",       // value
-                "u" =>  $userid))],
+                "v" => "$key"))],
             ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
                 "q" => "lock",       // query
                 "v" => "$key-$onoff",// value
-                "u" =>  $userid,     // user
                 "c" =>  $ch_id ))]   // chat
         ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -134,15 +141,12 @@ function lock_callback($update, $MadelineProto)
     $buttons = [
             ['_' => 'keyboardButtonCallback', 'text' => "\xe2\xac\x85\xef\xb8\x8f", 'data' => json_encode(array(
                 "q" => "decrease_flood",   // query
-                "u" =>  $userid,           // user
                 "c" =>  $ch_id ))],        // chat
             ['_' => 'keyboardButtonCallback', 'text' => (string) $locked[$ch_id]['floodlimit'], 'data' => json_encode(array(
                 "q" => "hint",             // query
-                "u" =>  $userid,           // user
                 "v" => "flood"))],
             ['_' => 'keyboardButtonCallback', 'text' => "\xe2\x9e\xa1\xef\xb8\x8f", 'data' => json_encode(array(
                 "q" => "increase_flood",   // query
-                "u" =>  $userid,           // user
                 "c" =>  $ch_id ))],        // chat
         ];
     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -150,7 +154,6 @@ function lock_callback($update, $MadelineProto)
     $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
             "q" => "back_to_settings", // query
-            "u" =>  $userid,           // user
             "c" =>  $ch_id ))]         // chat
     ];
     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -173,7 +176,7 @@ function increment_flood($update, $MadelineProto, $up = false)
     $id = $parsed_query['msg_id'];
     $ch_id = $parsed_query['data']['c'];
     $userid = $parsed_query['user_id'];
-    $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$id]]);
+    $message = $MadelineProto->messages->getMessages(['channel' => $peer, 'id' => [$id]]);
     if (!is_array($message)) return;
     $message = $message['messages'][0]['message'];
     $default = array(
@@ -182,7 +185,13 @@ function increment_flood($update, $MadelineProto, $up = false)
         'parse_mode' => 'html',
         'message' => $message
     );
-    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
     $file = file_get_contents("locked.json");
     $locked = json_decode($file, true);
     if ($up) {
@@ -213,12 +222,10 @@ function increment_flood($update, $MadelineProto, $up = false)
         $buttons = [
             ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
                 "q" => "hint",       // query
-                "v" => "$key",       // value
-                "u" =>  $userid ))],
+                "v" => "$key"))],
             ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
                 "q" => "lock",       // query
                 "v" => "$key-$onoff",// value
-                "u" =>  $userid,     // user
                 "c" =>  $ch_id ))]   // chat
         ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -227,15 +234,12 @@ function increment_flood($update, $MadelineProto, $up = false)
     $buttons = [
             ['_' => 'keyboardButtonCallback', 'text' => "\xe2\xac\x85\xef\xb8\x8f", 'data' => json_encode(array(
                 "q" => "decrease_flood",   // query
-                "u" =>  $userid,           // user
                 "c" =>  $ch_id ))],        // chat
             ['_' => 'keyboardButtonCallback', 'text' => (string) $locked[$ch_id]['floodlimit'], 'data' => json_encode(array(
                 "q" => "hint",             // query
-                "u" =>  $userid,           // user
                 "v" => "flood" ))],        // chat
             ['_' => 'keyboardButtonCallback', 'text' => "\xe2\x9e\xa1\xef\xb8\x8f", 'data' => json_encode(array(
                 "q" => "increase_flood",   // query
-                "u" =>  $userid,           // user
                 "c" =>  $ch_id ))],        // chat
         ];
     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -243,7 +247,6 @@ function increment_flood($update, $MadelineProto, $up = false)
     $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
             "q" => "back_to_settings", // query
-            "u" =>  $userid,           // user
             "c" =>  $ch_id ))]         // chat
     ];
     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -266,7 +269,7 @@ function alert_hint($update, $MadelineProto, $up = false)
     $id = $parsed_query['msg_id'];
     $userid = $parsed_query['user_id'];
     $v = $parsed_query['data']['v'];
-    $message = $MadelineProto->channels->getMessages(['channel' => $peer, 'id' => [$id]]);
+    $message = $MadelineProto->messages->getMessages(['channel' => $peer, 'id' => [$id]]);
     if (!is_array($message)) return;
     $message = $message['messages'][0]['message'];
     $default = array(
@@ -287,24 +290,34 @@ function settings_menu_callback($update, $MadelineProto)
     $peer = $parsed_query['peer'];
     $id = $parsed_query['msg_id'];
     $ch_id = $parsed_query['data']['c'];
+    $info = cache_get_info($update, $MadelineProto, $ch_id, true);
+    if ($info) {
+        $title = "for ".$info['title'];
+    } else {
+        $title = "";
+    }
     $userid = $parsed_query['user_id'];
     $default = array(
         'peer' => $parsed_query['peer'],
         'id' => $parsed_query['msg_id'],
         'parse_mode' => 'html',
-        'message' => "Here's the settings menu! Feel free to explore"
+        'message' => "Here's the settings menu $title! Feel free to explore"
     );
-    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
     if (is_moderated($ch_id)) {
         $rows = [];
          $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "Locked", 'data' => json_encode(array(
             "q" => "locked",     // query
-            "u" =>  $userid,     // user
             "c" =>  $ch_id ))],  // chat
         ['_' => 'keyboardButtonCallback', 'text' => "Welcome", 'data' => json_encode(array(
             "q" => "welcome_menu",       // query
-            "u" =>  $userid,     // user
             "c" =>  $ch_id ))]   // chat
         ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -346,8 +359,7 @@ function help2_callback($update, $MadelineProto)
                 ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
                     "q" => "help3",
                     "v" => "$command",
-                    "e" => "$v",
-                    "u" =>  $peer))];
+                    "e" => "$v"))];
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
             $rows[] = $row;
          } else {
@@ -357,8 +369,7 @@ function help2_callback($update, $MadelineProto)
                 ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
                     "q" => "help3",
                     "v" => "$command",
-                    "e" => "$v",
-                    "u" =>  $peer))]
+                    "e" => "$v"))]
             ];
         }
     }
@@ -368,8 +379,7 @@ function help2_callback($update, $MadelineProto)
     }
     $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
-            "q" => "back_to_help",
-            "u" =>  $peer))]
+            "q" => "back_to_help"))]
     ];
     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
     $rows[] = $row;
@@ -400,8 +410,7 @@ function help3_callback($update, $MadelineProto)
     $rows = [];
     $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
-            "q" => "back_to_help",
-            "u" =>  $peer))]
+            "q" => "back_to_help"))]
     ];
     $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
     $rows[] = $row;
@@ -442,8 +451,7 @@ function help_menu_callback($update, $MadelineProto)
              $buttons[] =
                 ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
                     "q" => "help2",
-                    "v" => "$menu",
-                    "u" =>  $peer))];
+                    "v" => "$menu"))];
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
             $rows[] = $row;
          } else {
@@ -452,8 +460,7 @@ function help_menu_callback($update, $MadelineProto)
              $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
                     "q" => "help2",
-                    "v" => "$menu",
-                    "u" =>  $peer))]
+                    "v" => "$menu"))]
             ];
         }
     }

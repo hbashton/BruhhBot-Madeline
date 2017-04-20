@@ -9,6 +9,13 @@ function start_message($update, $MadelineProto)
             $update['update']['message']['from_id']
         )['bot_api_id'];
         $msg_id = $update['update']['message']['id'];
+        if ($update['update']['message']['message'] != "/start") {
+            $query = preg_replace("/\/start/", "", $update['update']['message']['message']);
+            if (!preg_match_all("/settings-/", $query, $out)) return;
+            $chat = preg_replace("/ settings-/", "", $query);
+            settings_menu_deeplink($update, $MadelineProto, $chat);
+            return;
+        }
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,

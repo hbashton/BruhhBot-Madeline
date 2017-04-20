@@ -96,7 +96,7 @@ function settings_menu($update, $MadelineProto)
             $msg_id = $update['update']['message']['id'];
             $mods = $MadelineProto->responses['welcome_toggle']['mods'];
             $chat = parse_chat_data($update, $MadelineProto);
-            $title = htmlentities($chat['title']);
+            $title = $chat['title'];
             $peer = $chat['peer'];
             $ch_id = $chat['id'];
             $userid = cache_from_user_info($update, $MadelineProto);
@@ -106,10 +106,10 @@ function settings_menu($update, $MadelineProto)
                 return;
             }
             $default = array(
-                'peer' => $peer,
+                'peer' => $userid,
                 'reply_to_msg_id' => $msg_id,
                 'parse_mode' => 'html',
-                'message' => "Here's the settings menu! Feel free to explore"
+                'message' => "Here's the settings menu for $title! Feel free to explore"
                 );
             $rows = [];
             if (is_moderated($ch_id)) {
@@ -118,11 +118,9 @@ function settings_menu($update, $MadelineProto)
                         $buttons = [
                             ['_' => 'keyboardButtonCallback', 'text' => "Locked", 'data' => json_encode(array(
                                 "q" => "locked",     // query
-                                "u" =>  $userid,     // user
                                 "c" =>  $ch_id ))],  // chat
                             ['_' => 'keyboardButtonCallback', 'text' => "Welcome", 'data' => json_encode(array(
                                 "q" => "welcome_menu", // query
-                                "u" =>  $userid,       // user
                                 "c" =>  $ch_id ))]     // chat
                         ];
                         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -136,11 +134,79 @@ function settings_menu($update, $MadelineProto)
                                 );
                                 \danog\MadelineProto\Logger::log($sentMessage);
                             }
-                        } catch (Exception $e) {}
+                        } catch (Exception $e) {
+                            $default['peer'] = $peer;
+                            $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                            $url = "https://telegram.me/$botusername?start=settings-$ch_id";
+                            $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Start a chat with me!", 'url' => $url, ];
+                            $buttons = [$keyboardButtonUrl];
+                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                            $rows = [$row];
+                            $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                            $default['reply_markup'] = $replyInlineMarkup;
+                            $default['message'] = "Please start a chat with me so I can send you the settings for $title";
+                            $sentMessage = $MadelineProto->messages->sendMessage(
+                                    $default
+                                );
+                            \danog\MadelineProto\Logger::log($sentMessage);
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+function settings_menu_deeplink($update, $MadelineProto, $ch_id)
+{
+    $msg_id = $update['update']['message']['id'];
+    $info = cache_get_info($update, $MadelineProto, $ch_id, true);
+    if ($info) {
+        $title = "for ".$info['title'];
+    } else {
+        $title = "";
+    }
+    $userid = cache_from_user_info($update, $MadelineProto);
+    if (isset($userid['bot_api_id'])) {
+        $userid = $userid['bot_api_id'];
+    } else {
+        return;
+    }
+    $default = array(
+        'peer' => $userid,
+        'reply_to_msg_id' => $msg_id,
+        'parse_mode' => 'html',
+        'message' => "Here's the settings menu for $title! Feel free to explore"
+        );
+    $rows = [];
+    if (!is_admin_mod($update, $MadelineProto, $userid, false, false, $ch_id)) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
+    if (is_moderated($ch_id)) {
+        $buttons = [
+            ['_' => 'keyboardButtonCallback', 'text' => "Locked", 'data' => json_encode(array(
+                "q" => "locked",     // query
+                "c" =>  $ch_id ))],  // chat
+            ['_' => 'keyboardButtonCallback', 'text' => "Welcome", 'data' => json_encode(array(
+                "q" => "welcome_menu", // query
+                "c" =>  $ch_id ))]     // chat
+        ];
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+        $default['reply_markup'] = $replyInlineMarkup;
+        try {
+            if (isset($default['message'])) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+        } catch (Exception $e) {}
     }
 }
 
@@ -150,15 +216,27 @@ function locked_menu($update, $MadelineProto)
     $peer = $parsed_query['peer'];
     $id = $parsed_query['msg_id'];
     $ch_id = $parsed_query['data']['c'];
+    $info = cache_get_info($update, $MadelineProto, $ch_id, true);
+    if ($info) {
+        $title = "for ".$info['title'];
+    } else {
+        $title = "";
+    }
     $userid = $parsed_query['user_id'];
     $default = array(
         'peer' => $parsed_query['peer'],
         'id' => $id,
         'parse_mode' => 'html',
-        'message' => "Here's the locked settings. Any disabled message type will be deleted when sent.\n\xE2\x9C\x85 => Enabled\n\xE2\x9D\x8C => Disabled"
+        'message' => "Here's the locked settings $title. Any disabled message type will be deleted when sent.\n\xE2\x9C\x85 => Enabled\n\xE2\x9D\x8C => Disabled"
     );
-    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
-    if (is_moderated($ch_id)) {
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
+    if (is_moderated($ch_id)) { 
         $rows = [];
         $file = file_get_contents("locked.json");
         $locked = json_decode($file, true);
@@ -185,12 +263,10 @@ function locked_menu($update, $MadelineProto)
             $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
                     "q" => "hint",       // query
-                    "v" => "$key",       // value
-                    "u" =>  $userid))],
+                    "v" => "$key"))],
                 ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
                     "q" => "lock",       // query
                     "v" => "$key-$onoff",// value
-                    "u" =>  $userid,     // user
                     "c" =>  $ch_id ))]   // chat
             ];
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -199,16 +275,13 @@ function locked_menu($update, $MadelineProto)
         $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => "\xe2\xac\x85\xef\xb8\x8f", 'data' => json_encode(array(
                     "q" => "decrease_flood",   // query
-                    "u" =>  $userid,           // user
                     "c" =>  $ch_id ))],        // chat
                 ['_' => 'keyboardButtonCallback', 'text' => (string) $locked[$ch_id]['floodlimit'], 'data' => json_encode(array(
                     "q" =>  "hint",            // query
                     "v" =>  "flood",           // value
-                    "u" =>  $userid,           // user
                     "c" =>  $ch_id ))],        // chat
                 ['_' => 'keyboardButtonCallback', 'text' => "\xe2\x9e\xa1\xef\xb8\x8f", 'data' => json_encode(array(
                     "q" => "increase_flood",   // query
-                    "u" =>  $userid,           // user
                     "c" =>  $ch_id ))],        // chat
             ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -216,7 +289,6 @@ function locked_menu($update, $MadelineProto)
         $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
                     "q" => "back_to_settings", // query
-                    "u" =>  $userid,           // user
                     "c" =>  $ch_id ))]         // chat
             ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -226,12 +298,10 @@ function locked_menu($update, $MadelineProto)
     }
     try {
         if (isset($default['message'])) {
-            try {
-                $sentMessage = $MadelineProto->messages->editMessage(
-                    $default
-                );
-                \danog\MadelineProto\Logger::log($sentMessage);
-            } catch (Exception $e) {}
+            $sentMessage = $MadelineProto->messages->editMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
         }
     } catch (Exception $e) {}
 }
@@ -249,7 +319,13 @@ function welcome_menu($update, $MadelineProto)
         'parse_mode' => 'html',
         'message' => "If you ask me to, I will greet new people!"
     );
-    if ($parsed_query['data']['u'] != $parsed_query['user_id'] or !is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) return;
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
     if (is_moderated($ch_id)) {
         check_json_array('settings.json', $default['peer']);
         $file = file_get_contents("settings.json");
@@ -268,7 +344,6 @@ function welcome_menu($update, $MadelineProto)
         $welcomeon = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "welcome", // query
         "v" => "on",      // value
-        "u" =>  $userid,
         "c" =>  $ch_id))]; // userid
         if (!$settings[$default['peer']]["welcome"]) {
             $text = "Don't welcome new users \xE2\x9C\x85";
@@ -278,13 +353,11 @@ function welcome_menu($update, $MadelineProto)
         $welcomeoff = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "welcome",
         "v" => "off",
-        "u" =>  $userid,
         "c" =>  $ch_id))];
         $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeon], ];
         $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeoff], ];
         $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
         "q" => "back_to_settings", // query
-        "u" =>  $userid,           // user
         "c" =>  $ch_id ))];        // chat
         $row3 = ['_' => 'keyboardButtonRow', 'buttons' => [$back] ];
         $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2, $row3], ];

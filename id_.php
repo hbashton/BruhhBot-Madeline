@@ -30,12 +30,12 @@ function catch_id($update, $MadelineProto, $user)
                         'username', $user_['User']
                     )
                     ) {
-                        $username = $user_['User']['username'];
+                        $username = $MadelineProto->utf8ize($user_['User']['username']);
                     } elseif (array_key_exists(
                         'first_name', $user_['User']
                     )
                     ) {
-                        $username = $user_['User']['first_name'];
+                        $username = $MadelineProto->utf8ize($user_['User']['first_name']);
                     } else {
                         $username = "no-name-user";
                     }
@@ -55,12 +55,12 @@ function catch_id($update, $MadelineProto, $user)
                     'username', $user_['User']
                 )
                 ) {
-                    $username = $user_['User']['username'];
+                    $username = $MadelineProto->utf8ize($user_['User']['username']);
                 } elseif (array_key_exists(
                     'first_name', $user_['User']
                 )
                 ) {
-                    $username = $user_['User']['first_name'];
+                    $username = $MadelineProto->utf8ize($user_['User']['first_name']);
                 } else {
                     $username = "no-name-user";
                 }
@@ -86,12 +86,12 @@ function catch_id($update, $MadelineProto, $user)
                             'username', $user_['User']
                         )
                         ) {
-                            $username = $user_['User']['username'];
+                            $username = $MadelineProto->utf8ize($user_['User']['username']);
                         } elseif (array_key_exists(
                             'first_name', $user_['User']
                         )
                         ) {
-                            $username = $user_['User']['first_name'];
+                            $username = $MadelineProto->utf8ize($user_['User']['first_name']);
                         } else {
                             $username = "no-name-user";
                         }
