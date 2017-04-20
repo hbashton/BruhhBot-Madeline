@@ -14,38 +14,14 @@ function start_message($update, $MadelineProto)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html',
             );
-        $message_ = file_get_contents('start_help.html');
-        if (strlen($message_) > 4000) {
-            $half = intval(strlen($message_) / 2);
-            $message = array();
-            if (strpos($message_, "\n", $half) !== false) {
-                $message[] = substr($message_, 0, strpos($message_, "\n", $half)+1);
-                $message[] = substr($message_, strpos($message_, "\n", $half)+1);
-            } else {
-                $message[] = substr($message_, 0, $half) . '...';
-                $message[] = substr($message_, $half);
-            }
-        } else {
-            $message = $message_;
-        }
-        $default['message'] = $message;
+        $botname = getenv('BOT_USERNAME');
+        $default['message'] = "Hi! I'm a bot made for managing supergroups. To use my functionality, you'll need to add me to your group, and my helper $botname must be there as well. To explore my commands, use /help.";
         if (isset($default['message'])) {
-            if (is_array($message)) {
-                foreach ($message as $value) {
-                    try {
-                        $default['message'] = $value;
-                        $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
-                    } catch (Exception $e) {}
-                }
-            } else {
-                try {
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                } catch (Exception $e) {}
-            }
+            try {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            } catch (Exception $e) {}
         }
     }
 }
