@@ -9,18 +9,20 @@ function start_message($update, $MadelineProto)
             $update['update']['message']['from_id']
         )['bot_api_id'];
         $msg_id = $update['update']['message']['id'];
-        if ($update['update']['message']['message'] != "/start") {
-            $query = preg_replace("/\/start/", "", $update['update']['message']['message']);
-            if (preg_match_all("/settings-/", $query, $out)) {
-                $chat = preg_replace("/ settings-/", "", $query);
-                settings_menu_deeplink($update, $MadelineProto, $chat);
+        try {
+            if ($update['update']['message']['message'] != "/start") {
+                $query = preg_replace("/\/start/", "", $update['update']['message']['message']);
+                if (preg_match_all("/settings-/", $query, $out)) {
+                    $chat = preg_replace("/ settings-/", "", $query);
+                    settings_menu_deeplink($update, $MadelineProto, $chat);
+                }
+                if (preg_match_all("/rules-/", $query, $out)) {
+                    $chat = preg_replace("/ rules-/", "", $query);
+                    get_chat_rules_deeplink($update, $MadelineProto, $chat);
+                }
+                return;
             }
-            if (preg_match_all("/rules-/", $query, $out)) {
-                $chat = preg_replace("/ rules-/", "", $query);
-                get_chat_rules_deeplink($update, $MadelineProto, $chat);
-            }
-            return;
-        }
+        } catch (Exception $e) {}
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
