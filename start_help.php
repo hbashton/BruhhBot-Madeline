@@ -15,7 +15,7 @@ function start_message($update, $MadelineProto)
             'parse_mode' => 'html',
             );
         $botname = getenv('BOT_USERNAME');
-        $default['message'] = "Hi! I'm a bot made for managing supergroups. To use my functionality, you'll need to add me to your group, and my helper $botname must be there as well. To explore my commands, use /help.";
+        $default['message'] = "Hi! I'm a bot made for managing supergroups. To use my functionality, you'll need to add me to your group, and my helper $botname must be there as well (as an admin!). To explore my commands, use /help.";
         if (isset($default['message'])) {
             try {
                 $sentMessage = $MadelineProto->messages->sendMessage(
