@@ -11,9 +11,14 @@ function start_message($update, $MadelineProto)
         $msg_id = $update['update']['message']['id'];
         if ($update['update']['message']['message'] != "/start") {
             $query = preg_replace("/\/start/", "", $update['update']['message']['message']);
-            if (!preg_match_all("/settings-/", $query, $out)) return;
-            $chat = preg_replace("/ settings-/", "", $query);
-            settings_menu_deeplink($update, $MadelineProto, $chat);
+            if (preg_match_all("/settings-/", $query, $out)) {
+                $chat = preg_replace("/ settings-/", "", $query);
+                settings_menu_deeplink($update, $MadelineProto, $chat);
+            }
+            if (preg_match_all("/rules-/", $query, $out)) {
+                $chat = preg_replace("/ rules-/", "", $query);
+                get_chat_rules_deeplink($update, $MadelineProto, $chat);
+            }
             return;
         }
         $default = array(

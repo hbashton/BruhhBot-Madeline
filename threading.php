@@ -592,6 +592,18 @@ class NewChannelMessage extends Threaded
                                 set_chat_about($update, $MadelineProto, $msg);
                                 break;
 
+                            case 'setrules':
+                                unset($msg_arr[0]);
+                                $msg = implode(" ", $msg_arr);
+                                set_chat_rules($update, $MadelineProto, $msg);
+                                break;
+
+                            case 'rules':
+                                unset($msg_arr[0]);
+                                $msg = implode(" ", $msg_arr);
+                                get_chat_rules($update, $MadelineProto);
+                                break;
+
                             case 'newlink':
                                 export_new_invite($update, $MadelineProto);
                                 break;

@@ -712,3 +712,89 @@ function pinalert($update, $MadelineProto)
         \danog\MadelineProto\Logger::log($forwardMessage);
     } catch (Exception $e) {}
 }
+
+function get_chat_rules($update, $MadelineProto)
+{
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    if (bot_present($update, $MadelineProto)) {
+        if (is_supergroup($update, $MadelineProto)) {
+            $msg_id = $update['update']['message']['id'];
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            $title = $chat['title'];
+            $ch_id = $chat['id'];
+            $default = array(
+                'peer' => $fromid,
+                'reply_to_msg_id' => $msg_id,
+                'parse_mode' => 'html'
+                );
+            if (is_moderated($ch_id)) {
+                check_json_array("settings.json", $ch_id);
+                $file = file_get_contents("settings.json");
+                $settings = json_decode($file, true);
+                if (!isset($settings[$ch_id]["rules"])) {
+                    $settings[$ch_id]["rules"] = "";
+                }
+                if ($settings[$ch_id]["rules"] != "") {
+                    $default['message'] = "<code>Rules for $title</code>:\n".$settings[$ch_id]["rules"];
+                } else {
+                    $default['message'] = "There are no rules for $title";
+                }
+            }
+            if (isset($default['message'])) {
+                try {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                } catch (Exception $e) {
+                    $default['peer'] = $peer;
+                    $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                    $url = "https://telegram.me/$botusername?start=rules-$ch_id";
+                    $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Get the rules!", 'url' => $url, ];
+                    $buttons = [$keyboardButtonUrl];
+                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                    $rows = [$row];
+                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                    $default['reply_markup'] = $replyInlineMarkup;
+                    $default['message'] = "Please start a chat with me so I can send you the rules for $title";
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                    \danog\MadelineProto\Logger::log($sentMessage);
+                }
+            }
+        }
+    }
+}
+
+function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
+{
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $msg_id = $update['update']['message']['id'];
+    $chat = cache_get_info($update, $MadelineProto, $ch_id, true);
+    $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+    $title = $chat['title'];
+    $default = array(
+        'peer' => $fromid,
+        'parse_mode' => 'html'
+        );
+    check_json_array("settings.json", $ch_id);
+    $file = file_get_contents("settings.json");
+    $settings = json_decode($file, true);
+    if (!isset($settings[$ch_id]["rules"])) {
+        $settings[$ch_id]["rules"] = "";
+    }
+    if ($settings[$ch_id]["rules"] != "") {
+        $default['message'] = "<code>Rules for $title</code>:\n".$settings[$ch_id]["rules"];
+    } else {
+        $default['message'] = "There are no rules for $title";
+    }
+    if (isset($default['message'])) {
+        try {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        } catch (Exception $e) {}
+    }
+}
