@@ -327,16 +327,16 @@ function welcome_menu($update, $MadelineProto)
         return;
     }
     if (is_moderated($ch_id)) {
-        check_json_array('settings.json', $default['peer']);
+        check_json_array('settings.json', $ch_id);
         $file = file_get_contents("settings.json");
         $settings = json_decode($file, true);
-        if (!isset($settings[$default['peer']])) {
-            $settings[$default['peer']] = [];
+        if (!isset($settings[$ch_id])) {
+            $settings[$ch_id] = [];
         }
-        if (!array_key_exists("welcome", $settings[$default['peer']])) {
-            $settings[$default['peer']]['welcome']  = true;
+        if (!array_key_exists("welcome", $settings[$ch_id])) {
+            $settings[$ch_id]['welcome']  = true;
         }
-        if ($settings[$default['peer']]["welcome"]) {
+        if ($settings[$ch_id]["welcome"]) {
             $text = "Welcome new users \xE2\x9C\x85";
         } else {
             $text = "Welcome new users";
@@ -345,7 +345,7 @@ function welcome_menu($update, $MadelineProto)
         "q" => "welcome", // query
         "v" => "on",      // value
         "c" =>  $ch_id))]; // userid
-        if (!$settings[$default['peer']]["welcome"]) {
+        if (!$settings[$ch_id]["welcome"]) {
             $text = "Don't welcome new users \xE2\x9C\x85";
         } else {
             $text = "Don't welcome new users";

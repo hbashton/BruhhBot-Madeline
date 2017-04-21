@@ -750,6 +750,7 @@ function get_chat_rules($update, $MadelineProto)
                         $default
                     );
                 } catch (Exception $e) {
+                    if (isset($default['entities'])) unset($default['entities']);
                     $default['peer'] = $peer;
                     $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
                     $url = "https://telegram.me/$botusername?start=rules-$ch_id";

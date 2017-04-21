@@ -22,10 +22,10 @@ function welcome_callback($update, $MadelineProto)
     }
     if (is_moderated($ch_id)) {
         if ($parsed_query['data']['v'] == "on") {
-            check_json_array('settings.json', $default['peer']);
+            check_json_array('settings.json', $ch_id);
             $file = file_get_contents("settings.json");
             $settings = json_decode($file, true);
-            $settings[$default['peer']]["welcome"] = true;
+            $settings[$ch_id]["welcome"] = true;
             $text = "Welcome new users \xE2\x9C\x85";
         } else {
             $text = "Welcome new users";
@@ -35,10 +35,10 @@ function welcome_callback($update, $MadelineProto)
         "v" => "on",
         "c" =>  $ch_id))]; 
         if ($parsed_query['data']['v'] == "off") {
-            check_json_array('settings.json', $default['peer']);
+            check_json_array('settings.json', $ch_id);
             $file = file_get_contents("settings.json");
             $settings = json_decode($file, true);
-            $settings[$default['peer']]["welcome"] = false;
+            $settings[$ch_id]["welcome"] = false;
             $text = "Don't welcome new users \xE2\x9C\x85";
         } else {
             $text = "Don't welcome new users";
@@ -311,7 +311,7 @@ function settings_menu_callback($update, $MadelineProto)
         return;
     }
     if (is_moderated($ch_id)) {
-        $rows = [];
+         $rows = [];
          $buttons = [
         ['_' => 'keyboardButtonCallback', 'text' => "Locked", 'data' => json_encode(array(
             "q" => "locked",     // query
