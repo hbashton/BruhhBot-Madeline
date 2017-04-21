@@ -261,6 +261,11 @@ class NewChannelMessage extends Threaded
                         try {
                             $message = "I really don't like them!";
                             $default['message'] = $message;
+                            $delete = $uMadelineProto->
+                            channels->deleteMessages(
+                                ['channel' => $peer,
+                                'id' => [$msg_id]]
+                            );
                             $kick = $uMadelineProto->
                             channels->kickFromChannel(
                                 ['channel' => $peer,
@@ -277,13 +282,19 @@ class NewChannelMessage extends Threaded
                             \danog\MadelineProto\Logger::log(
                                 $sentMessage
                             );
-                        } catch (Exception $e) {}
+                        } catch (Exception $e) {
+                            }
                     }
                     if (isset($banlist[$ch_id])) {
                         if (in_array($fromid, $banlist[$ch_id]) && !is_admin($update, $MadelineProto, $fromid)) {
                             try {
                                 $message = "NO! They are NOT allowed here!";
                                 $default['message'] = $message;
+                                $delete = $uMadelineProto->
+                                channels->deleteMessages(
+                                    ['channel' => $peer,
+                                    'id' => [$msg_id]]
+                                );
                                 $kick = $uMadelineProto->
                                 channels->kickFromChannel(
                                     ['channel' => $peer,
