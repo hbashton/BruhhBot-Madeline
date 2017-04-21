@@ -63,6 +63,7 @@ function saveme($update, $MadelineProto, $msg, $name)
                 if ($name && $msg) {
                     $name = htmlentities(cb($name));
                     $msg = $MadelineProto->utf8ize($msg);
+                    $msg = fixtags($msg);
                     $codename = "<code>$name</code>";
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
@@ -139,7 +140,8 @@ function getme($update, $MadelineProto, $name)
         $msg_id = $update['update']['message']['id'];
         $default = array(
             'peer' => $peer,
-            'reply_to_msg_id' => $msg_id
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode' => 'html'
             );
         check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");
@@ -169,9 +171,13 @@ function getme($update, $MadelineProto, $name)
                 }
             }
             if (isset($message)) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
+                try {
+                    $sentMessage = $MadelineProto->messages->sendMessage(
+                        $default
+                    );
+                } catch (Exception $e) {
+                    return;
+                }
             }
             if (isset($replyid)) {
                 try {

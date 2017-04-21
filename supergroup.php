@@ -727,6 +727,7 @@ function get_chat_rules($update, $MadelineProto)
             $default = array(
                 'peer' => $fromid,
                 'reply_to_msg_id' => $msg_id,
+                'parse_mode' => 'html'
                 );
             if (is_moderated($ch_id)) {
                 check_json_array("settings.json", $ch_id);
@@ -780,6 +781,7 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
     $title = $chat['title'];
     $default = array(
         'peer' => $fromid,
+        'parse_mode' => 'html'
         );
     check_json_array("settings.json", $ch_id);
     $file = file_get_contents("settings.json");
@@ -800,6 +802,16 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+            try {
+                $default['message'] = fixtags($default['message']);
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+                $settings[$ch_id]['rules'] = fixtags($default['message']);
+            } catch (Exception $e) {
+                return;
+            }
+        }
     }
 }
