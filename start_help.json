@@ -43,6 +43,7 @@
         "Setphoto":"<b>setphoto</b> - Set the group photo!",
         "Setname":"<b>setname</b> <code>name</code> - Set the group title!",
         "Setabout":"<b>setabout</b> <code>\"about\"</code> - Change the about section of the group description. You MUST provide <code>\"about\"</code> in double quotes.",
+        "Rules":"<b>setrules</b> <code>rules</code> - Set the rules for the group.\n<b>setrules</b> <code>clear</code> - Clear the rules for the group.\n<b>rules</b> - See the rules for the group.",
         "Invite":"<b>invite</b> <code>[@username|ID]</code> - Invite a user to the group! <code>Note: the user must have their privacy settings set to allow the bot to invite them, and the group must allow the bot to add users.</code>",
         "Adminlist":"<b>adminlist</b> - Get a list of administrators for the group. If you spam this command, you'll just make them mad, so don't use this over and over."
         },
