@@ -257,7 +257,7 @@ class NewChannelMessage extends Threaded
                     check_json_array('gbanlist.json', false, false);
                     $file = file_get_contents("gbanlist.json");
                     $gbanlist = json_decode($file, true);
-                    if (array_key_exists($fromid, $gbanlist)) {
+                    if (array_key_exists($fromid, $gbanlist) && !is_admin($update, $MadelineProto, $fromid)) {
                         try {
                             $message = "I really don't like them!";
                             $default['message'] = $message;
@@ -280,7 +280,7 @@ class NewChannelMessage extends Threaded
                         } catch (Exception $e) {}
                     }
                     if (isset($banlist[$ch_id])) {
-                        if (in_array($fromid, $banlist[$ch_id])) {
+                        if (in_array($fromid, $banlist[$ch_id]) && !is_admin($update, $MadelineProto, $fromid)) {
                             try {
                                 $message = "NO! They are NOT allowed here!";
                                 $default['message'] = $message;
