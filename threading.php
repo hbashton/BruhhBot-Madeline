@@ -258,24 +258,26 @@ class NewChannelMessage extends Threaded
                     $file = file_get_contents("gbanlist.json");
                     $gbanlist = json_decode($file, true);
                     if (array_key_exists($fromid, $gbanlist)) {
-                        $message = "I really don't like them!";
-                        $default['message'] = $message;
-                        $kick = $uMadelineProto->
-                        channels->kickFromChannel(
-                            ['channel' => $peer,
-                            'user_id' => $fromid,
-                            'kicked' => true]
-                        );
-                        $sentMessage = $MadelineProto->
-                        messages->sendMessage(
-                            $default
-                        );
-                        if (isset($kick)) {
-                            \danog\MadelineProto\Logger::log($kick);
-                        }
-                        \danog\MadelineProto\Logger::log(
-                            $sentMessage
-                        );
+                        try {
+                            $message = "I really don't like them!";
+                            $default['message'] = $message;
+                            $kick = $uMadelineProto->
+                            channels->kickFromChannel(
+                                ['channel' => $peer,
+                                'user_id' => $fromid,
+                                'kicked' => true]
+                            );
+                            $sentMessage = $MadelineProto->
+                            messages->sendMessage(
+                                $default
+                            );
+                            if (isset($kick)) {
+                                \danog\MadelineProto\Logger::log($kick);
+                            }
+                            \danog\MadelineProto\Logger::log(
+                                $sentMessage
+                            );
+                        } catch (Exception $e) {}
                     }
                     if (isset($banlist[$ch_id])) {
                         if (in_array($fromid, $banlist[$ch_id])) {
