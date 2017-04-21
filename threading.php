@@ -775,6 +775,14 @@ function NewChatAddUser($update, $MadelineProto)
                         if ($settings[$ch_id]["welcome"]) {
                             $mention2 = html_mention($username, $mention);
                             $message = "Hi $mention2, welcome to <b>$title</b>";
+                            $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                            $url = "https://telegram.me/$botusername?start=rules-$ch_id";
+                            $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Rules", 'url' => $url, ];
+                            $buttons = [$keyboardButtonUrl];
+                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                            $rows = [$row];
+                            $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                            $default['reply_markup'] = $replyInlineMarkup;
                             $default['message'] = $message;
                             $sentMessage = $MadelineProto->
                             messages->sendMessage($default);
@@ -914,6 +922,14 @@ function NewChatJoinedByLink($update, $MadelineProto)
                         if ($settings[$ch_id]["welcome"]) {
                             $mention2 = html_mention($username, $mention);
                             $message = "Hi $mention2, welcome to <b>$title</b>";
+                            $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                            $url = "https://telegram.me/$botusername?start=rules-$ch_id";
+                            $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Rules", 'url' => $url, ];
+                            $buttons = [$keyboardButtonUrl];
+                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                            $rows = [$row];
+                            $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                            $default['reply_markup'] = $replyInlineMarkup;
                             $default['message'] = $message;
                             $sentMessage = $MadelineProto->
                             messages->sendMessage($default);
