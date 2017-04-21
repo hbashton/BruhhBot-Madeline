@@ -727,7 +727,6 @@ function get_chat_rules($update, $MadelineProto)
             $default = array(
                 'peer' => $fromid,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
                 );
             if (is_moderated($ch_id)) {
                 check_json_array("settings.json", $ch_id);
@@ -737,10 +736,13 @@ function get_chat_rules($update, $MadelineProto)
                     $settings[$ch_id]["rules"] = "";
                 }
                 if ($settings[$ch_id]["rules"] != "") {
-                    $default['message'] = "<code>Rules for $title</code>:\n".$settings[$ch_id]["rules"];
+                    $default['message'] = "Rules for $title:\n".$settings[$ch_id]["rules"];
+                    $bold = create_style('bold', 10, $title);
                 } else {
                     $default['message'] = "There are no rules for $title";
+                    $bold = create_style('bold', 23, $title);
                 }
+                $default['entities'] = $bold;
             }
             if (isset($default['message'])) {
                 try {
@@ -777,7 +779,6 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
     $title = $chat['title'];
     $default = array(
         'peer' => $fromid,
-        'parse_mode' => 'html'
         );
     check_json_array("settings.json", $ch_id);
     $file = file_get_contents("settings.json");
@@ -786,10 +787,13 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
         $settings[$ch_id]["rules"] = "";
     }
     if ($settings[$ch_id]["rules"] != "") {
-        $default['message'] = "<code>Rules for $title</code>:\n".$settings[$ch_id]["rules"];
+        $default['message'] = "Rules for $title:\n".$settings[$ch_id]["rules"];
+        $bold = create_style('bold', 10, $title);
     } else {
         $default['message'] = "There are no rules for $title";
+        $bold = create_style('bold', 23, $title);
     }
+    $default['entities'] = $bold;
     if (isset($default['message'])) {
         try {
             $sentMessage = $MadelineProto->messages->sendMessage(

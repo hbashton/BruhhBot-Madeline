@@ -249,7 +249,7 @@ function create_style($type, $offset, $length, $full = true)
         break;
     }
     if (!is_numeric($length)) {
-        $length = strlen($length);
+        $length = mb_strlen($length);
     }
     if ($full) {
         return([['_' => $style, 'offset' => $offset,
