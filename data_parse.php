@@ -378,7 +378,7 @@ function multipleExplodeKeepDelimiters($delimiters, $string) {
     return $finalArray;
 }
 
-function fixtags ($text)
+function fixtags($text)
 {
     $text = htmlspecialchars($text);
     $text = preg_replace("/=/", "=\"\"", $text);

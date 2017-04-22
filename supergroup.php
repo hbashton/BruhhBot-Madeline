@@ -751,21 +751,29 @@ function get_chat_rules($update, $MadelineProto)
                         $default
                     );
                 } catch (Exception $e) {
-                    if (isset($default['entities'])) unset($default['entities']);
-                    $default['peer'] = $peer;
-                    $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
-                    $url = "https://telegram.me/$botusername?start=rules-$ch_id";
-                    $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Get the rules!", 'url' => $url, ];
-                    $buttons = [$keyboardButtonUrl];
-                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-                    $rows = [$row];
-                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
-                    $default['reply_markup'] = $replyInlineMarkup;
-                    $default['message'] = "Please start a chat with me so I can send you the rules for $title";
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
-                    \danog\MadelineProto\Logger::log($sentMessage);
+                    if ($e->getMessage() == "USER_IS_BLOCKED") {
+                        if (isset($default['entities'])) unset($default['entities']);
+                        $default['peer'] = $peer;
+                        $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                        $url = "https://telegram.me/$botusername?start=rules-$ch_id";
+                        $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Get the rules!", 'url' => $url, ];
+                        $buttons = [$keyboardButtonUrl];
+                        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                        $rows = [$row];
+                        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                        $default['reply_markup'] = $replyInlineMarkup;
+                        $default['message'] = "Please start a chat with me so I can send you the rules for $title";
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                                $default
+                            );
+                    } else {
+                        $default['message'] = "Rules HTML formatted incorrectly";
+                        $default['peer'] = $ch_id;
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                                $default
+                            );
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                    }
                 }
             }
         }
@@ -810,7 +818,10 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
                 );
                 $settings[$ch_id]['rules'] = fixtags($default['message']);
             } catch (Exception $e) {
-                return;
+                $default['message'] = "Rules HTML formatted incorrectly.";
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
             }
         }
     }
