@@ -42,7 +42,7 @@ Well, here's a breakdown:
 | Item          | Type           | Description  |
 | ------------- |:--------------:| ------------:|
 `MTPROTO_NUMBER` | (int) | The phone number you used to sign the bot up to telegram
-`MTPROTO_SETTINGS` | (json) | Your API ID and HASH (I'm not using these right now, but I require them if I decide to do so in the future
+`MTPROTO_SETTINGS` | (json) | Your API ID and HASH 
 `MASTER_USERNAME` | (string) | Your username
 `SUDO` | (array) |An array of User ID's that are considered "sudo" users, and can control the bot just like you
 `WEATHER_KEY` | (string) | Obtained from [DarkSky](https://darksky.net/dev/)
