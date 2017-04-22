@@ -70,7 +70,7 @@ if (isset($argv[1])) {
     $dumpme = false;
 }
 
-$settings = json_decode(getenv(MTPROTO_SETTINGS), true);
+$settings = json_decode(getenv("MTPROTO_SETTINGS"), true);
 
 if (!isset($uMadelineProto)) {
     $uMadelineProto = new \danog\MadelineProto\API();
