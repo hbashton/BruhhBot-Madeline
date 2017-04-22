@@ -24,9 +24,7 @@
         },
     "Save":
         {
-        "Save":"<b>save</b> <code>name message</code> - Save <code>message</code> under <code>name</code> to be retrieved later with <code>#name</code>",
-        "SaveFrom":"<b>save</b> <code>from name</code> - Save a message [by reply] under <code>name</code> to be retrieved later with <code>#name</code>",
-        "SaveClear":"<b>save</b> <code>clear name</code> - Clear the saved message under <code>name</code>",
+        "Save":"<b>save</b> <code>name message</code> - Save <code>message</code> under <code>name</code> to be retrieved later with <code>#name</code> \n<b>save</b> <code>from name</code> - Save a message [by reply] under <code>name</code> to be retrieved later with <code>#name</code>\n<b>save</b> <code>clear name</code> - Clear the saved message under <code>name</code>\n\n<code>You can use HTML formatting in /save, to make your messages cleaner and easier to read.</code>\n<pre>Supported tags:\n&lt;br&gt; a newline\n&lt;b&gt; &lt;i&gt;bold works ok, internal tags are stripped&lt;/i&gt; &lt;/b&gt;\n&lt;strong&gt;bold&lt;/strong&gt;\n&lt;em&gt;italic&lt;/em&gt;\n&lt;i&gt;italic&lt;/i&gt;\n&lt;code&gt;inline fixed-width code&lt;/code&gt;\n&lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;\n&lt;a href=&quot;https://github.com&quot;&gt;URL&lt;/a&gt;\n&lt;a href=&quot;mention:@username&quot;&gt;Mention by username&lt;/a&gt;\nhref=&quot;mention:186785362&quot;&gt;Mention by user id&lt;/a&gt;\nlanguage=&quot;json&quot;&gt;Pre tags can have a language attribute&lt;/pre&gt;</pre>",
         "Saved":"<b>saved</b> - Get a list of saved messages!"
         },
     "AntiSpam":
