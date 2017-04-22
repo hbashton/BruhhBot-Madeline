@@ -354,7 +354,7 @@ function help2_callback($update, $MadelineProto)
     foreach ($startj['commands_help'][$v] as $command => $desc) {
          if ($rowcount < 2 && $rowcount > 0) {
              $end = false;
-             $rowcount = 0;
+             $rowcount++;
              $buttons[] =
                 ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
                     "q" => "help3",

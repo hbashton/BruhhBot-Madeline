@@ -731,31 +731,8 @@ function NewChatAddUser($update, $MadelineProto)
                 $file = file_get_contents("gbanlist.json");
                 $gbanlist = json_decode($file, true);
                 if (array_key_exists($mention, $gbanlist)) {
-                    $message = "I really don't like them!";
-                    $default['message'] = $message;
-                    $kick = $uMadelineProto->
-                    channels->kickFromChannel(
-                        ['channel' => $peer,
-                        'user_id' => $mention,
-                        'kicked' => true]
-                    );
-                    $sentMessage = $MadelineProto->
-                    messages->sendMessage(
-                        $default
-                    );
-                    if (isset($kick)) {
-                        \danog\MadelineProto\Logger::log($kick);
-                    }
-                    \danog\MadelineProto\Logger::log(
-                        $sentMessage
-                    );
-                }
-                check_json_array('banlist.json', $ch_id);
-                $file = file_get_contents("banlist.json");
-                $banlist = json_decode($file, true);
-                if (isset($banlist[$ch_id])) {
-                    if (in_array($mention, $banlist[$ch_id])) {
-                        $message = "NO! They are NOT allowed here!";
+                    try {
+                        $message = "I really don't like them!";
                         $default['message'] = $message;
                         $kick = $uMadelineProto->
                         channels->kickFromChannel(
@@ -773,6 +750,33 @@ function NewChatAddUser($update, $MadelineProto)
                         \danog\MadelineProto\Logger::log(
                             $sentMessage
                         );
+                    } catch (Exception $e) {}
+                }
+                check_json_array('banlist.json', $ch_id);
+                $file = file_get_contents("banlist.json");
+                $banlist = json_decode($file, true);
+                if (isset($banlist[$ch_id])) {
+                    if (in_array($mention, $banlist[$ch_id])) {
+                        try {
+                            $message = "NO! They are NOT allowed here!";
+                            $default['message'] = $message;
+                            $kick = $uMadelineProto->
+                            channels->kickFromChannel(
+                                ['channel' => $peer,
+                                'user_id' => $mention,
+                                'kicked' => true]
+                            );
+                            $sentMessage = $MadelineProto->
+                            messages->sendMessage(
+                                $default
+                            );
+                            if (isset($kick)) {
+                                \danog\MadelineProto\Logger::log($kick);
+                            }
+                            \danog\MadelineProto\Logger::log(
+                                $sentMessage
+                            );
+                        } catch (Exception $e) {}
                     }
                 }
                 $bot_id = $MadelineProto->API->bot_id;
@@ -882,28 +886,8 @@ function NewChatJoinedByLink($update, $MadelineProto)
                 $file = file_get_contents("gbanlist.json");
                 $gbanlist = json_decode($file, true);
                 if (array_key_exists($mention, $gbanlist)) {
-                    $message = "I really don't like them!";
-                    $default['message'] = $message;
-                    $kick = $uMadelineProto->
-                    channels->kickFromChannel(
-                        ['channel' => $peer,
-                        'user_id' => $mention,
-                        'kicked' => true]
-                    );
-                    $sentMessage = $MadelineProto->
-                    messages->sendMessage(
-                        $default
-                    );
-                    if (isset($kick)) {
-                        \danog\MadelineProto\Logger::log($kick);
-                    }
-                    \danog\MadelineProto\Logger::log(
-                        $sentMessage
-                    );
-                }
-                if (isset($banlist[$ch_id])) {
-                    if (in_array($mention, $banlist[$ch_id])) {
-                        $message = "NO! They are NOT allowed here!";
+                    try {
+                        $message = "I really don't like them!";
                         $default['message'] = $message;
                         $kick = $uMadelineProto->
                         channels->kickFromChannel(
@@ -921,6 +905,30 @@ function NewChatJoinedByLink($update, $MadelineProto)
                         \danog\MadelineProto\Logger::log(
                             $sentMessage
                         );
+                    } catch (Exception $e) {}
+                }
+                if (isset($banlist[$ch_id])) {
+                    if (in_array($mention, $banlist[$ch_id])) {
+                        try {
+                            $message = "NO! They are NOT allowed here!";
+                            $default['message'] = $message;
+                            $kick = $uMadelineProto->
+                            channels->kickFromChannel(
+                                ['channel' => $peer,
+                                'user_id' => $mention,
+                                'kicked' => true]
+                            );
+                            $sentMessage = $MadelineProto->
+                            messages->sendMessage(
+                                $default
+                            );
+                            if (isset($kick)) {
+                                \danog\MadelineProto\Logger::log($kick);
+                            }
+                            \danog\MadelineProto\Logger::log(
+                                $sentMessage
+                            );
+                        } catch (Exception $e) {}
                     }
                 }
                 $bot_id = $MadelineProto->API->bot_id;
