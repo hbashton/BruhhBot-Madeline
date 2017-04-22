@@ -23,6 +23,7 @@
         "krakjoe/pthreads-polyfill": "dev-master",
         "nicmart/string-template": "~0.1",
         "erusev/parsedown": "^1.6",
+        "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*",
         "ext-bcmath": "*",
         "ext-mcrypt": "*"
