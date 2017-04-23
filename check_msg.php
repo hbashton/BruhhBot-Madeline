@@ -27,7 +27,12 @@ function check_locked($update, $MadelineProto)
             $peer = $chat['peer'];
             $ch_id = $chat['id'];
             $msg_id = $update['update']['message']['id'];
-            if (is_moderated($ch_id) && is_bot_admin($update, $MadelineProto) && !from_admin_mod($update, $MadelineProto)) {
+            if (!from_admin_mod($update, $MadelineProto) or are_mods_restricted($ch_id)) {
+                $mod = false;
+            } else {
+                $mod = true;
+            }
+            if (is_moderated($ch_id) && is_bot_admin($update, $MadelineProto) && !$mod) {
                 $msg_ = $update["update"]["message"];
                 if (array_key_exists("media", $msg_)) {
                     switch ($msg_["media"]["_"]) {

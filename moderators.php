@@ -352,3 +352,54 @@ function is_admin_mod($update, $MadelineProto, $userid, $str = '', $send = false
         return false;
     }
 }
+
+function is_chat_owner($update, $MadelineProto, $ch_id, $userid)
+{
+    if (is_master($MadelineProto, $userid)) return true;
+    try {
+        $admins = cache_get_info($update, $MadelineProto, $ch_id, true);
+        $peer = $admins['id'];
+        foreach ($admins['participants'] as $key) {
+            if (array_key_exists('user', $key)) {
+                $id = $key['user']['id'];
+            } else {
+                if (array_key_exists('bot', $key)) {
+                    $id = $key['bot']['id'];
+                }
+            }
+            if ($id == $userid) {
+                if (array_key_exists("role", $key)) {
+                    if ($key['role'] == "creator"
+                    ) {
+                        $mod = true;
+                        break;
+                    } else {
+                        $mod = false;
+                        break;
+                    }
+                } else {
+                    $mod = false;
+                    break;
+                }
+            }
+            $mod = false;
+        }
+        if ($mod) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function are_mods_restricted($ch_id)
+{
+    check_json_array('settings.json', $ch_id);
+    $file = file_get_contents("settings.json");
+    $settings = json_decode($file, true);
+    if (!isset($settings[$ch_id]['restrict_mods'])) return false;
+    if (!$settings[$ch_id]['restrict_mods']) return false;
+    return true;
+}

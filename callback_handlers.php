@@ -322,6 +322,15 @@ function settings_menu_callback($update, $MadelineProto)
         ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
         $rows[] = $row;
+        if (is_chat_owner($update, $MadelineProto, $ch_id, $userid)) {
+            $buttons = [
+                ['_' => 'keyboardButtonCallback', 'text' => "Moderators", 'data' => json_encode(array(
+                    "q" => "moderators_menu",
+                    "c" =>  $ch_id ))]
+            ];
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+            $rows[] = $row;
+        }
         $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
         $default['reply_markup'] = $replyInlineMarkup;
     }
@@ -476,4 +485,69 @@ function help_menu_callback($update, $MadelineProto)
         );
         \danog\MadelineProto\Logger::log($sentMessage);
     } catch (Exception $e) {}
+}
+
+function moderators_menu_callback($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $ch_id = $parsed_query['data']['c'];
+    $userid = $parsed_query['user_id'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'id' => $parsed_query['msg_id'],
+        'parse_mode' => 'html',
+        'message' => "Moderators can be restricted so that their messages are limited just like a regular user. As the owner of the group, you can configure that setting here."
+    );
+    if (!is_chat_owner($update, $MadelineProto, $parsed_query['data']['c'], $parsed_query['user_id'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the moderation settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
+    if (is_moderated($ch_id)) {
+        if ($parsed_query['data']['v'] == "on") {
+            check_json_array('settings.json', $ch_id);
+            $file = file_get_contents("settings.json");
+            $settings = json_decode($file, true);
+            $settings[$ch_id]["restrict_mods"] = true;
+            $text = "Limit moderators \xE2\x9C\x85";
+        } else {
+            $text = "Limit moderators";
+        }
+        $limiton = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
+        "q" => "moderators",
+        "v" => "on",
+        "c" =>  $ch_id))]; 
+        if ($parsed_query['data']['v'] == "off") {
+            check_json_array('settings.json', $ch_id);
+            $file = file_get_contents("settings.json");
+            $settings = json_decode($file, true);
+            $settings[$ch_id]["restrict_mods"] = false;
+            $text = "Don't limit moderators \xE2\x9C\x85";
+        } else {
+            $text = "Don't limit moderators";
+        }
+        $limitoff = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
+        "q" => "moderators",
+        "v" => "off",
+        "c" =>  $ch_id))];
+        $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$limiton], ];
+        $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$limitoff], ];
+        $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+    "q" => "back_to_settings", // query
+    "c" =>  $ch_id ))];        // chat
+        $row3 = ['_' => 'keyboardButtonRow', 'buttons' => [$back] ];
+        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2, $row3], ];
+        $default['reply_markup'] = $replyInlineMarkup;
+        file_put_contents('settings.json', json_encode($settings));
+        try {
+            $editedMessage = $MadelineProto->messages->editMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($editedMessage);
+        } catch (Exception $e) {}
+    }
 }
