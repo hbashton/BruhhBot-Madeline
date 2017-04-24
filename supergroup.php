@@ -445,12 +445,7 @@ function delmessage($update, $MadelineProto)
                                 $del_id = $update['update']['message']['reply_to_msg_id'];
                                 $delete = $uMadelineProto->channels->deleteMessages(
                                     ['channel' => $peer,
-                                    'id' => [$del_id]]
-                                );
-                                \danog\MadelineProto\Logger::log($delete);
-                                $delete = $uMadelineProto->channels->deleteMessages(
-                                    ['channel' => $peer,
-                                    'id' => [$msg_id]]
+                                    'id' => [$del_id,$msg_id]]
                                 );
                                 \danog\MadelineProto\Logger::log($delete);
                             } catch (Exception $e) {}
