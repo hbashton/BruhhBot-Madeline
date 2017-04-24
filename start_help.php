@@ -60,9 +60,9 @@ function help_message($update, $MadelineProto)
         $file = file_get_contents("start_help.json");
         $startj = json_decode($file, true);
         foreach ($startj['menus'] as $menu => $desc) {
-             if ($rowcount < 2 && $rowcount > 0) {
+             if ($rowcount < 2) {
                  $end = false;
-                 $rowcount = 0;
+                 $rowcount++;
                  $buttons[] =
                     ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
                         "q" => "help2",
@@ -72,7 +72,7 @@ function help_message($update, $MadelineProto)
                 $rows[] = $row;
              } else {
                  $end = true;
-                 $rowcount++;
+                 $rowcount = 1;
                  $buttons = [
                     ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
                         "q" => "help2",

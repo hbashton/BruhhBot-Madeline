@@ -39,6 +39,7 @@ function catch_id($update, $MadelineProto, $user)
                     } else {
                         $username = "no-name-user";
                     }
+                    $firstname = $MadelineProto->utf8ize($user_['User']['first_name']);
                     $userid = $user_['bot_api_id'];
                     break;
                 } catch (Exception $e) {
@@ -64,8 +65,9 @@ function catch_id($update, $MadelineProto, $user)
                 } else {
                     $username = "no-name-user";
                 }
+                $firstname = $MadelineProto->utf8ize($user_['User']['first_name']);
                 $userid = $user_['bot_api_id'];
-                $return = array(true, $userid, $username);
+                $return = array(true, $userid, $username, $firstname);
             } catch (Exception $e) {
                 return array(false);
             }
@@ -96,7 +98,8 @@ function catch_id($update, $MadelineProto, $user)
                             $username = "no-name-user";
                         }
                         $userid = $user_['bot_api_id'];
-                        $return = array(true, $userid, $username);
+                        $firstname = $MadelineProto->utf8ize($user_['User']['first_name']);
+                        $return = array(true, $userid, $username, $firstname);
                     }
                 }
             }
@@ -105,7 +108,7 @@ function catch_id($update, $MadelineProto, $user)
         }
     }
     if (isset($userid)) {
-        return array(true, $userid, $username);
+        return array(true, $userid, $username, $firstname);
     } else {
         return array(false);
     }

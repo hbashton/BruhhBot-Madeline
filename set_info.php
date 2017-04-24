@@ -380,3 +380,64 @@ function set_chat_rules($update, $MadelineProto, $msg)
         }
     }
 }
+
+function set_chat_welcome($update, $MadelineProto, $msg)
+{
+    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    if (bot_present($update, $MadelineProto)) {
+        if (is_supergroup($update, $MadelineProto)) {
+            $msg_id = $update['update']['message']['id'];
+            $mods = $MadelineProto->responses['set_chat_title']['mods'];
+            $chat = parse_chat_data($update, $MadelineProto);
+            $peer = $chat['peer'];
+            $title = $chat['title'];
+            $ch_id = $chat['id'];
+            $default = array(
+                'peer' => $peer,
+                'reply_to_msg_id' => $msg_id,
+                'parse_mode' => 'html'
+                );
+            $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+            if (is_moderated($ch_id)) {
+                if (is_bot_admin($update, $MadelineProto)) {
+                    if (from_admin_mod(
+                        $update,
+                        $MadelineProto,
+                        $mods,
+                        true
+                    )
+                    ) {
+                        if ($msg) {
+                            if ($msg != "clear") {
+                                check_json_array("settings.json", $ch_id);
+                                $file = file_get_contents("settings.json");
+                                $settings = json_decode($file, true);
+                                $settings[$ch_id]["custom_welcome"] = fixtags($msg);
+                                file_put_contents('settings.json', json_encode($settings));
+                                $default['message'] = "I've set the welcome message for $title.";
+                            } else {
+                                check_json_array("settings.json", $ch_id);
+                                $file = file_get_contents("settings.json");
+                                $settings = json_decode($file, true);
+                                if (isset($settings[$ch_id]["custom_welcome"])) unset($settings[$ch_id]["custom_welcome"]);
+                                file_put_contents('settings.json', json_encode($settings));
+                                $default['message'] = "Welcome set to default";
+                            }
+                        } else {
+                            $message = "Set the welcome message with /welcome <code>message</code>\nClear it with /welcome <code>clear</code>\n<code>Message me help and navigate to the Welcome menu to see a list of variables";
+                            $default['message'] = $message;
+                        }
+                    }
+                }
+            }
+            if (isset($default['message'])) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
+            if (isset($sentMessage)) {
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+        }
+    }
+}

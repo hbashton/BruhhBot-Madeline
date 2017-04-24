@@ -33,7 +33,7 @@ function welcome_callback($update, $MadelineProto)
         $welcomeon = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "welcome",
         "v" => "on",
-        "c" =>  $ch_id))]; 
+        "c" =>  $ch_id))];
         if ($parsed_query['data']['v'] == "off") {
             check_json_array('settings.json', $ch_id);
             $file = file_get_contents("settings.json");
@@ -100,7 +100,7 @@ function lock_callback($update, $MadelineProto)
         $newtext = "\xE2\x9D\x8C";
         $newonoff = "off";
         array_push($locked[$ch_id], $val);
-    } 
+    }
     if (preg_match_all('/-off/', $val, $matches)) {
         $val = preg_replace("/-off/", "", $val);
         $newtext = "\xE2\x9C\x85";
@@ -316,8 +316,8 @@ function settings_menu_callback($update, $MadelineProto)
         ['_' => 'keyboardButtonCallback', 'text' => "Locked", 'data' => json_encode(array(
             "q" => "locked",     // query
             "c" =>  $ch_id ))],  // chat
-        ['_' => 'keyboardButtonCallback', 'text' => "Welcome", 'data' => json_encode(array(
-            "q" => "welcome_menu",       // query
+        ['_' => 'keyboardButtonCallback', 'text' => "Group Settings", 'data' => json_encode(array(
+            "q" => "group_settings",       // query
             "c" =>  $ch_id ))]   // chat
         ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
@@ -380,7 +380,7 @@ function help2_callback($update, $MadelineProto)
             $rows[] = $row;
          } else {
              $end = true;
-             $rowcount++;
+             $rowcount = 1;
              $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
                     "q" => "help3",
@@ -463,7 +463,7 @@ function help_menu_callback($update, $MadelineProto)
     foreach ($startj['menus'] as $menu => $desc) {
          if ($rowcount < 2 && $rowcount > 0) {
              $end = false;
-             $rowcount = 0;
+             $rowcount++;
              $buttons[] =
                 ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
                     "q" => "help2",
@@ -472,7 +472,7 @@ function help_menu_callback($update, $MadelineProto)
             $rows[] = $row;
          } else {
              $end = true;
-             $rowcount++;
+             $rowcount = 1;
              $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
                     "q" => "help2",
@@ -527,7 +527,7 @@ function moderators_menu_callback($update, $MadelineProto)
         $limiton = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "moderators",
         "v" => "on",
-        "c" =>  $ch_id))]; 
+        "c" =>  $ch_id))];
         if ($parsed_query['data']['v'] == "off") {
             check_json_array('settings.json', $ch_id);
             $file = file_get_contents("settings.json");
@@ -631,7 +631,7 @@ function alert_me_callback($update, $MadelineProto)
         $on = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
         "q" => "alert_me_cb",
         "v" => "on",
-        "c" =>  $ch_id))]; 
+        "c" =>  $ch_id))];
         if ($parsed_query['data']['v'] == "off") {
             check_json_array('settings.json', $ch_id);
             $file = file_get_contents("settings.json");
@@ -653,6 +653,71 @@ function alert_me_callback($update, $MadelineProto)
         "c" =>  $ch_id))];
         $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$on], ];
         $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$off], ];
+        $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+    "q" => "back_to_settings", // query
+    "c" =>  $ch_id ))];        // chat
+        $row3 = ['_' => 'keyboardButtonRow', 'buttons' => [$back] ];
+        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2, $row3], ];
+        $default['reply_markup'] = $replyInlineMarkup;
+        file_put_contents('settings.json', json_encode($settings));
+        try {
+            $editedMessage = $MadelineProto->messages->editMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($editedMessage);
+        } catch (Exception $e) {}
+    }
+}
+
+function rules_show_callback($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $ch_id = $parsed_query['data']['c'];
+    $userid = $parsed_query['user_id'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'id' => $parsed_query['msg_id'],
+        'parse_mode' => 'html',
+        'message' => "When I welcome someone, should I give them a link to the rules or not?"
+    );
+    if (!is_admin_mod($update, $MadelineProto, $parsed_query['user_id'], false, false, $parsed_query['data']['c'])) {
+        try {
+            $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
+            \danog\MadelineProto\Logger::log($callbackAnswer);
+        } catch (Exception $e) {}
+        return;
+    }
+    if (is_moderated($ch_id)) {
+        if ($parsed_query['data']['v'] == "on") {
+            check_json_array('settings.json', $ch_id);
+            $file = file_get_contents("settings.json");
+            $settings = json_decode($file, true);
+            $settings[$ch_id]["show_rules_welcome"] = true;
+            $text = "Show the rules \xE2\x9C\x85";
+        } else {
+            $text = "Show the rules";
+        }
+        $welcomeon = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
+        "q" => "rules_show",
+        "v" => "on",
+        "c" =>  $ch_id))];
+        if ($parsed_query['data']['v'] == "off") {
+            check_json_array('settings.json', $ch_id);
+            $file = file_get_contents("settings.json");
+            $settings = json_decode($file, true);
+            $settings[$ch_id]["show_rules_welcome"] = false;
+            $text = "Don't show the rules \xE2\x9C\x85";
+        } else {
+            $text = "Don't show the rules";
+        }
+        $welcomeoff = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
+        "q" => "rules_show",
+        "v" => "off",
+        "c" =>  $ch_id))];
+        $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeon], ];
+        $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$welcomeoff], ];
         $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
     "q" => "back_to_settings", // query
     "c" =>  $ch_id ))];        // chat

@@ -465,6 +465,12 @@ class NewChannelMessage extends Threaded
                                 setflood($update, $MadelineProto, $msg);
                                 break;
 
+                            case 'welcome':
+                                unset($msg_arr[0]);
+                                $msg = implode(" ", $msg_arr);
+                                set_chat_welcome($update, $MadelineProto, $msg);
+                                break;
+
                             case 'modlist':
                                 modlist($update, $MadelineProto);
                                 break;
@@ -714,6 +720,7 @@ function NewChatAddUser($update, $MadelineProto)
             );
             if ($id[0]) {
                 $username = $id[2];
+                $firstname = $id[3];
             }
             $msg_id = $update['update']['message']['id'];
             $chat = parse_chat_data($update, $MadelineProto);
@@ -791,15 +798,31 @@ function NewChatAddUser($update, $MadelineProto)
                         }
                         if ($settings[$ch_id]["welcome"]) {
                             $mention2 = html_mention($username, $mention);
-                            $message = "Hi $mention2, welcome to <b>$title</b>";
-                            $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
-                            $url = "https://telegram.me/$botusername?start=rules-$ch_id";
-                            $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Rules", 'url' => $url, ];
-                            $buttons = [$keyboardButtonUrl];
-                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-                            $rows = [$row];
-                            $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
-                            $default['reply_markup'] = $replyInlineMarkup;
+                            if (isset($settings[$ch_id]["custom_welcome"])) {
+                                $str = $settings[$ch_id]["custom_welcome"];
+                                $repl = array(
+                                    "name"  => $firstname,
+                                    "username" => $username,
+                                    "mention" => $mention2,
+                                    "id" => $mention,
+                                    "title" => $title
+                                );
+                                $message = $MadelineProto->engine->render($str, $repl);
+                            } else {
+                                $message = "Hi $mention2, welcome to <b>$title</b>";
+                            }
+                            if (isset($settings[$ch_id]["show_rules_welcome"])) {
+                                if ($settings[$ch_id]["show_rules_welcome"]) {
+                                    $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                                    $url = "https://telegram.me/$botusername?start=rules-$ch_id";
+                                    $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Rules", 'url' => $url, ];
+                                    $buttons = [$keyboardButtonUrl];
+                                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                                    $rows = [$row];
+                                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                                    $default['reply_markup'] = $replyInlineMarkup;
+                                }
+                            }
                             $default['message'] = $message;
                             $sentMessage = $MadelineProto->
                             messages->sendMessage($default);
@@ -867,6 +890,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
             if ($id[0]) {
                 $username = $id[2];
                 $mention = $id[1];
+                $firstname = $id[3];
             }
             $msg_id = $update['update']['message']['id'];
             $chat = parse_chat_data($update, $MadelineProto);
@@ -942,15 +966,31 @@ function NewChatJoinedByLink($update, $MadelineProto)
                         }
                         if ($settings[$ch_id]["welcome"]) {
                             $mention2 = html_mention($username, $mention);
-                            $message = "Hi $mention2, welcome to <b>$title</b>";
-                            $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
-                            $url = "https://telegram.me/$botusername?start=rules-$ch_id";
-                            $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Rules", 'url' => $url, ];
-                            $buttons = [$keyboardButtonUrl];
-                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-                            $rows = [$row];
-                            $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
-                            $default['reply_markup'] = $replyInlineMarkup;
+                            if (isset($settings[$ch_id]["custom_welcome"])) {
+                                $str = $settings[$ch_id]["custom_welcome"];
+                                $repl = array(
+                                    "name" => $firstname,
+                                    "username" => $username,
+                                    "mention" => $mention2,
+                                    "id" => $mention,
+                                    "title" => $title
+                                );
+                                $message = $MadelineProto->engine->render($str, $repl);
+                            } else {
+                                $message = "Hi $mention2, welcome to <b>$title</b>";
+                            }
+                            if (isset($settings[$ch_id]["show_rules_welcome"])) {
+                                if ($settings[$ch_id]["show_rules_welcome"]) {
+                                    $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
+                                    $url = "https://telegram.me/$botusername?start=rules-$ch_id";
+                                    $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Rules", 'url' => $url, ];
+                                    $buttons = [$keyboardButtonUrl];
+                                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+                                    $rows = [$row];
+                                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+                                    $default['reply_markup'] = $replyInlineMarkup;
+                                }
+                            }
                             $default['message'] = $message;
                             $sentMessage = $MadelineProto->
                             messages->sendMessage($default);

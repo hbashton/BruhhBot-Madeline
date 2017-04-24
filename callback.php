@@ -17,8 +17,20 @@ class BotCallbackQuery extends Threaded
         if (array_key_exists("data", $update['update'])) {
             $parsed_query = parse_query($update, $MadelineProto);
             switch ($parsed_query['data']['q']) {
+                case 'group_settings':
+                    group_settings($update, $MadelineProto);
+                break;
+
                 case 'moderators':
                     moderators_menu_callback($update, $MadelineProto);
+                break;
+
+                case 'rules_menu':
+                    rules_menu($update, $MadelineProto);
+                break;
+
+                case 'rules_show':
+                    rules_show_callback($update, $MadelineProto);
                 break;
 
                 case 'moderators_menu':
@@ -64,15 +76,15 @@ class BotCallbackQuery extends Threaded
                 case 'locked':
                     locked_menu($update, $MadelineProto);
                 break;
-                
+
                 case 'help2':
                     help2_callback($update, $MadelineProto);
                 break;
-                
+
                 case 'help3':
                     help3_callback($update, $MadelineProto);
                 break;
-                
+
                 case 'back_to_help':
                     help_menu_callback($update, $MadelineProto);
                 break;

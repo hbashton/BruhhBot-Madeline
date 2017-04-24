@@ -176,6 +176,7 @@ function getme($update, $MadelineProto, $name)
                         $default
                     );
                 } catch (Exception $e) {
+                    var_dump($e->getMessage());
                     $default['message'] = "HTML of this message formatted incorrectly.";
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
