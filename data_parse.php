@@ -123,7 +123,7 @@ function parse_query($update, $MadelineProto)
         return false;
     }
 }
-           
+
 function user_specific_data($update, $MadelineProto, $user)
 {
     /**
@@ -380,12 +380,13 @@ function multipleExplodeKeepDelimiters($delimiters, $string) {
 
 function fixtags($text)
 {
-    $text = htmlspecialchars($text);
-    $text = preg_replace("/=/", "=\"\"", $text);
-    $text = preg_replace("/&quot;/", "&quot;\"", $text);
-    $tags = "/&lt;(\/|)(\w*)(\ |)(\w*)([\\\=]*)(?|(\")\"&quot;\"|)(?|(.*)?&quot;(\")|)([\ ]?)(\/|)&gt;/i";
-    $replacement = "<$1$2$3$4$5$6$7$8$9$10>";
-    $text = preg_replace($tags, $replacement, $text);
-    $text = preg_replace("/=\"\"/", "=", $text);
+    preg_match_all('#<([b/strong/em/i/code/pre])>(.+?)</\1>#is', $text, $matches);
+    foreach ($matches[2] as $match) {
+        $text = str_replace($match, htmlentities($match), $text);
+    }
+    preg_match_all("<a href=\x22(.+?)\x22>", $text, $matches);
+    foreach ($matches[1] as $match) {
+        $text = str_replace($match, htmlentities($match), $text);
+    }
     return $text;
 }
