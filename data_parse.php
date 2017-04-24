@@ -382,7 +382,7 @@ function fixtags($text)
 {
     preg_match_all('#<([b/strong/em/i/code/pre])>(.+?)</\1>#is', $text, $matches);
     foreach ($matches[2] as $match) {
-        $text = str_replace($match, htmlentities($match), $text);
+        $text = str_replace($match, htmlentities(trim($match)), $text);
     }
     preg_match_all("<a href=\x22(.+?)\x22>", $text, $matches);
     foreach ($matches[1] as $match) {
