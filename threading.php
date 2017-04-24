@@ -143,7 +143,7 @@ class NewMessage extends Threaded
                             $msg = implode(" ", $msg_arr);
                             broadcast_to_all($update, $MadelineProto, $msg);
                             break;
-                            
+
                         case 'join':
                             unset($msg_arr[0]);
                             $msg = implode(" ", $msg_arr);
@@ -824,11 +824,13 @@ function NewChatAddUser($update, $MadelineProto)
                                 }
                             }
                             $default['message'] = $message;
-                            $sentMessage = $MadelineProto->
-                            messages->sendMessage($default);
-                            \danog\MadelineProto\Logger::log(
-                                $sentMessage
-                            );
+                            try {
+                                $sentMessage = $MadelineProto->
+                                messages->sendMessage($default);
+                                \danog\MadelineProto\Logger::log(
+                                    $sentMessage
+                                );
+                            } catch (Exception $e) {}
                         }
                     }
                 } else {
@@ -992,11 +994,13 @@ function NewChatJoinedByLink($update, $MadelineProto)
                                 }
                             }
                             $default['message'] = $message;
-                            $sentMessage = $MadelineProto->
-                            messages->sendMessage($default);
-                            \danog\MadelineProto\Logger::log(
-                                $sentMessage
-                            );
+                            try {
+                                $sentMessage = $MadelineProto->
+                                messages->sendMessage($default);
+                                \danog\MadelineProto\Logger::log(
+                                    $sentMessage
+                                );
+                            } catch (Exception $e) {}
                         }
                     }
                 } else {
