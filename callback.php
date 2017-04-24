@@ -20,9 +20,21 @@ class BotCallbackQuery extends Threaded
                 case 'moderators':
                     moderators_menu_callback($update, $MadelineProto);
                 break;
-                
+
                 case 'moderators_menu':
                     moderators_menu($update, $MadelineProto);
+                break;
+
+                case 'alert_me_menu':
+                    alert_me_menu($update, $MadelineProto);
+                break;
+
+                case 'alert_me_cb':
+                    alert_me_callback($update, $MadelineProto);
+                break;
+
+                case 'user_settings':
+                    user_settings_menu($update, $MadelineProto);
                 break;
 
                 case 'welcome':

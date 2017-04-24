@@ -205,8 +205,8 @@ while (true) {
                 var_dump($update);
             }
             if (is_supergroup($update, $MadelineProto)) {
-                check_locked($update, $MadelineProto);
-                check_flood($update, $MadelineProto);
+                $pool->submit(new check_locked($update, $MadelineProto));
+                $pool->submit(new check_flood($update, $MadelineProto));
                 $pool->submit(new NewChannelMessage($update, $MadelineProto));
                 if (array_key_exists('action', $update['update']['message'])) {
                     $pool->submit(new NewChannelMessageAction($update, $MadelineProto));

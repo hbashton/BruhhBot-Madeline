@@ -322,6 +322,13 @@ function settings_menu_callback($update, $MadelineProto)
         ];
         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
         $rows[] = $row;
+        $button = [
+            ['_' => 'keyboardButtonCallback', 'text' => "User Settings", 'data' => json_encode(array(
+                "q" => "user_settings",
+                "c" =>  $ch_id))]
+        ];
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $button ];
+        $rows[] = $row;
         if (is_chat_owner($update, $MadelineProto, $ch_id, $userid)) {
             $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => "Moderators", 'data' => json_encode(array(
@@ -536,6 +543,116 @@ function moderators_menu_callback($update, $MadelineProto)
         "c" =>  $ch_id))];
         $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$limiton], ];
         $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$limitoff], ];
+        $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+    "q" => "back_to_settings", // query
+    "c" =>  $ch_id ))];        // chat
+        $row3 = ['_' => 'keyboardButtonRow', 'buttons' => [$back] ];
+        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => [$row1, $row2, $row3], ];
+        $default['reply_markup'] = $replyInlineMarkup;
+        file_put_contents('settings.json', json_encode($settings));
+        try {
+            $editedMessage = $MadelineProto->messages->editMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($editedMessage);
+        } catch (Exception $e) {}
+    }
+}
+
+function user_settings_menu($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $ch_id = $parsed_query['data']['c'];
+    $userid = $parsed_query['user_id'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'id' => $parsed_query['msg_id'],
+        'parse_mode' => 'html',
+        'message' => "These settings are specific to you, for this chat only."
+    );
+    if (is_moderated($ch_id)) {
+         $rows = [];
+         $buttons = [
+        ['_' => 'keyboardButtonCallback', 'text' => "Alerts", 'data' => json_encode(array(
+            "q" => "alert_me_menu",
+            "c" =>  $ch_id ))]
+        ];
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+        $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
+    "q" => "back_to_settings", // query
+    "c" =>  $ch_id ))];        // chat
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => [$back] ];
+        $rows[] = $row;
+        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+        $default['reply_markup'] = $replyInlineMarkup;
+    }
+    if (isset($default['message'])) {
+        try {
+            $sentMessage = $MadelineProto->messages->editMessage(
+                $default
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        } catch (Exception $e) {}
+    }
+}
+
+function alert_me_callback($update, $MadelineProto)
+{
+    $parsed_query = parse_query($update, $MadelineProto);
+    $peer = $parsed_query['peer'];
+    $id = $parsed_query['msg_id'];
+    $ch_id = $parsed_query['data']['c'];
+    $userid = $parsed_query['user_id'];
+    $default = array(
+        'peer' => $parsed_query['peer'],
+        'id' => $parsed_query['msg_id'],
+        'parse_mode' => 'html',
+        'message' => "If you are a moderator in this group you may recieve alerts about actions taken. You can opt to recieve them, or not, here."
+    );
+    if (is_moderated($ch_id)) {
+        if ($parsed_query['data']['v'] == "on") {
+            check_json_array('settings.json', $ch_id);
+            $file = file_get_contents("settings.json");
+            $settings = json_decode($file, true);
+            if (!isset($settings[$ch_id][$userid])) {
+                $settings[$ch_id][$userid] = [];
+            }
+            if (!isset($settings[$ch_id][$userid]["alertme"])) {
+                $settings[$ch_id][$userid]["alertme"] = true;
+            }
+            $settings[$ch_id][$userid]["alertme"] = true;
+            $text = "Alert me! \xE2\x9C\x85";
+        } else {
+            $text = "Alert me.";
+        }
+        $on = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
+        "q" => "alert_me_cb",
+        "v" => "on",
+        "c" =>  $ch_id))]; 
+        if ($parsed_query['data']['v'] == "off") {
+            check_json_array('settings.json', $ch_id);
+            $file = file_get_contents("settings.json");
+            $settings = json_decode($file, true);
+            if (!isset($settings[$ch_id][$userid])) {
+                $settings[$ch_id][$userid] = [];
+            }
+            if (!isset($settings[$ch_id][$userid]["alertme"])) {
+                $settings[$ch_id][$userid]["alertme"] = false;
+            }
+            $settings[$ch_id][$userid]["alertme"] = false;
+            $text = "Don't alert me! \xE2\x9C\x85";
+        } else {
+            $text = "Don't alert me.";
+        }
+        $off = ['_' => 'keyboardButtonCallback', 'text' => "$text", 'data' => json_encode(array(
+        "q" => "alert_me_cb",
+        "v" => "off",
+        "c" =>  $ch_id))];
+        $row1 = ['_' => 'keyboardButtonRow', 'buttons' => [$on], ];
+        $row2 = ['_' => 'keyboardButtonRow', 'buttons' => [$off], ];
         $back = ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
     "q" => "back_to_settings", // query
     "c" =>  $ch_id ))];        // chat

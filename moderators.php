@@ -403,3 +403,21 @@ function are_mods_restricted($ch_id)
     if (!$settings[$ch_id]['restrict_mods']) return false;
     return true;
 }
+
+function alert_check($ch_id, $userid)
+{
+    check_json_array('settings.json', $ch_id);
+    $file = file_get_contents("settings.json");
+    $settings = json_decode($file, true);
+    if (!isset($settings[$ch_id][$userid])) {
+        $settings[$ch_id][$userid] = [];
+    }
+    if (!isset($settings[$ch_id][$userid]["alertme"])) {
+        $settings[$ch_id][$userid]["alertme"] = true;
+    }
+    if (!$settings[$ch_id][$userid]["alertme"]) {
+        return false;
+    } else {
+        return true;
+    }
+}

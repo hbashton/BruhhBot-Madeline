@@ -236,7 +236,6 @@ function adminlist($update, $MadelineProto)
                 'parse_mode' => 'html'
                 );
             $admins = cache_get_chat_info($update, $MadelineProto);
-            var_dump($admins);
             foreach ($admins['participants'] as $key) {
                 if (array_key_exists('user', $key)) {
                     $id = $key['user']['id'];
@@ -400,18 +399,8 @@ function pinmessage($update, $MadelineProto, $silent, $user = false)
                                 $default['message'] = $message;
                                 \danog\MadelineProto\Logger::log($pin);
                                 $message2 = "User $mention pinned a message in <b>$title</b> - $tg_id";
-                                $default2['message'] = $message2;
-                                $sentMessage2 = $MadelineProto->messages->sendMessage(
-                                    $default2
-                                );
-                                \danog\MadelineProto\Logger::log($sentMessage2);
-                                $forwardMessage = $MadelineProto->messages->forwardMessages([
-                                    'silent' => false,
-                                    'from_peer' => $ch_id,
-                                    'id' => [$pin_id],
-                                    'to_peer' => $peer2]
-                                );
-                                \danog\MadelineProto\Logger::log($forwardMessage);
+                                alert_moderators($MadelineProto, $ch_id, $message2);
+                                alert_moderators_forward($MadelineProto, $ch_id, $pin_id);
                             } catch (Exception $e) {}
                         } else {
                             $message = $MadelineProto->responses['pinmessage']['help'];
@@ -680,36 +669,19 @@ function pinalert($update, $MadelineProto)
     try {
         $chat = parse_chat_data($update, $MadelineProto);
         $ch_id = $chat['id'];
+        if (!is_moderated($ch_id)) return;
         $chatpeer = $chat['peer'];
         $title = htmlentities($chat['title']);
         $msgid = $update['update']['message']['id'];
         $pin_id = $update['update']['message']['reply_to_msg_id'];
-        $peer = cache_get_info(
-            $update,
-            $MadelineProto,
-            getenv('MASTER_USERNAME')
-        )['bot_api_id'];
         $tg_id = str_replace("-100", "", $ch_id);
         $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
+        if ($fromid == $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id']) return;
         $username = catch_id($update, $MadelineProto, $fromid)[2];
         $mention = html_mention($username, $fromid);
-        $default = array(
-            'peer' => $peer,
-            'parse_mode' => 'html'
-        );
         $message = "User $mention pinned a message in <b>$title</b> - $tg_id";
-        $default['message'] = $message;
-        $sentMessage = $MadelineProto->messages->sendMessage(
-            $default
-        );
-        \danog\MadelineProto\Logger::log($sentMessage);
-        $forwardMessage = $MadelineProto->messages->forwardMessages([
-            'silent' => false,
-            'from_peer' => $ch_id,
-            'id' => [$pin_id],
-            'to_peer' => $peer]
-        );
-        \danog\MadelineProto\Logger::log($forwardMessage);
+        alert_moderators($MadelineProto, $ch_id, $message);
+        alert_moderators_forward($MadelineProto, $ch_id, $pin_id);
     } catch (Exception $e) {}
 }
 
@@ -823,6 +795,115 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
                     $default
                 );
             }
+        }
+    }
+}
+
+function alert_moderators($MadelineProto, $ch_id, $text)
+{
+    $default = array(
+        'message' => $text,
+        'parse_mode' => 'html'
+    );
+    $users = [];
+    $admins = cache_get_info(false, $MadelineProto, $ch_id, true);
+    foreach ($admins['participants'] as $key) {
+        if (array_key_exists('user', $key)) {
+            $id = $key['user']['id'];
+        } else {
+            if (array_key_exists('bot', $key)) {
+                $id = $key['bot']['id'];
+            }
+        }
+        if (array_key_exists("role", $key)) {
+            if ($key['role'] == "moderator"
+                or $key['role'] == "creator"
+                or $key['role'] == "editor"
+            ) {
+                $mod = true;
+            } else {
+                $mod = false;
+            }
+        } else {
+            $mod = false;
+        }
+        if ($mod) {
+            $users[] = $id;
+        }
+    }
+    check_json_array('promoted.json', $ch_id);
+    $file = file_get_contents("promoted.json");
+    $promoted = json_decode($file, true);
+    if (isset($promoted[$ch_id])) {
+        foreach ($promoted[$ch_id] as $id) {
+            if (in_array($id, $users)) continue;
+            $users[] = $id;
+        }
+    }
+    foreach ($users as $peer) {
+        try {
+            if (!alert_check($ch_id, $peer)) continue;
+            $default['peer'] = $peer;
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        } catch (Exception $e) {
+            continue;
+        }
+    }
+}
+
+function alert_moderators_forward($MadelineProto, $ch_id, $msg_id)
+{
+    $users = [];
+    $admins = cache_get_info(false, $MadelineProto, $ch_id, true);
+    foreach ($admins['participants'] as $key) {
+        if (array_key_exists('user', $key)) {
+            $id = $key['user']['id'];
+        } else {
+            if (array_key_exists('bot', $key)) {
+                $id = $key['bot']['id'];
+            }
+        }
+        if (array_key_exists("role", $key)) {
+            if ($key['role'] == "moderator"
+                or $key['role'] == "creator"
+                or $key['role'] == "editor"
+            ) {
+                $mod = true;
+            } else {
+                $mod = false;
+            }
+        } else {
+            $mod = false;
+        }
+        if ($mod) {
+            $users[] = $id;
+        }
+    }
+    check_json_array('promoted.json', $ch_id);
+    $file = file_get_contents("promoted.json");
+    $promoted = json_decode($file, true);
+    if (isset($promoted[$ch_id])) {
+        foreach ($promoted[$ch_id] as $id) {
+            if (in_array($id, $users)) continue;
+            $users[] = $id;
+        }
+    }
+    foreach ($users as $peer) {
+        try {
+            if (alert_check($ch_id, $peer)) {
+                $forwardMessage = $MadelineProto->messages->forwardMessages([
+                    'silent' => false,
+                    'from_peer' => $ch_id,
+                    'id' => [$msg_id],
+                    'to_peer' => $peer]
+                );
+                \danog\MadelineProto\Logger::log($forwardMessage);
+            }
+        } catch (Exception $e) {
+            continue;
         }
     }
 }
