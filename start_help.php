@@ -60,7 +60,7 @@ function help_message($update, $MadelineProto)
         $file = file_get_contents("start_help.json");
         $startj = json_decode($file, true);
         foreach ($startj['menus'] as $menu => $desc) {
-             if ($rowcount < 2) {
+             if ($rowcount < 2 && $rowcount > 0) {
                  $end = false;
                  $rowcount++;
                  $buttons[] =
