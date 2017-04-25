@@ -30,16 +30,16 @@ function catch_id($update, $MadelineProto, $user)
                         'username', $user_['User']
                     )
                     ) {
-                        $username = $MadelineProto->utf8ize($user_['User']['username']);
+                        $username = $user_['User']['username'];
                     } elseif (array_key_exists(
                         'first_name', $user_['User']
                     )
                     ) {
-                        $username = $MadelineProto->utf8ize($user_['User']['first_name']);
+                        $username = $user_['User']['first_name'];
                     } else {
                         $username = "no-name-user";
                     }
-                    $firstname = $MadelineProto->utf8ize($user_['User']['first_name']);
+                    $firstname = $user_['User']['first_name'];
                     $userid = $user_['bot_api_id'];
                     break;
                 } catch (Exception $e) {
@@ -56,16 +56,16 @@ function catch_id($update, $MadelineProto, $user)
                     'username', $user_['User']
                 )
                 ) {
-                    $username = $MadelineProto->utf8ize($user_['User']['username']);
+                    $username = $user_['User']['username'];
                 } elseif (array_key_exists(
                     'first_name', $user_['User']
                 )
                 ) {
-                    $username = $MadelineProto->utf8ize($user_['User']['first_name']);
+                    $username = $user_['User']['first_name'];
                 } else {
                     $username = "no-name-user";
                 }
-                $firstname = $MadelineProto->utf8ize($user_['User']['first_name']);
+                $firstname = $user_['User']['first_name'];
                 $userid = $user_['bot_api_id'];
                 $return = array(true, $userid, $username, $firstname);
             } catch (Exception $e) {
@@ -88,17 +88,17 @@ function catch_id($update, $MadelineProto, $user)
                             'username', $user_['User']
                         )
                         ) {
-                            $username = $MadelineProto->utf8ize($user_['User']['username']);
+                            $username = $user_['User']['username'];
                         } elseif (array_key_exists(
                             'first_name', $user_['User']
                         )
                         ) {
-                            $username = $MadelineProto->utf8ize($user_['User']['first_name']);
+                            $username = $user_['User']['first_name'];
                         } else {
                             $username = "no-name-user";
                         }
                         $userid = $user_['bot_api_id'];
-                        $firstname = $MadelineProto->utf8ize($user_['User']['first_name']);
+                        $firstname = $user_['User']['first_name'];
                         $return = array(true, $userid, $username, $firstname);
                     }
                 }

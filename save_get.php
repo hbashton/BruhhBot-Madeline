@@ -50,7 +50,7 @@ function saveme($update, $MadelineProto, $msg, $name, $user = false)
             if ($name) {
                 if ($name == "from") {
                     if ($msg) {
-                        $msg = $MadelineProto->utf8ize($msg);
+                        $msg = $msg;
                         savefrom($update, $MadelineProto, $msg);
                         return;
                     } else {
