@@ -399,15 +399,17 @@ function pinmessage($update, $MadelineProto, $silent, $user = false)
                                 $default['message'] = $message;
                                 \danog\MadelineProto\Logger::log($pin);
                                 $message2 = "User $mention pinned a message in <b>$title</b> - $tg_id";
-                                alert_moderators($MadelineProto, $ch_id, $message2);
-                                alert_moderators_forward($MadelineProto, $ch_id, $pin_id);
+                                if (!$user) {
+                                    alert_moderators($MadelineProto, $ch_id, $message2);
+                                    alert_moderators_forward($MadelineProto, $ch_id, $pin_id);
+                                }
                             } catch (Exception $e) {}
                         } else {
                             $message = $MadelineProto->responses['pinmessage']['help'];
                             $default['message'] = $message;
                         }
                     }
-                    if (isset($default['message'])) {
+                    if (isset($default['message']) && !$user) {
                         $sentMessage = $MadelineProto->messages->sendMessage(
                             $default
                         );
