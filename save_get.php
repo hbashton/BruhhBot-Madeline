@@ -382,7 +382,7 @@ function saved_get($update, $MadelineProto)
     }
 }
 
-function save_clear($update, $MadelineProto, $msg, )
+function save_clear($update, $MadelineProto, $msg, $user = false)
 {
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
@@ -444,7 +444,7 @@ function save_clear($update, $MadelineProto, $msg, )
                     $message = "Use <code>/save clear message</code> to clear the contents of a message";
                     $default['message'] = $message;
                 }
-                if (isset($default['message']) && ) {
+                if (isset($default['message']) && !$user) {
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
                     );

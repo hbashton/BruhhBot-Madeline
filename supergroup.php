@@ -2,7 +2,7 @@
 /**
     Copyright (C) 2016-2017 Hunter Ashton
 
-    This file is part of BruhhBot.
+    This file is part of BruhhBot, the most vulnerable bot on Telegram.
 
     BruhhBot is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
