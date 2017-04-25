@@ -62,8 +62,7 @@ function saveme($update, $MadelineProto, $msg, $name, $user = false)
             if (strlen($msg) < 2000) {
                 if ($name && $msg) {
                     $name = htmlentities(cb($name));
-                    $msg = $MadelineProto->utf8ize($msg);
-                    $msg = fixtags($msg);
+                    $msg = base64_encode(fixtags($msg));
                     $codename = "<code>$name</code>";
                     check_json_array('saved.json', $ch_id);
                     $file = file_get_contents("saved.json");
@@ -152,7 +151,11 @@ function getme($update, $MadelineProto, $name)
                 foreach ($saved[$ch_id] as $i => $ii) {
                     if (!is_array($i)) {
                         if ($i == $name) {
-                            $message = "$name:\r\n".$saved[$ch_id][$i];
+                            if (base64_encode(base64_decode($saved[$ch_id][$i])) === $saved[$ch_id][$i]) {
+                                $message = "$name:\r\n".base64_decode($saved[$ch_id][$i]);
+                            } else {
+                                $message = "$name:\r\n".$saved[$ch_id][$i];
+                            }
                             $default['message'] = $message;
                             $default['entities'] = $boldname;
                         }
