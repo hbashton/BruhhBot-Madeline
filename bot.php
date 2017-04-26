@@ -73,7 +73,7 @@ if (isset($argv[1])) {
 $settings = json_decode(getenv("MTPROTO_SETTINGS"), true);
 
 if (!isset($uMadelineProto)) {
-    $uMadelineProto = new \danog\MadelineProto\API();
+    $uMadelineProto = new \danog\MadelineProto\API($settings);
     $checkedPhone = $uMadelineProto->auth->checkPhone(
         [
             'phone_number'     => getenv('MTPROTO_NUMBER'),
@@ -113,7 +113,7 @@ if (!isset($uMadelineProto)) {
     $uMadelineProto = \danog\MadelineProto\Serialization::deserialize(
         'session.madeline'
     );
-    $MadelineProto = new \danog\MadelineProto\API();
+    $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
     echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
@@ -128,7 +128,7 @@ if (!isset($uMadelineProto)) {
     );
 }
 if (!isset($MadelineProto)) {
-    $MadelineProto = new \danog\MadelineProto\API();
+    $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
     \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
     echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
@@ -171,7 +171,7 @@ while (true) {
             'limit' => 50000, 'timeout' => 0]
         );
     } catch (Exception $e) {
-        $MadelineProto = new \danog\MadelineProto\API();
+        $MadelineProto = new \danog\MadelineProto\API($settings);
         $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
         \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
         echo 'Serializing MadelineProto to bot.madeline...'.PHP_EOL;
