@@ -96,7 +96,7 @@ function settings_menu($update, $MadelineProto)
             $msg_id = $update['update']['message']['id'];
             $mods = $MadelineProto->responses['welcome_toggle']['mods'];
             $chat = parse_chat_data($update, $MadelineProto);
-            $title = $chat['title'];
+            $title = htmlentities($chat['title']);
             $peer = $chat['peer'];
             $ch_id = $chat['id'];
             $userid = cache_from_user_info($update, $MadelineProto);
@@ -178,7 +178,7 @@ function settings_menu_deeplink($update, $MadelineProto, $ch_id)
     $msg_id = $update['update']['message']['id'];
     $info = cache_get_info($update, $MadelineProto, $ch_id, true);
     if ($info) {
-        $title = "for ".$info['title'];
+        $title = "for ".htmlentities($info['title']);
     } else {
         $title = "";
     }
@@ -250,7 +250,7 @@ function locked_menu($update, $MadelineProto)
     $ch_id = $parsed_query['data']['c'];
     $info = cache_get_info($update, $MadelineProto, $ch_id, true);
     if ($info) {
-        $title = "for ".$info['title'];
+        $title = "for ".htmlentities($info['title']);
     } else {
         $title = "";
     }
@@ -294,12 +294,12 @@ function locked_menu($update, $MadelineProto)
             }
             $buttons = [
                 ['_' => 'keyboardButtonCallback', 'text' => $value, 'data' => json_encode(array(
-                    "q" => "hint",       // query
+                    "q" => "hint",
                     "v" => "$key"))],
                 ['_' => 'keyboardButtonCallback', 'text' => $text, 'data' => json_encode(array(
-                    "q" => "lock",       // query
-                    "v" => "$key-$onoff",// value
-                    "c" =>  $ch_id ))]   // chat
+                    "q" => "lock",
+                    "v" => "$key-$onoff",
+                    "c" =>  $ch_id ))]
             ];
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
             $rows[] = $row;

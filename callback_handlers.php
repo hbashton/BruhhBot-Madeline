@@ -292,7 +292,7 @@ function settings_menu_callback($update, $MadelineProto)
     $ch_id = $parsed_query['data']['c'];
     $info = cache_get_info($update, $MadelineProto, $ch_id, true);
     if ($info) {
-        $title = "for ".$info['title'];
+        $title = "for ".htmlentities($info['title']);
     } else {
         $title = "";
     }
@@ -362,44 +362,23 @@ function help2_callback($update, $MadelineProto)
         'peer' => $parsed_query['peer'],
         'parse_mode' => 'html'
     );
-    $rows = [];
-    $rowcount = 0;
     $file = file_get_contents("start_help.json");
     $startj = json_decode($file, true);
     $default['message'] = $startj['menus'][$v];
+    $button_list = [];
     foreach ($startj['commands_help'][$v] as $command => $desc) {
-         if ($rowcount < 2 && $rowcount > 0) {
-             $end = false;
-             $rowcount++;
-             $buttons[] =
-                ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
-                    "q" => "help3",
-                    "v" => "$command",
-                    "e" => "$v"))];
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-            $rows[] = $row;
-         } else {
-             $end = true;
-             $rowcount = 1;
-             $buttons = [
-                ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
-                    "q" => "help3",
-                    "v" => "$command",
-                    "e" => "$v"))]
-            ];
-        }
+         $button_list[] =
+            ['_' => 'keyboardButtonCallback', 'text' => $command, 'data' => json_encode(array(
+                "q" => "help3",
+                "v" => "$command",
+                "e" => "$v"))];
     }
-    if ($end) {
-        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-        $rows[] = $row;
-    }
-    $buttons = [
+    $header = [
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
             "q" => "back_to_help"))]
     ];
-    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-    $rows[] = $row;
-    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+    $menu = build_keyboard_callback($button_list, 2, $header);
+    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $menu, ];
     $default['reply_markup'] = $replyInlineMarkup;
     if (isset($default['message'])) {
         try {
@@ -456,35 +435,17 @@ function help_menu_callback($update, $MadelineProto)
         'parse_mode' => 'html',
         'message' => 'You can navigate the help menu to see each command and how it\'s used. All commands can be started with !, /, or #'
         );
-    $rows = [];
-    $rowcount = 0;
     $file = file_get_contents("start_help.json");
     $startj = json_decode($file, true);
+    $button_list = [];
     foreach ($startj['menus'] as $menu => $desc) {
-         if ($rowcount < 2 && $rowcount > 0) {
-             $end = false;
-             $rowcount++;
-             $buttons[] =
-                ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
-                    "q" => "help2",
-                    "v" => "$menu"))];
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-            $rows[] = $row;
-         } else {
-             $end = true;
-             $rowcount = 1;
-             $buttons = [
-                ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
-                    "q" => "help2",
-                    "v" => "$menu"))]
-            ];
-        }
+         $button_list[] =
+            ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
+                "q" => "help2",
+                "v" => "$menu"))];
     }
-    if ($end) {
-        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-        $rows[] = $row;
-    }
-    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+    $menu = build_keyboard_callback($button_list, 2);
+    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $menu, ];
     $default['reply_markup'] = $replyInlineMarkup;
     try {
         $sentMessage = $MadelineProto->messages->sendMessage(

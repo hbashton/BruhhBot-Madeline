@@ -53,42 +53,22 @@ function help_message($update, $MadelineProto)
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html',
-            'message' => 'All commands can be started with !, /, or #'
+            'message' => 'You can navigate the help menu to see each command and how it\'s used. All commands can be started with !, /, or #'
             );
-        $rows = [];
-        $rowcount = 0;
         $file = file_get_contents("start_help.json");
         $startj = json_decode($file, true);
+        $button_list = [];
         foreach ($startj['menus'] as $menu => $desc) {
-             if ($rowcount < 2 && $rowcount > 0) {
-                 $end = false;
-                 $rowcount++;
-                 $buttons[] =
-                    ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
-                        "q" => "help2",
-                        "v" => "$menu",
-                        "u" =>  $peer))];
-                $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-                $rows[] = $row;
-             } else {
-                 $end = true;
-                 $rowcount = 1;
-                 $buttons = [
-                    ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
-                        "q" => "help2",
-                        "v" => "$menu",
-                        "u" =>  $peer))]
-                ];
-            }
+             $button_list[] =
+                ['_' => 'keyboardButtonCallback', 'text' => $menu, 'data' => json_encode(array(
+                    "q" => "help2",
+                    "v" => "$menu",
+                    "u" =>  $peer))];
         }
-        if ($end) {
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
-            $rows[] = $row;
-        }
-        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows, ];
+        $menu = build_keyboard_callback($button_list, 2);
+        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $menu, ];
         $default['reply_markup'] = $replyInlineMarkup;
     }
-    var_dump($default);
     try {
         $sentMessage = $MadelineProto->messages->sendMessage(
             $default

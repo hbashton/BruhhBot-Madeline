@@ -384,6 +384,7 @@ function fixtags($text)
     foreach ($matches[2] as $match) {
         $text = str_replace($match, htmlentities(trim($match)), $text);
     }
+
     preg_match_all("<a href=\x22(.+?)\x22>", $text, $matches);
     foreach ($matches[1] as $match) {
         $text = str_replace($match, htmlentities($match), $text);
@@ -397,4 +398,38 @@ function decodeEmoticons($src)
     $result = mb_convert_encoding($replaced, "UTF-16", "HTML-ENTITIES");
     $result = mb_convert_encoding($result, 'utf-8', 'utf-16');
     return $result;
+}
+
+function build_keyboard_callback($button_list, $count = 2, $header = false, $footer = false, $end = false)
+{
+    $buttons = [];
+    $cols = 0;
+    if(count($button_list)%$count != 0) {
+      $end = true;
+    }
+    foreach ($button_list as $button) {
+         if ($cols < $count) {
+             $buttons[] = $button;
+             $cols++;
+         } else {
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+            $rows[] = $row;
+            $buttons = [];
+            $buttons[] = $button;
+            $cols = 1;
+        }
+    }
+    if ($end) {
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $rows[] = $row;
+    }
+    if ($header) {
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $header ];
+        array_unshift($rows, $row);
+    }
+    if ($footer) {
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $footer ];
+        array_push($rows, $row);
+    }
+    return($rows);
 }
