@@ -495,7 +495,9 @@ function moderators_menu_callback($update, $MadelineProto)
             $settings[$ch_id]["restrict_mods"] = true;
             $text = "Limit moderators \xE2\x9C\x85";
             $from_name = catch_id($update, $MadelineProto, $parsed_query['user_id'])[2];
-            $alert = "<code>The owner $title, $from_name, has restricted moderators. You will no longer be able to send locked messages.</code>";
+            if (isset($from_name)) {
+                $alert = "<code>The owner $title, $from_name, has restricted moderators. You will no longer be able to send locked messages.</code>";
+            }
         } else {
             $text = "Limit moderators";
         }
@@ -509,7 +511,9 @@ function moderators_menu_callback($update, $MadelineProto)
             $settings = json_decode($file, true);
             $settings[$ch_id]["restrict_mods"] = false;
             $text = "Don't limit moderators \xE2\x9C\x85";
-            $alert = "<code>The owner $title, $from_name, has unrestricted moderators. You can send locked messages once more.</code>";
+            if (isset($from_name)) {
+                $alert = "<code>The owner $title, $from_name, has unrestricted moderators. You can send locked messages once more.</code>";
+            }
         } else {
             $text = "Don't limit moderators";
         }
