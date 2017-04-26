@@ -174,6 +174,7 @@ class check_flood extends Threaded
                     $chat = parse_chat_data($update, $MadelineProto);
                     $peer = $chat['peer'];
                     $ch_id = $chat['id'];
+                    $title = htmlentities($chat['title']);
                     $msg_id = $update['update']['message']['id'];
                     $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
                     check_json_array('locked.json', $ch_id);
@@ -212,6 +213,7 @@ class check_flood extends Threaded
                                                         "mention" => $mention
                                                     );
                                                     $message = $MadelineProto->engine->render($str, $repl);
+                                                    $alert = "<code>$username was kicked for flooding in $title</code>";
                                                     if (isset($message)) {
                                                         $sentMessage = $MadelineProto->
                                                         messages->sendMessage(
@@ -224,6 +226,7 @@ class check_flood extends Threaded
                                                     if (isset($kick)) {
                                                         \danog\MadelineProto\Logger::log($kick);
                                                     }
+                                                    alert_moderators($MadelineProto, $ch_id, $alert);
                                                     if (isset($sentMessage)) {
                                                         \danog\MadelineProto\Logger::log(
                                                             $sentMessage
@@ -408,28 +411,8 @@ function check_flood_user($update, $MadelineProto)
                                                     'user_id' => $fromid,
                                                     'kicked' => true]
                                                 );
-                                                $mention = html_mention($username, $fromid);
-                                                $str = $MadelineProto->responses['check_flood']['kick'];
-                                                $repl = array(
-                                                    "mention" => $mention
-                                                );
-                                                $message = $MadelineProto->engine->render($str, $repl);
-                                                if (isset($message)) {
-                                                    $sentMessage = $MadelineProto->
-                                                    messages->sendMessage(
-                                                        ['peer' => $peer,
-                                                        'reply_to_msg_id' => $msg_id,
-                                                        'message' => $message,
-                                                        'parse_mode' => 'html']
-                                                    );
-                                                }
                                                 if (isset($kick)) {
                                                     \danog\MadelineProto\Logger::log($kick);
-                                                }
-                                                if (isset($sentMessage)) {
-                                                    \danog\MadelineProto\Logger::log(
-                                                        $sentMessage
-                                                    );
                                                 }
                                                 $MadelineProto->flooder = [];
                                             }

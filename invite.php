@@ -213,6 +213,10 @@ function invite_user($update, $MadelineProto, $msg)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
@@ -234,6 +238,7 @@ function invite_user($update, $MadelineProto, $msg)
                                     $inviteuser = $uMadelineProto->channels->inviteToChannel(
                                         ['channel' => $peer, 'users' => [$userid] ]
                                     );
+                                    $alert = "<code>$from_name invited $username to $title</code>";
                                 } catch (Exception $e) {
                                     $str = $MadelineProto->responses['invite_user']['exception'];
                                     $repl = array(
@@ -264,6 +269,7 @@ function invite_user($update, $MadelineProto, $msg)
             }
             if (isset($inviteuser)) {
                 \danog\MadelineProto\Logger::log($inviteuser);
+                alert_moderators($MadelineProto, $ch_id, $alert);
             }
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);

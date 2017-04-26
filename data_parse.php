@@ -153,7 +153,7 @@ function user_specific_data($update, $MadelineProto, $user)
             unset($isbanned[0]);
             foreach ($isbanned as $key => $value) {
                 $chat = cache_get_info($update, $MadelineProto, $value);
-                $title = $chat["Chat"]["title"];
+                $title = htmlentities($chat["Chat"]["title"]);
                 $id = $chat['Chat']['id'];
                 if (!is_null($title) && !is_null($id)) {
                     $title_id = array(
@@ -384,7 +384,6 @@ function fixtags($text)
     foreach ($matches[2] as $match) {
         $text = str_replace($match, htmlentities(trim($match)), $text);
     }
-
     preg_match_all("<a href=\x22(.+?)\x22>", $text, $matches);
     foreach ($matches[1] as $match) {
         $text = str_replace($match, htmlentities($match), $text);

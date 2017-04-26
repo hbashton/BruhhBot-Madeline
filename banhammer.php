@@ -33,6 +33,10 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                 'reply_to_msg_id' => $msg_id,
                 'parse_mode' => 'html',
                 );
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
@@ -70,6 +74,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                             );
                                             $message = $MadelineProto->engine->render($str, $repl);
                                             $default['message'] = $message;
+                                            $alert = "<code>$from_name banned $username in $title.</code>";
                                             try {
                                                 $kick = $MadelineProto->
                                                 channels->kickFromChannel(
@@ -99,8 +104,8 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                                 'user_id' => $userid,
                                                 'kicked' => true, ]
                                             );
-                                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                                        }
+                                        } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                                        $alert = "<code>$from_name banned $username in $title.</code>";
                                         array_push($banlist[$ch_id], $userid);
                                         file_put_contents(
                                             'banlist.json',
@@ -137,6 +142,9 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
             if (isset($sentMessage) && $send) {
                 \danog\MadelineProto\Logger::log($sentMessage);
             }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
+            }
         }
     }
 }
@@ -151,13 +159,17 @@ function unbanme($update, $MadelineProto, $msg = "")
             $mods = $MadelineProto->responses['unbanme']['mods'];
             $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
-            $title = html_bold($chat['title']);
+            $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
                 'parse_mode' => 'html',
             );
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
@@ -199,8 +211,8 @@ function unbanme($update, $MadelineProto, $msg = "")
                                                 'user_id' => $userid,
                                                 'kicked' => false]
                                             );
-                                        } catch (\danog\MadelineProto\RPCErrorException $e) {
-                                        }
+                                        } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                                        $alert = "<code>$from_name unbanned $username in $title.</code>";
                                     } else {
                                         $str = $MadelineProto->responses['unbanme']['already'];
                                         $repl = array(
@@ -241,6 +253,9 @@ function unbanme($update, $MadelineProto, $msg = "")
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);
             }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
+            }
         }
     }
 }
@@ -262,6 +277,10 @@ function kickhim($update, $MadelineProto, $msg = "")
                 'reply_to_msg_id' => $msg_id,
                 'parse_mode' => 'html',
             );
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
@@ -310,7 +329,7 @@ function kickhim($update, $MadelineProto, $msg = "")
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
-
+                                    $alert = "<code>$from_name kicked $username in $title.</code>";
                                 }
                             } else {
                                 $str = $MadelineProto->responses['kickhim']['idk'];
@@ -340,6 +359,9 @@ function kickhim($update, $MadelineProto, $msg = "")
             }
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);
+            }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
             }
         }
     }

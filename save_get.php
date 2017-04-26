@@ -142,6 +142,9 @@ function getme($update, $MadelineProto, $name)
             'reply_to_msg_id' => $msg_id,
             'parse_mode' => 'html'
             );
+        if (isset($update['update']['message']['reply_to_msg_id'])) {
+            $default['reply_to_msg_id'] = $update['update']['message']['reply_to_msg_id'];
+        }
         check_json_array('saved.json', $ch_id);
         $file = file_get_contents("saved.json");
         $saved = json_decode($file, true);

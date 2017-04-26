@@ -27,6 +27,10 @@ function promoteme($update, $MadelineProto, $msg = "")
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
@@ -54,6 +58,7 @@ function promoteme($update, $MadelineProto, $msg = "")
                                     );
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
+                                    $alert = "<code>$from_name promoted $username to a moderator in $title</code>";
                                 } else {
                                     $str = $MadelineProto->responses['promoteme']['already'];
                                     $repl = array(
@@ -74,6 +79,7 @@ function promoteme($update, $MadelineProto, $msg = "")
                                 );
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
+                                $alert = "<code>$from_name promoted $username to a moderator in $title</code>";
                             }
                         } else {
                             $str = $MadelineProto->responses['promoteme']['idk'];
@@ -94,6 +100,9 @@ function promoteme($update, $MadelineProto, $msg = "")
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);
             }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
+            }
         }
     }
 }
@@ -108,6 +117,10 @@ function demoteme($update, $MadelineProto, $msg = "")
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
@@ -140,6 +153,7 @@ function demoteme($update, $MadelineProto, $msg = "")
                                 );
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
+                                $alert = "<code>$from_name demoted $username in $title</code>";
                             } else {
                                 $str = $MadelineProto->responses['demoteme']['fail'];
                                 $repl = array(
@@ -157,6 +171,7 @@ function demoteme($update, $MadelineProto, $msg = "")
                             );
                             $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
+                            $alert = "<code>$from_name demoted $username in $title</code>";
                         }
                     } else {
                         $str = $MadelineProto->responses['demoteme']['idk'];
@@ -175,6 +190,9 @@ function demoteme($update, $MadelineProto, $msg = "")
             }
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);
+            }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
             }
         }
     }

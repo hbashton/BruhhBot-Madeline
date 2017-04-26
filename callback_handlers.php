@@ -17,6 +17,7 @@ function welcome_callback($update, $MadelineProto)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }
@@ -85,6 +86,7 @@ function lock_callback($update, $MadelineProto)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }
@@ -189,6 +191,7 @@ function increment_flood($update, $MadelineProto, $up = false)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }
@@ -203,6 +206,7 @@ function increment_flood($update, $MadelineProto, $up = false)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You can't make the floodlimit 1 or below", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }
@@ -307,6 +311,7 @@ function settings_menu_callback($update, $MadelineProto)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }
@@ -462,6 +467,12 @@ function moderators_menu_callback($update, $MadelineProto)
     $id = $parsed_query['msg_id'];
     $ch_id = $parsed_query['data']['c'];
     $userid = $parsed_query['user_id'];
+    $info = cache_get_info($update, $MadelineProto, $ch_id, true);
+    if ($info) {
+        $title = "of ".htmlentities($info['title']);
+    } else {
+        $title = "";
+    }
     $default = array(
         'peer' => $parsed_query['peer'],
         'id' => $parsed_query['msg_id'],
@@ -472,6 +483,7 @@ function moderators_menu_callback($update, $MadelineProto)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the moderation settings of this chat", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }
@@ -482,6 +494,8 @@ function moderators_menu_callback($update, $MadelineProto)
             $settings = json_decode($file, true);
             $settings[$ch_id]["restrict_mods"] = true;
             $text = "Limit moderators \xE2\x9C\x85";
+            $from_name = catch_id($update, $MadelineProto, $parsed_query['user_id'])[2];
+            $alert = "<code>The owner $title, $from_name, has restricted moderators. You will no longer be able to send locked messages.</code>";
         } else {
             $text = "Limit moderators";
         }
@@ -495,6 +509,7 @@ function moderators_menu_callback($update, $MadelineProto)
             $settings = json_decode($file, true);
             $settings[$ch_id]["restrict_mods"] = false;
             $text = "Don't limit moderators \xE2\x9C\x85";
+            $alert = "<code>The owner $title, $from_name, has unrestricted moderators. You can send locked messages once more.</code>";
         } else {
             $text = "Don't limit moderators";
         }
@@ -516,6 +531,9 @@ function moderators_menu_callback($update, $MadelineProto)
                 $default
             );
             \danog\MadelineProto\Logger::log($editedMessage);
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
+            }
         } catch (Exception $e) {}
     }
 }
@@ -647,6 +665,7 @@ function rules_show_callback($update, $MadelineProto)
         try {
             $callbackAnswer = $MadelineProto->messages->setBotCallbackAnswer(['alert'  => true, 'query_id' => $parsed_query['query_id'], 'message' => "You cannot change the settings of this chat", 'cache_time' => 3, ]);
             \danog\MadelineProto\Logger::log($callbackAnswer);
+            return;
         } catch (Exception $e) {}
         return;
     }

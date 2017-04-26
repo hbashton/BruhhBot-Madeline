@@ -26,6 +26,10 @@ function muteme($update, $MadelineProto, $msg = "", $send = true)
         $peer = $chat['peer'];
         $title = htmlentities($chat['title']);
         $ch_id = $chat['id'];
+        $fromid = cache_from_user_info($update, $MadelineProto);
+        if (!isset($fromid['bot_api_id'])) return;
+        $fromid = $fromid['bot_api_id'];
+        $from_name = catch_id($update, $MadelineProto, $fromid)[2];
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
@@ -65,6 +69,7 @@ function muteme($update, $MadelineProto, $msg = "", $send = true)
                                 );
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
+                                $alert = "<code>$from_name muted $username in $title</code>";
                             } else {
                                 $str = $MadelineProto->responses['muteme']['already'];
                                 $repl = array(
@@ -87,6 +92,7 @@ function muteme($update, $MadelineProto, $msg = "", $send = true)
                             );
                             $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
+                            $alert = "<code>$from_name muted $username in $title</code>";
                         }
                     }
                 } else {
@@ -108,6 +114,9 @@ function muteme($update, $MadelineProto, $msg = "", $send = true)
         if (isset($sentMessage) && $send) {
             \danog\MadelineProto\Logger::log($sentMessage);
         }
+        if (isset($alert)) {
+            alert_moderators($MadelineProto, $ch_id, $alert);
+        }
     }
 }
 
@@ -122,6 +131,10 @@ function unmuteme($update, $MadelineProto, $msg = "")
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
@@ -158,6 +171,7 @@ function unmuteme($update, $MadelineProto, $msg = "")
                                 );
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
+                                $alert = "<code>$from_name unmuted $username in $title</code>";
                             } else {
                                 $str = $MadelineProto->responses['unmuteme']['already'];
                                 $repl = array(
@@ -188,6 +202,9 @@ function unmuteme($update, $MadelineProto, $msg = "")
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);
             }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
+            }
         }
     }
 }
@@ -208,6 +225,10 @@ function muteall($update, $MadelineProto, $send = true)
                 'parse_mode' => 'html'
                 );
             $userid = "all";
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id) && is_bot_admin($update, $MadelineProto) && from_admin_mod($update, $MadelineProto, $mods, true)) {
                 check_json_array('mutelist.json', $ch_id);
                 $file = file_get_contents("mutelist.json");
@@ -221,6 +242,7 @@ function muteall($update, $MadelineProto, $send = true)
                         );
                         $message = $MadelineProto->responses['muteall']['success'];
                         $default['message'] = $message;
+                        $alert = "<code>$from_name muted EVERYONE in $title</code>";
                     } else {
                         $message = $MadelineProto->responses['muteall']['already'];
                         $default['message'] = $message;
@@ -242,6 +264,9 @@ function muteall($update, $MadelineProto, $send = true)
             if (isset($sentMessage) && $send) {
                 \danog\MadelineProto\Logger::log($sentMessage);
             }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
+            }
         }
     }
 }
@@ -257,6 +282,10 @@ function unmuteall($update, $MadelineProto)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $userid = "all";
+            $fromid = cache_from_user_info($update, $MadelineProto);
+            if (!isset($fromid['bot_api_id'])) return;
+            $fromid = $fromid['bot_api_id'];
+            $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             $default = array(
                 'peer' => $peer,
                 'reply_to_msg_id' => $msg_id,
@@ -281,6 +310,7 @@ function unmuteall($update, $MadelineProto)
                         );
                         $message = $MadelineProto->responses['unmuteall']['success'];
                         $default['message'] = $message;
+                        $alert = "<code>$from_name unmuted EVERYONE in $title</code>";
                     } else {
                         $message = $MadelineProto->responses['unmuteall']['already'];
                         $default['message'] = $message;
@@ -297,6 +327,9 @@ function unmuteall($update, $MadelineProto)
             }
             if (isset($sentMessage)) {
                 \danog\MadelineProto\Logger::log($sentMessage);
+            }
+            if (isset($alert)) {
+                alert_moderators($MadelineProto, $ch_id, $alert);
             }
         }
     }
