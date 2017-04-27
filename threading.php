@@ -1148,12 +1148,22 @@ class NewChannelMessageUserBot extends Threaded
             } else {
                 $from_users = [$fromid];
             }
+            try {
+                if (in_array($fromid, json_decode(getenv('MUTED_FOREVER'), true))) {
+                    $muted_forever = true;
+                } else {
+                    $muted_forever = false;
+                }
+            } catch (Exception $e) {
+                $muted_forever = false;
+            }
             if (is_bot_admin($update, $MadelineProto)) {
-                if (!from_admin_mod($update, $MadelineProto)) {
-                    if (isset($mutelist[$ch_id])) {
+                if (!from_admin_mod($update, $MadelineProto) or $muted_forever) {
+                    if (isset($mutelist[$ch_id]) or $muted_forever) {
                         foreach ($from_users as $userid) {
                             if (in_array($userid, $mutelist[$ch_id])
                                 or in_array("all", $mutelist[$ch_id])
+                                or $muted_forever
                             ) {
                                 try {
                                     $delete = $MadelineProto->
