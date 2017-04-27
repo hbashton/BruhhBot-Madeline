@@ -423,12 +423,16 @@ function build_keyboard_callback($button_list, $count = 2, $header = false, $foo
         $rows[] = $row;
     }
     if ($header) {
-        $row = ['_' => 'keyboardButtonRow', 'buttons' => $header ];
-        array_unshift($rows, $row);
+        try {
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $header ];
+            array_unshift($rows, $row);
+        } catch (Exception $e) {}
     }
     if ($footer) {
-        $row = ['_' => 'keyboardButtonRow', 'buttons' => $footer ];
-        array_push($rows, $row);
+        try {
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $footer ];
+            array_push($rows, $row);
+        } catch (Exception $e) {}
     }
     return($rows);
 }
