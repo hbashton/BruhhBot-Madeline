@@ -382,6 +382,7 @@ function help2_callback($update, $MadelineProto)
         ['_' => 'keyboardButtonCallback', 'text' => "\xf0\x9f\x94\x99", 'data' => json_encode(array(
             "q" => "back_to_help"))]
     ];
+    var_dump($header);
     $menu = build_keyboard_callback($button_list, 2, $header);
     $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $menu, ];
     $default['reply_markup'] = $replyInlineMarkup;

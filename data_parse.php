@@ -401,6 +401,7 @@ function decodeEmoticons($src)
 
 function build_keyboard_callback($button_list, $count = 2, $header = false, $footer = false, $end = false)
 {
+    $rows =[];
     $buttons = [];
     $cols = 0;
     if(count($button_list)%$count != 0) {

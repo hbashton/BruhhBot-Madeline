@@ -10,7 +10,6 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
         if (isset($MadelineProto->API->is_bot_present[$peer])) {
             $diff = time() - $MadelineProto->API->is_bot_present[$peer]["timestamp"];
             if ($diff < 300) {
-            var_dump($diff);
                 if (!$MadelineProto->API->is_bot_present[$peer]["return"]) {
                     try {
                         if (!$silent) {
