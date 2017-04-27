@@ -582,7 +582,7 @@ function purgemessage($update, $MadelineProto)
                                     'id' => range($del_id, $newMessageID)]
                                 );
                                 \danog\MadelineProto\Logger::log($delete);
-                                unset($default['message']);
+                                return;
                             } catch (Exception $e) {}
                         } else {
                             $message = $MadelineProto->responses['purgemessage']['help'];
