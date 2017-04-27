@@ -413,7 +413,7 @@ function alert_check($ch_id, $userid)
         $settings[$ch_id][$userid] = [];
     }
     if (!isset($settings[$ch_id][$userid]["alertme"])) {
-        $settings[$ch_id][$userid]["alertme"] = true;
+        $settings[$ch_id][$userid]["alertme"] = false;
     }
     if (!$settings[$ch_id][$userid]["alertme"]) {
         return false;
