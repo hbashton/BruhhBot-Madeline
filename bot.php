@@ -194,14 +194,4 @@ while (true) {
         $offset = end($updates)['update_id'] + 1;
         $pool->submit(new BotAPIUpdates($updates, $MadelineProto));
     }
-    try {
-        $updates = $uMadelineProto->API->get_updates(
-            ['offset' => $offset_user,
-            'limit' => 50000, 'timeout' => 0]
-        );
-    } catch (Exception $e) {}
-    if (end($updates)) {
-        $offset_user = end($updates)['update_id'] + 1;
-        $pool->submit(new UserBotUpdates($updates, $uMadelineProto));
-    }
 }
