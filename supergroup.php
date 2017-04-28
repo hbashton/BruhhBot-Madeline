@@ -452,6 +452,7 @@ function delmessage($update, $MadelineProto)
                                     'id' => [$del_id,$msg_id]]
                                 );
                                 \danog\MadelineProto\Logger::log($delete);
+                                return;
                             } catch (Exception $e) {}
                         } else {
                             $message = $MadelineProto->responses['delmessage']['help'];
