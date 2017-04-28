@@ -1335,6 +1335,7 @@ class UserBotUpdates extends Threaded
             break;
             }
         }
+        \danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).PHP_EOL;
     }
 }
 
@@ -1377,5 +1378,6 @@ class BotAPIUpdates extends Threaded
                 }
             }
         }
+        \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;
     }
 }

@@ -91,11 +91,13 @@ class check_locked extends Threaded
                             $locked = json_decode($file, true);
                             if (isset($locked[$ch_id])) {
                                 if (in_array($type, $locked[$ch_id])) {
-                                    $delete = $uMadelineProto->
-                                    channels->deleteMessages(
-                                        ['channel' => $peer,
-                                        'id' => [$msg_id]]
-                                    );
+                                    try {
+                                        $delete = $uMadelineProto->
+                                        channels->deleteMessages(
+                                            ['channel' => $peer,
+                                            'id' => [$msg_id]]
+                                        );
+                                    } catch (Exception $e) {}
                                 }
                             }
                         }
