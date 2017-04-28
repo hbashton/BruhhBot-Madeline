@@ -1293,4 +1293,3 @@ class NewChannelMessageUserBot extends Threaded
         }
     }
 }
-
