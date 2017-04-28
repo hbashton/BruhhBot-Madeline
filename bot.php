@@ -190,38 +190,9 @@ while (true) {
             'limit' => 50000, 'timeout' => 0]
         );
     }
-    foreach ($updates as $update) {
-        $offset = $update['update_id'] + 1;
-        switch ($update['update']['_']) {
-        case 'updateNewMessage':
-            if ($dumpme) {
-                var_dump($update);
-            }
-            if (is_peeruser($update, $MadelineProto)) {
-                $pool->submit(new NewMessage($update, $MadelineProto));
-            }
-        break;
-        case 'updateNewChannelMessage':
-            if ($dumpme) {
-                var_dump($update);
-            }
-            if (is_supergroup($update, $MadelineProto)) {
-                $pool->submit(new check_locked($update, $MadelineProto));
-                $pool->submit(new check_flood($update, $MadelineProto));
-                $pool->submit(new NewChannelMessage($update, $MadelineProto));
-                if (array_key_exists('action', $update['update']['message'])) {
-                    $pool->submit(new NewChannelMessageAction($update, $MadelineProto));
-                }
-            }
-        break;
-        case 'updateBotCallbackQuery':
-            if ($dumpme) {
-                var_dump($update);
-            }
-            if (is_supergroup($update, $MadelineProto) or is_peeruser($update, $MadelineProto)) {
-                $pool->submit(new BotCallbackQuery($update, $MadelineProto));
-            }
-        }
+    if (end($updates)) {
+        $offset = end($updates)['update_id'] + 1;
+        $pool->submit(new BotAPIUpdates($updates, $MadelineProto));
     }
     try {
         $updates = $uMadelineProto->API->get_updates(
@@ -229,35 +200,9 @@ while (true) {
             'limit' => 50000, 'timeout' => 0]
         );
     } catch (Exception $e) {}
-    foreach ($updates as $update) {
-        $offset_user = $update['update_id'] + 1;
-        switch ($update['update']['_']) {
-        case 'updateNewChannelMessage':
-            if ($dumpme) {
-                var_dump($update);
-            }
-            if (is_supergroup($update, $MadelineProto)) {
-                if (!array_key_exists("from_id", $update['update']['message'])) break;
-                try {
-                    $user = cache_from_user_info($update, $uMadelineProto);
-                } catch (Exception $e) {
-                    break;
-                }
-                if (!array_key_exists("type", $user)) break;
-                if ($user['type'] != "bot") {
-                    $uMadelineProto->flooder['num'] = 0;
-                    $uMadelineProto->flooder['user'] = $update['update']['message']['from_id'];
-                    break;
-                }
-                if (isset($user['bot_api_id'])) {
-                    if ($user['bot_api_id'] == $MadelineProto->API->bot_api_id) break;
-                }
-                $pool->submit(new check_locked_user($update, $uMadelineProto));
-                $pool->submit(new check_flood_user($update, $uMadelineProto));
-                $pool->submit(new NewChannelMessageUserBot($update, $uMadelineProto));
-            }
-        break;
-        }
+    if (end($updates)) {
+        $offset_user = end($updates)['update_id'] + 1;
+        $pool->submit(new UserBotUpdates($updates, $uMadelineProto));
     }
     \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;
     \danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).PHP_EOL;

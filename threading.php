@@ -1268,7 +1268,7 @@ class NewChannelMessageUserBot extends Threaded
                             case 'from':
                                 break;
                             default:
-                                saveme($update, $MadelineProto, $msg, $name);
+                                saveme($update, $MadelineProto, $msg, $name, true);
                             }
                             break;
 
@@ -1288,6 +1288,92 @@ class NewChannelMessageUserBot extends Threaded
                             break;
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+class UserBotUpdates extends Threaded
+{
+    private $updates;
+    private $uMadelineProto;
+    public function __construct($updates, $uMadelineProto)
+    {
+        $this->updates = $updates;
+        $this->uMadelineProto = $uMadelineProto;
+    }
+    public function run()
+    {
+        require_once 'require_exceptions.php';
+        $updates = $this->updates;
+        $uMadelineProto = $this->uMadelineProto;
+        $pool = new Pool(100);
+        foreach ($updates as $update) {
+            switch ($update['update']['_']) {
+            case 'updateNewChannelMessage':
+                if (is_supergroup($update, $uMadelineProto)) {
+                    if (!array_key_exists("from_id", $update['update']['message'])) break;
+                    try {
+                        $user = cache_from_user_info($update, $uMadelineProto);
+                    } catch (Exception $e) {
+                        break;
+                    }
+                    if (!array_key_exists("type", $user)) break;
+                    if ($user['type'] != "bot") {
+                        $uMadelineProto->flooder['num'] = 0;
+                        $uMadelineProto->flooder['user'] = $update['update']['message']['from_id'];
+                        break;
+                    }
+                    if (isset($user['bot_api_id'])) {
+                        if ($user['bot_api_id'] == $uMadelineProto->API->bot_api_id) break;
+                    }
+                    $pool->submit(new check_locked_user($update, $uMadelineProto));
+                    $pool->submit(new check_flood_user($update, $uMadelineProto));
+                    $pool->submit(new NewChannelMessageUserBot($update, $uMadelineProto));
+                }
+            break;
+            }
+        }
+    }
+}
+
+class BotAPIUpdates extends Threaded
+{
+    private $updates;
+    private $MadelineProto;
+    public function __construct($updates, $MadelineProto)
+    {
+        $this->updates = $updates;
+        $this->MadelineProto = $MadelineProto;
+    }
+    public function run()
+    {
+        require_once 'require_exceptions.php';
+        $updates = $this->updates;
+        $MadelineProto = $this->MadelineProto;
+        $uMadelineProto = $MadelineProto->API->uMadelineProto;
+        $pool = new Pool(100);
+        foreach ($updates as $update) {
+            switch ($update['update']['_']) {
+            case 'updateNewMessage':
+                if (is_peeruser($update, $MadelineProto)) {
+                    $pool->submit(new NewMessage($update, $MadelineProto));
+                }
+            break;
+            case 'updateNewChannelMessage':
+                if (is_supergroup($update, $MadelineProto)) {
+                    $pool->submit(new check_locked($update, $MadelineProto));
+                    $pool->submit(new check_flood($update, $MadelineProto));
+                    $pool->submit(new NewChannelMessage($update, $MadelineProto));
+                    if (array_key_exists('action', $update['update']['message'])) {
+                        $pool->submit(new NewChannelMessageAction($update, $MadelineProto));
+                    }
+                }
+            break;
+            case 'updateBotCallbackQuery':
+                if (is_supergroup($update, $MadelineProto) or is_peeruser($update, $MadelineProto)) {
+                    $pool->submit(new BotCallbackQuery($update, $MadelineProto));
                 }
             }
         }
