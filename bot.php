@@ -204,6 +204,4 @@ while (true) {
         $offset_user = end($updates)['update_id'] + 1;
         $pool->submit(new UserBotUpdates($updates, $uMadelineProto));
     }
-    \danog\MadelineProto\Serialization::serialize('bot.madeline', $MadelineProto).PHP_EOL;
-    \danog\MadelineProto\Serialization::serialize('session.madeline', $uMadelineProto).PHP_EOL;
 }
