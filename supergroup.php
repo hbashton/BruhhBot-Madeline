@@ -570,16 +570,9 @@ function purgemessage($update, $MadelineProto)
                                     $default
                                 );
                                 \danog\MadelineProto\Logger::log($sentMessage);
-                                foreach ($sentMessage['updates'] as $messageObject) {
-                                    if (!array_key_exists('_', $messageObject)) return;
-                                    if ($messageObject["_"] == "updateMessageID") {
-                                        $newMessageID = $messageObject['id'];
-                                        break;
-                                    }
-                                }
                                 $delete = $uMadelineProto->channels->deleteMessages(
                                     ['channel' => $peer,
-                                    'id' => range($del_id, $newMessageID)]
+                                    'id' => range($del_id, $msg_id)]
                                 );
                                 \danog\MadelineProto\Logger::log($delete);
                                 return;
