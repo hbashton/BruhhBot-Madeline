@@ -147,6 +147,7 @@ $MadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
 $MadelineProto->API->is_bot_present = [];
+$MadelineProto->API->cache = [];
 $MadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
 $MadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
 $MadelineProto->API->uMadelineProto = $uMadelineProto;
