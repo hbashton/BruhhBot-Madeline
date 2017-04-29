@@ -40,7 +40,11 @@ function catch_id($update, $MadelineProto, $user)
                         } else {
                             $username = "no-name-user";
                         }
-                        $firstname = $user_['User']['first_name'];
+                        if (isset($user_['User']['first_name'])) {
+                            $firstname = $user_['User']['first_name'];
+                        } else {
+                            $firstname = "no-name-user";
+                        }
                         $userid = $user_['bot_api_id'];
                         break;
                     } catch (Exception $e) {
@@ -66,7 +70,11 @@ function catch_id($update, $MadelineProto, $user)
                     } else {
                         $username = "no-name-user";
                     }
-                    $firstname = $user_['User']['first_name'];
+                    if (isset($user_['User']['first_name'])) {
+                        $firstname = $user_['User']['first_name'];
+                    } else {
+                        $firstname = "no-name-user";
+                    }
                     $userid = $user_['bot_api_id'];
                     $return = array(true, $userid, $username, $firstname);
                 } catch (Exception $e) {
@@ -99,7 +107,11 @@ function catch_id($update, $MadelineProto, $user)
                                 $username = "no-name-user";
                             }
                             $userid = $user_['bot_api_id'];
-                            $firstname = $user_['User']['first_name'];
+                            if (isset($user_['User']['first_name'])) {
+                                $firstname = $user_['User']['first_name'];
+                            } else {
+                                $firstname = "no-name-user";
+                            }
                             $return = array(true, $userid, $username, $firstname);
                         }
                     }
@@ -126,7 +138,11 @@ function catch_id($update, $MadelineProto, $user)
                     $username = "no-name-user";
                 }
                 $userid = $user_['bot_api_id'];
-                $firstname = $user_['User']['first_name'];
+                if (isset($user_['User']['first_name'])) {
+                    $firstname = $user_['User']['first_name'];
+                } else {
+                    $firstname = "no-name-user";
+                }
                 $return = array(true, $userid, $username, $firstname);
             }
         } catch (Exception $e) {}
