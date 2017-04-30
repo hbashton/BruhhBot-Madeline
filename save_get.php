@@ -59,53 +59,51 @@ function saveme($update, $MadelineProto, $msg, $name, $user = false)
                     }
                 }
             }
-            if (strlen($msg) < 2000) {
-                if ($name && $msg) {
-                    $name = htmlentities(cb($name));
-                    $msg = base64_encode(fixtags($msg));
-                    $codename = "<code>$name</code>";
-                    check_json_array('saved.json', $ch_id);
-                    $file = file_get_contents("saved.json");
-                    $saved = json_decode($file, true);
-                    if (isset($saved[$ch_id])) {
-                        if (!array_key_exists("from", $saved[$ch_id])) {
-                            $saved[$ch_id]["from"] = [];
-                        }
-                        if (array_key_exists($name, $saved[$ch_id]["from"])) {
-                            unset($saved[$ch_id]["from"][$name]);
-                        }
-                        $saved[$ch_id][$name] = $msg;
-                        file_put_contents('saved.json', json_encode($saved));
-                        $str = $MadelineProto->responses['saveme']['success'];
-                        $repl = array(
-                            "name" => $name
-                        );
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
-                    } else {
-                        $saved[$ch_id] = [];
+            if ($name && $msg) {
+                $name = htmlentities(cb($name));
+                $msg = base64_encode(fixtags($msg));
+                $codename = "<code>$name</code>";
+                check_json_array('saved.json', $ch_id);
+                $file = file_get_contents("saved.json");
+                $saved = json_decode($file, true);
+                if (isset($saved[$ch_id])) {
+                    if (!array_key_exists("from", $saved[$ch_id])) {
                         $saved[$ch_id]["from"] = [];
-                        $saved[$ch_id][$name] = $msg;
-                        file_put_contents('saved.json', json_encode($saved));
-                        $str = $MadelineProto->responses['saveme']['success'];
-                        $repl = array(
-                            "name" => $name
-                        );
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
                     }
+                    if (array_key_exists($name, $saved[$ch_id]["from"])) {
+                        unset($saved[$ch_id]["from"][$name]);
+                    }
+                    $saved[$ch_id][$name] = $msg;
+                    file_put_contents('saved.json', json_encode($saved));
+                    $str = $MadelineProto->responses['saveme']['success'];
+                    $repl = array(
+                        "name" => $name
+                    );
+                    $message = $MadelineProto->engine->render($str, $repl);
+                    $default['message'] = $message;
                 } else {
-                    $message = $MadelineProto->responses['saveme']['help'];
+                    $saved[$ch_id] = [];
+                    $saved[$ch_id]["from"] = [];
+                    $saved[$ch_id][$name] = $msg;
+                    file_put_contents('saved.json', json_encode($saved));
+                    $str = $MadelineProto->responses['saveme']['success'];
+                    $repl = array(
+                        "name" => $name
+                    );
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
-                if (isset($default['message']) && !$user) {
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                }
-                if (isset($sentMessage)) {
-                    \danog\MadelineProto\Logger::log($sentMessage);
-                }
+            } else {
+                $message = $MadelineProto->responses['saveme']['help'];
+                $default['message'] = $message;
+            }
+            if (isset($default['message']) && !$user) {
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    $default
+                );
+            }
+            if (isset($sentMessage)) {
+                \danog\MadelineProto\Logger::log($sentMessage);
             }
         }
     }
