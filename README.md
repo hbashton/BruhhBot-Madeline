@@ -18,7 +18,7 @@ sudo apt-get install -y composer php7.0 php7.0-common php7.0-mbstring php7.0-xml
 To deploy BruhhBot, let's clone it to the computer we want to use it on
 
 ```
-git clone --recursive https://github.com/hbashton/BruhhBot-Madeline.git
+git clone --recursive https://github.com/hbashton/BruhhBot-Madeline.git -b bot-api
 ```
 
 Create a .env file using [the one provided](.env.example) as a template
