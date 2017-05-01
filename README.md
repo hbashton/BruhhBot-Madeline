@@ -27,6 +27,7 @@ Grab your Weather API key using [DarkSky](https://darksky.net/dev/) and place in
 
 Obtain an API key from [@BotFather](http://telegram.me/botfather)
 
+If you want to make your bot a little different than BruhhBot, or just want to play with the responses, you can make a file called custom_responses.json and place it in the root of the source, copying all the contents from [responses.json](responses.json) and modifying them as you see fit.
 
 Finally, deploy your bot
 

@@ -142,7 +142,13 @@ if (!isset($MadelineProto)) {
         'bot.madeline'
     );
 }
-$MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+if (file_exists('custom_responses.json')) {
+    try {
+        $MadelineProto->responses = json_decode(file_get_contents("custom_responses.json"), true);
+    } catch (Exception $e) {}
+} else {
+    $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+}
 $MadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
 $MadelineProto->engine = new StringTemplate\Engine;
 $MadelineProto->flooder = [];
@@ -151,6 +157,13 @@ $MadelineProto->API->cache = [];
 $MadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
 $MadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
 $MadelineProto->API->uMadelineProto = $uMadelineProto;
+if (file_exists('custom_responses.json')) {
+    try {
+        $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("custom_responses.json"), true);
+    } catch (Exception $e) {}
+} else {
+    $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+}
 $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
 $MadelineProto->API->uMadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
 $MadelineProto->API->uMadelineProto->engine = new StringTemplate\Engine;
