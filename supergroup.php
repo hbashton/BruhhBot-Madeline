@@ -453,7 +453,9 @@ function delmessage($update, $MadelineProto)
                                 );
                                 \danog\MadelineProto\Logger::log($delete);
                                 return;
-                            } catch (Exception $e) {}
+                            } catch (Exception $e) {
+                                var_dump($e->getMessage());
+                            }
                         } else {
                             $message = $MadelineProto->responses['delmessage']['help'];
                             $default['message'] = $message;
