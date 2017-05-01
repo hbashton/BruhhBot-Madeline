@@ -566,18 +566,17 @@ function purgemessage($update, $MadelineProto)
                             $uMadelineProto = $MadelineProto->API->uMadelineProto;
                             try {
                                 $del_id = $update['update']['message']['reply_to_msg_id'];
-                                $default['message'] = "Deleting all messages after $del_id..";
-                                $sentMessage = $MadelineProto->messages->sendMessage(
-                                    $default
-                                );
-                                \danog\MadelineProto\Logger::log($sentMessage);
+                                $default['message'] = "Deleted all messages after $del_id..";
                                 $delete = $uMadelineProto->channels->deleteMessages(
                                     ['channel' => $peer,
                                     'id' => range($del_id, $msg_id)]
                                 );
                                 \danog\MadelineProto\Logger::log($delete);
                                 return;
-                            } catch (Exception $e) {}
+                            } catch (Exception $e) {
+                                $error = $e->getMessage;
+                                $default['message'] = "Purge failed. Error:\n$error";
+                            }
                         } else {
                             $message = $MadelineProto->responses['purgemessage']['help'];
                             $default['message'] = $message;
