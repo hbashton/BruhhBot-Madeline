@@ -1,4 +1,4 @@
-From 7d4d1b1becc87b8c1be7b38daf9344509ee0d9ed Mon Sep 17 00:00:00 2001
+From b159fd1389c715b48dca12d7ffbae89edd625be4 Mon Sep 17 00:00:00 2001
 From: halogenOS Code Review <xosdeveloperbruhh@gmail.com>
 Date: Sun, 29 Jan 2017 19:04:06 -0600
 Subject: [PATCH 1/1] Remove log spam
@@ -6,11 +6,12 @@ Subject: [PATCH 1/1] Remove log spam
 ---
  src/danog/MadelineProto/MTProtoTools/CallHandler.php     | 2 +-
  src/danog/MadelineProto/MTProtoTools/ResponseHandler.php | 1 -
+ src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php    | 1 -
  src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 4 ++--
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ 4 files changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/src/danog/MadelineProto/MTProtoTools/CallHandler.php b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-index 79477f4..1be98b5 100644
+index 000d819..871ea9d 100644
 --- a/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 @@ -52,7 +52,7 @@ trait CallHandler
@@ -23,7 +24,7 @@ index 79477f4..1be98b5 100644
                  $int_message_id = $this->send_message($serialized, $content_related, $aargs);
                  if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
 diff --git a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
-index 94e86e1..99dd8cf 100644
+index a2e3f4b..0166183 100644
 --- a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 @@ -73,7 +73,6 @@ trait ResponseHandler
@@ -34,13 +35,25 @@ index 94e86e1..99dd8cf 100644
  
              switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                  case 'msgs_ack':
+diff --git a/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php b/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php
+index 8a8a5eb..0b5af67 100644
+--- a/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php
++++ b/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php
+@@ -29,7 +29,6 @@ trait SeqNoHandler
+     public function check_in_seq_no($datacenter, $current_msg_id)
+     {
+         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
+-            \danog\MadelineProto\Logger::log(['SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
+         }
+     }
+ 
 diff --git a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-index e03ed74..2bd1dd5 100644
+index 819de63..a1772ee 100644
 --- a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-@@ -151,8 +151,8 @@ trait UpdateHandler
-                 throw $e;
+@@ -158,8 +158,8 @@ trait UpdateHandler
              }
+             throw $e;
          }
 -        \danog\MadelineProto\Logger::log(['Got '.$difference['_']], \danog\MadelineProto\Logger::VERBOSE);
          $this->get_channel_state($channel)['sync_loading'] = false;
@@ -48,7 +61,7 @@ index e03ed74..2bd1dd5 100644
          switch ($difference['_']) {
              case 'updates.channelDifferenceEmpty':
                  $this->set_channel_state($channel, $difference);
-@@ -228,9 +228,9 @@ trait UpdateHandler
+@@ -239,9 +239,9 @@ trait UpdateHandler
              $this->get_update_state()['pending_seq_updates'] = [];
          }
          $difference = $this->method_call('updates.getDifference', ['pts' => $this->get_update_state()['pts'], 'date' => $this->get_update_state()['date'], 'qts' => $this->get_update_state()['qts']], ['datacenter' => $this->datacenter->curdc]);
