@@ -211,6 +211,8 @@ function is_admin($update, $MadelineProto, $userid, $send = false, $ch_id = fals
 function is_bot_admin($update, $MadelineProto, $send = false)
 {
     try {
+        $chat = cache_get_chat_info($update, $MadelineProto);
+        $peer = $chat['id'];
         $bot_id = $MadelineProto->API->bot_id;
         $bot_api_id = $MadelineProto->API->bot_api_id;
         $mod = is_admin($update, $MadelineProto, $bot_id);
