@@ -29,7 +29,7 @@ function start_message($update, $MadelineProto)
             'parse_mode' => 'html',
             );
         $botname = getenv('BOT_USERNAME');
-        $default['message'] = "Hi! I'm a bot made for managing supergroups. To use my functionality, you'll need to add me to your group, and my helper $botname must be there as well (as an admin!). To explore my commands, use /help.";
+        $default['message'] = "Hi! I'm a bot made for managing supergroups. To use my functionality, you'll need to add me to your group, and my helper $botname must be there as well (as an admin!). To explore my commands, use /help. To get started using me in a group, you can either add me and my helper, or you can message me !join <code>[invite link|@username]</code> to get $botname to join on their own, then proceed to add me. Once you have both of us in your group, use /add to begin using me.";
         if (isset($default['message'])) {
             try {
                 $sentMessage = $MadelineProto->messages->sendMessage(
