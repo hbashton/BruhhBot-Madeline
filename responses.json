@@ -98,8 +98,8 @@
     },
     "import_chat_invite":
     {
-        "exception":"I can't seem to join with that link. Are you sure you formatted it correctly?",
-        "help":"Use <code>/join [https://t.me/joinchat/(hash)]</code> to add my partner {botname} to this chat!"
+        "exception":"I can't seem to join with that link/username. Are you sure you formatted it correctly?",
+        "help":"PM me !join <code>[invite link|@username]</code> to invite my partner {botname} to a group! <code>Note: if you choose to use an invite link, the link must be in the format [https://t.me/joinchat/...]</code>"
     },
     "welcome_toggle":
     {

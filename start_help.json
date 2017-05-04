@@ -21,7 +21,7 @@
         "Welcome":"<b>welcome</b> <code>message</code> - Set the welcome message! You can use HTML formatting and the following variables:\n<pre>{username}: will be replaced with the username\n{name}: will be replaced with the name\n{mention}: will be replaced with a mention of the user\n{id}: will be replaced with the user's id\n{title}: will be replaced with the group title</pre>\nExample:<code>/welcome the title of this group is {title}</code>",
         "Stats":"<b>stats</b> <code>[@username|ID|by reply]</code> - Get their name, username, and bot-related information about them",
         "ID":"<b>id</b> <code>[@username|ID|by reply]</code> - Get a users ID from their username, or vice versa",
-        "Join":"<b>join</b> <code>[invite link]</code> - Invite my partner to the group! <code>Note: the link must be in the format [https://t.me/joinchat/...]</code>"
+        "Join":"<b>join</b> <code>[invite link|@username]</code> - Invite my partner to the group! <code>Note: if you choose to use an invite link, the link must be in the format [https://t.me/joinchat/...]</code>"
         },
     "Save":
         {

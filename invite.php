@@ -293,7 +293,8 @@ function import_chat_invite($update, $MadelineProto, $msg)
                 $uMadelineProto = $MadelineProto->API->uMadelineProto;
                 $msg = preg_replace('/https:\/\/t.me\/joinchat\//', "", $msg);
                 $importchat = $uMadelineProto->messages->importChatInvite(['hash' => $msg]);
-                return;
+                $message = getenv('BOT_USERNAME')." has successfully joined the chat";
+                $default['message'] = $message;
             } catch (Exception $e) {
                 $message = $MadelineProto->responses['import_chat_invite']['exception'];
                 $default['message'] = $message;
@@ -305,6 +306,18 @@ function import_chat_invite($update, $MadelineProto, $msg)
             );
             $message = $MadelineProto->engine->render($str, $repl);
             $default['message'] = $message;
+        }
+        if ($msg && preg_match_all('/@/', $msg, $matches)) {
+            try {
+                $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                $importchat = $uMadelineProto->channels->joinChannel(['channel' => $msg, ]);
+                $message = getenv('BOT_USERNAME')." has successfully joined the chat";
+                $default['message'] = $message;
+            } catch (Exception $e) {
+                var_dump($e->getMessage());
+                $message = $uMadelineProto->responses['import_chat_invite']['exception'];
+                $default['message'] = $message;
+            }
         }
         if (isset($default['message'])) {
             $sentMessage = $MadelineProto->messages->sendMessage(
