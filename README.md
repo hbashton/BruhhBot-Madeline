@@ -1,4 +1,4 @@
-# [BruhhBotV2.0](https://telegram.me/BruhhBotV2)
+# [BruhhBot-Madeline](https://telegram.me/BruhhBotV2)
 
 BruhhBotV2.0 is a supergroup manager bot, based on [Daniil's](https://github.com/danog/MadelineProto) MadelineProto implementation for the Telegram Bot API
 
@@ -11,7 +11,7 @@ You will also need to register your account and retrieve your Telegram MTProto A
 Install php and it's required extensions
 
 ```
-sudo apt-get install -y composer php7.0 php7.0-common php7.0-mbstring php7.0-xml php7.0-bcmath php7.0-mcrypt
+sudo apt-get install -y composer php7.0 php7.0-common php7.0-mbstring php7.0-xml php7.0-bcmath php7.0-mcrypt php7.0-curl
 ```
 ### Installing
 
@@ -36,9 +36,9 @@ Finally, deploy your bot
 ```
 ## FAQ
 
-What do the values in [.env.example](.env.example) stand for?
+### Q. What do the values in [.env.example](.env.example) stand for?
 
-Well, here's a breakdown:
+### A. Well, here's a breakdown:
 
 | Item          | Type           | Description  |
 | ------------- |:--------------:| ------------:|
@@ -50,14 +50,16 @@ Well, here's a breakdown:
 `BOT_USERNAME` | (string) | The username of your bot created with a phone number
 `BOT_TOKEN` | (string) | Your API token received from [@BotFather](http://telegram.me/botfather)
 `BOT_API_USERNAME` | (string) | The username you assigned to your bot from [@BotFather](http://telegram.me/botfather)
-## PLEASE READ THIS!
 
-Your session, where you're logged in, is saved in session.madeline and bot.madeline (in the root of your bot directory).
-Sometimes, inevitably, the bot gets killed before fully writing to the file. In this case, you will need to remove it and rerun the bot.
+### Q. For some reason it's not working. I keep getting X error.
+
+### A. There's a good chance you formatted something wrong in the .env file. Try taking another look at the example I provided. If you think you followed the README 100%, go ahead and contact me for advice. My contact information is below.
+
+## PLEASE READ THIS!
 
 ## Support
 
-For support, message [@hunter_bruhh](https://telegram.me/hunter_bruhh) on telegram < (or just click the username)
+For support, message [@hunter_bruhh](https://telegram.me/hunter_bruhh) on telegram < (or just click the username as a shortcut)
 
 ## Built With
 

@@ -15,7 +15,7 @@
         "php": ">=7.0",
         "danog/phpstruct": "dev-fast",
         "danog/primemodule": "dev-master",
-        "phpseclib/phpseclib": "dev-ige",
+        "phpseclib/phpseclib": "dev-master#12dc23d9",
         "vlucas/phpdotenv": "^2.4",
         "rmccue/requests": ">=1.0",
         "cmfcmf/openweathermap-php-api": "dev-master",
@@ -26,7 +26,8 @@
         "rollbar/rollbar": "dev-master",
         "ext-mbstring": "*",
         "ext-bcmath": "*",
-        "ext-mcrypt": "*"
+        "ext-mcrypt": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^3.1"
