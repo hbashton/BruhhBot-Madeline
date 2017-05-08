@@ -71,6 +71,10 @@ if (isset($argv[1])) {
 }
 
 $settings = json_decode(getenv("MTPROTO_SETTINGS"), true);
+$settings['msg_array_limit'] = array(
+'incoming' => 600,
+'outgoing' => 600
+);
 
 if (!isset($uMadelineProto)) {
     $uMadelineProto = new \danog\MadelineProto\API($settings);
