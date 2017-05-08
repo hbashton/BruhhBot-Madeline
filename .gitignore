@@ -89,6 +89,7 @@ composer.lock
 /who
 #json db
 *.json
+*.pid
 !configuration.json
 !responses.json
 !hints.json
