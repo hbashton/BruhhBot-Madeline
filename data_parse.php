@@ -380,7 +380,7 @@ function multipleExplodeKeepDelimiters($delimiters, $string) {
 
 function fixtags($text)
 {
-    preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)(.*?)(<\/\\3>)(.*?)#is", $text, $matches, PREG_SET_ORDER);
+    preg_match_all("#(.*?)(<(a|b|strong|em|i|code|pre)[^>]*>)(.*?)(<\/\\3>)(.*)?#is", $text, $matches, PREG_SET_ORDER);
     if ($matches) {
         $last = count($matches) - 1;
         foreach ($matches as $val) {
@@ -389,13 +389,14 @@ function fixtags($text)
             }
             $text = str_replace($val[4], htmlentities(trim($val[4])), $text);
             if ($val == $matches[$last]) {
-                $text = str_replace($val[6], htmlentities($val[6]), $text);
+                $text = str_replace($val[6], fixtags($val[6]), $text);
             }
         }
         preg_match_all("#<a href=\x22(.+?)\x22>#is", $text, $matches);
         foreach ($matches[1] as $match) {
             $text = str_replace($match, htmlentities($match), $text);
         }
+
         return($text);
     } else {
         return(htmlentities($text));
