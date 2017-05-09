@@ -1,4 +1,4 @@
-From b159fd1389c715b48dca12d7ffbae89edd625be4 Mon Sep 17 00:00:00 2001
+From 9d01367e86800afd18cb756d1ec460d72faf9bce Mon Sep 17 00:00:00 2001
 From: halogenOS Code Review <xosdeveloperbruhh@gmail.com>
 Date: Sun, 29 Jan 2017 19:04:06 -0600
 Subject: [PATCH 1/1] Remove log spam
@@ -6,12 +6,11 @@ Subject: [PATCH 1/1] Remove log spam
 ---
  src/danog/MadelineProto/MTProtoTools/CallHandler.php     | 2 +-
  src/danog/MadelineProto/MTProtoTools/ResponseHandler.php | 1 -
- src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php    | 1 -
  src/danog/MadelineProto/MTProtoTools/UpdateHandler.php   | 4 ++--
- 4 files changed, 3 insertions(+), 5 deletions(-)
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/src/danog/MadelineProto/MTProtoTools/CallHandler.php b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
-index 000d819..871ea9d 100644
+index 1dcb5b4..03ae1b2 100644
 --- a/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/CallHandler.php
 @@ -52,7 +52,7 @@ trait CallHandler
@@ -24,7 +23,7 @@ index 000d819..871ea9d 100644
                  $int_message_id = $this->send_message($serialized, $content_related, $aargs);
                  if ($method === 'http_wait' || (isset($aargs['noResponse']) && $aargs['noResponse'])) {
 diff --git a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
-index a2e3f4b..0166183 100644
+index 3effd0e..19151a7 100644
 --- a/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/ResponseHandler.php
 @@ -73,7 +73,6 @@ trait ResponseHandler
@@ -35,20 +34,8 @@ index a2e3f4b..0166183 100644
  
              switch ($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_']) {
                  case 'msgs_ack':
-diff --git a/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php b/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php
-index 8a8a5eb..0b5af67 100644
---- a/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php
-+++ b/src/danog/MadelineProto/MTProtoTools/SeqNoHandler.php
-@@ -29,7 +29,6 @@ trait SeqNoHandler
-     public function check_in_seq_no($datacenter, $current_msg_id)
-     {
-         if (isset($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) && ($seq_no = $this->generate_in_seq_no($datacenter, $this->content_related($this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']))) !== $this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no']) {
--            \danog\MadelineProto\Logger::log(['SECURITY WARNING: Seqno mismatch (should be '.$seq_no.', is '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['seq_no'].', '.$this->datacenter->sockets[$datacenter]->incoming_messages[$current_msg_id]['content']['_'].')'], \danog\MadelineProto\Logger::ERROR);
-         }
-     }
- 
 diff --git a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
-index 819de63..a1772ee 100644
+index f95d5e5..7ba969a 100644
 --- a/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 +++ b/src/danog/MadelineProto/MTProtoTools/UpdateHandler.php
 @@ -158,8 +158,8 @@ trait UpdateHandler
