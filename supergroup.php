@@ -779,11 +779,11 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
             );
         } catch (Exception $e) {
             try {
-                $default['message'] = fixtags($default['message']);
+                $default['message'] = $default['message'];
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     $default
                 );
-                $settings[$ch_id]['rules'] = fixtags($default['message']);
+                $settings[$ch_id]['rules'] = $default['message'];
             } catch (Exception $e) {
                 $default['message'] = "Rules HTML formatted incorrectly.";
                 $sentMessage = $MadelineProto->messages->sendMessage(

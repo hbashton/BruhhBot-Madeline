@@ -61,7 +61,7 @@ function saveme($update, $MadelineProto, $msg, $name, $user = false)
             }
             if ($name && $msg) {
                 $name = htmlentities(cb($name));
-                $msg = base64_encode(fixtags($msg));
+                $msg = base64_encode($msg);
                 $codename = "<code>$name</code>";
                 check_json_array('saved.json', $ch_id);
                 $file = file_get_contents("saved.json");

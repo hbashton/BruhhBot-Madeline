@@ -374,7 +374,7 @@ function set_chat_rules($update, $MadelineProto, $msg)
                                 check_json_array("settings.json", $ch_id);
                                 $file = file_get_contents("settings.json");
                                 $settings = json_decode($file, true);
-                                $settings[$ch_id]["rules"] = fixtags($msg);
+                                $settings[$ch_id]["rules"] = $msg;
                                 file_put_contents('settings.json', json_encode($settings));
                                 $default['message'] = "Alright, I've set the rules for $title. You can get them with /rules";
                                 $alert = "<code>$from_name changed the rules in $title to:\n\"$msg\"</code>";
@@ -443,7 +443,7 @@ function set_chat_welcome($update, $MadelineProto, $msg)
                                 check_json_array("settings.json", $ch_id);
                                 $file = file_get_contents("settings.json");
                                 $settings = json_decode($file, true);
-                                $settings[$ch_id]["custom_welcome"] = fixtags($msg);
+                                $settings[$ch_id]["custom_welcome"] = $msg;
                                 file_put_contents('settings.json', json_encode($settings));
                                 $default['message'] = "I've set the welcome message for $title.";
                                 $alert = "<code>$from_name set the welcome message in $title as \"$msg\"</code>";
