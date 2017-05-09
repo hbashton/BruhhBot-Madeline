@@ -138,7 +138,7 @@ function getme($update, $MadelineProto, $name)
         $default = array(
             'peer' => $peer,
             'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html'
+            'parse_mode' => 'markdown'
             );
         if (isset($update['update']['message']['reply_to_msg_id'])) {
             $default['reply_to_msg_id'] = $update['update']['message']['reply_to_msg_id'];

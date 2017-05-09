@@ -693,7 +693,7 @@ function get_chat_rules($update, $MadelineProto)
             $default = array(
                 'peer' => $fromid,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
+                'parse_mode' => 'markdown'
                 );
             if (is_moderated($ch_id)) {
                 check_json_array("settings.json", $ch_id);
@@ -756,7 +756,7 @@ function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
     $title = htmlentities($chat['title']);
     $default = array(
         'peer' => $fromid,
-        'parse_mode' => 'html'
+        'parse_mode' => 'markdown'
         );
     check_json_array("settings.json", $ch_id);
     $file = file_get_contents("settings.json");

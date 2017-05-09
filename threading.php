@@ -825,6 +825,7 @@ function NewChatAddUser($update, $MadelineProto)
                                 }
                             }
                             $default['message'] = $message;
+                            $default['parse_mode'] = 'markdown';
                             try {
                                 $sentMessage = $MadelineProto->
                                 messages->sendMessage($default);
@@ -995,6 +996,7 @@ function NewChatJoinedByLink($update, $MadelineProto)
                                 }
                             }
                             $default['message'] = $message;
+                            $default['parse_mode'] = 'markdown';
                             try {
                                 $sentMessage = $MadelineProto->
                                 messages->sendMessage($default);
