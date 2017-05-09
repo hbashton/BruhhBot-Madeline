@@ -194,6 +194,7 @@ class NewChannelMessage extends Threaded
             return;
         }
         $fromid = $fromid['bot_api_id'];
+        if ($fromid == $MadelineProto->API->bot_id or $fromid == $MadelineProto->API->bot_api_id) return;
         if (array_key_exists('message', $update['update']['message'])
             && is_string($update['update']['message']['message'])
         ) {
