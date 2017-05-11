@@ -304,7 +304,9 @@ function modlist($update, $MadelineProto)
                 $promoted = json_decode($file, true);
                 if (isset($promoted[$ch_id])) {
                     foreach ($promoted[$ch_id] as $i => $key) {
-                        $username = catch_id($update, $MadelineProto, $key)[2];
+                        $id = catch_id($update, $MadelineProto, $key);
+                        if (!isset($id[2])) continue;
+                        $username = $id[2];
                         $mention = html_mention($username, $key);
                         if (!isset($message)) {
                             $str = $MadelineProto->responses['modlist']['header'];

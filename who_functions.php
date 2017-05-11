@@ -21,8 +21,9 @@ function wholist($update, $MadelineProto)
                 foreach ($admins['participants'] as $key) {
                     if (array_key_exists('user', $key)) {
                         $id = $key['user']['id'];
-                        $participant = catch_id($update, $MadelineProto, $id)[2];
-                        $message = $message.$participant." $id"."\r\n";
+                        $participant = catch_id($update, $MadelineProto, $id);
+                        if (!isset($participant[2])) continue;
+                        $message = $message.$participant[2]." $id"."\n";
                     }
                 }
                 $filename = "who/who$ch_id";
@@ -72,8 +73,9 @@ function whofile($update, $MadelineProto)
                 foreach ($users['participants'] as $key) {
                     if (array_key_exists('user', $key)) {
                         $id = $key['user']['id'];
-                        $participant = catch_id($update, $MadelineProto, $id)[2];
-                        $message[$id] = $participant;
+                        $participant = catch_id($update, $MadelineProto, $id);
+                        if (!isset($participant[2])) continue;
+                        $message[$id] = $participant[2];
                     }
                 }
                 $filename = "who/whofile$ch_id";
@@ -258,7 +260,6 @@ function whobanall($update, $MadelineProto, $wait = true)
                                             $output_file_name
                                         );
                                         $whobantxt = json_decode($file, true);
-                                        var_dump($whobantxt);
                                         foreach ($whobantxt as $key => $value) {
                                             banall($update, $MadelineProto, $key, false, false, true);
                                         }
