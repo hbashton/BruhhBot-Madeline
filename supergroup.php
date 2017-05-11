@@ -170,10 +170,9 @@ function idme($update, $MadelineProto, $msg = "")
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $str = $MadelineProto->responses['idme']['supergroup'];
-            $tg_id = str_replace("-100", "", $ch_id);
             $repl = array(
                 "title" => $title,
-                "ch_id" => $tg_id
+                "ch_id" => $ch_id
             );
             $noid = $MadelineProto->engine->render($str, $repl);
             $cont = true;
