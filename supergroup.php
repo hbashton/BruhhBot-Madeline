@@ -245,7 +245,9 @@ function adminlist($update, $MadelineProto)
                         $id = $key['bot']['id'];
                     }
                 }
-                $username = catch_id($update, $MadelineProto, $id)[2];
+                $username = catch_id($update, $MadelineProto, $id);
+                if (!isset($username[2])) continue;
+                $username = $username[2];
                 if (array_key_exists("role", $key)) {
                     if ($key['role'] == "moderator"
                         or $key['role'] == "creator"
