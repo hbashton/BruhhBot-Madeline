@@ -11,7 +11,7 @@ class NewMessage extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;
@@ -185,7 +185,7 @@ class NewChannelMessage extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;
@@ -681,7 +681,7 @@ class NewChannelMessageAction extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
 
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
@@ -1123,7 +1123,7 @@ class NewChannelMessageUserBot extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $fromid = cache_from_user_info($update, $MadelineProto);
@@ -1308,7 +1308,7 @@ class UserBotUpdates extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $updates = $this->updates;
         $uMadelineProto = $this->uMadelineProto;
         $pool = new Pool(100);
@@ -1353,7 +1353,7 @@ class BotAPIUpdates extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $updates = $this->updates;
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;

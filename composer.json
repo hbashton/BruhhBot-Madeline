@@ -1,10 +1,10 @@
 {
-    "name": "danog/madelineproto",
-    "description": "PHP implementation of telegram's MTProto protocol.",
+    "name": "hbashton/bruhhbot",
+    "description": "The most powerful group management bot for telegram.",
     "type": "project",
     "license": "AGPLV3",
-    "homepage": "https://daniil.it/MadelineProto",
     "keywords": ["telegram", "mtproto", "protocol", "bytes", "messenger", "client", "PHP", "video", "stickers", "audio", "files", "GB"],
+    "minimum-stability": "dev",
     "repositories": [
         {
             "type": "git",
@@ -12,35 +12,17 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
-        "danog/phpstruct": "dev-fast",
-        "danog/primemodule": "dev-master",
-        "phpseclib/phpseclib": "dev-master#12dc23d9",
-        "vlucas/phpdotenv": "^2.4",
+        "danog/madelineproto": "dev-master",
         "rmccue/requests": ">=1.0",
         "cmfcmf/openweathermap-php-api": "dev-master",
         "spatie/emoji": "dev-master",
-        "krakjoe/pthreads-polyfill": "dev-master",
         "nicmart/string-template": "~0.1",
-        "erusev/parsedown": "^1.6",
-        "rollbar/rollbar": "dev-master",
-        "ext-mbstring": "*",
-        "ext-bcmath": "*",
-        "ext-mcrypt": "*",
-        "ext-curl": "*"
-    },
-    "require-dev": {
-        "phpdocumentor/reflection-docblock": "^3.1"
+        "erusev/parsedown": "^1.6"
     },
     "authors": [
         {
             "name": "Daniil Gentili",
             "email": "daniil@daniil.it"
         }
-    ],
-    "autoload": {
-        "psr-0": {
-            "danog\\MadelineProto\\": "MadelineProto/src/"
-        }
-    }
+    ]
 }

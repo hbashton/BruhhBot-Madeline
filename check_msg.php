@@ -29,7 +29,7 @@ class check_locked extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;
@@ -166,7 +166,7 @@ class check_flood extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         $uMadelineProto = $MadelineProto->API->uMadelineProto;
@@ -267,7 +267,7 @@ class check_locked_user extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         if (bot_present($update, $MadelineProto, true, false, true)) {
@@ -396,7 +396,7 @@ class check_flood_user extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         if (bot_present($update, $MadelineProto, true, false, true)) {

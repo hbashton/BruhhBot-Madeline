@@ -11,7 +11,7 @@ class BotCallbackQuery extends Threaded
     }
     public function run()
     {
-        require_once 'require_exceptions.php';
+        require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
         if (array_key_exists("data", $update['update'])) {
