@@ -200,7 +200,7 @@ class check_flood extends Threaded
                                             if ($id[0]) {
                                                 $username = $id[2];
                                             }
-                                            $MadelineProto->flooder['num']++;
+                                            $MadelineProto->flooder['num'] = $MadelineProto->flooder['num'] + 1;
                                             if ($MadelineProto->flooder['num'] >= $locked[$ch_id]['floodlimit']) {
                                                 if (!from_admin_mod($update, $MadelineProto)) {
                                                     $kick = $uMadelineProto->
@@ -428,7 +428,7 @@ class check_flood_user extends Threaded
                                             if ($id[0]) {
                                                 $username = $id[2];
                                             }
-                                            $MadelineProto->flooder['num']++;
+                                            $MadelineProto->flooder['num'] = $MadelineProto->flooder['num'] + 1;
                                             if ($MadelineProto->flooder['num'] >= $locked[$ch_id]['floodlimit']) {
                                                 if (!from_admin_mod($update, $MadelineProto)) {
                                                     $kick = $MadelineProto->
