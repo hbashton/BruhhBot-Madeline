@@ -12,7 +12,7 @@
         }
     ],
     "require": {
-        "danog/madelineproto": "dev-master#be6bc0c",
+        "danog/madelineproto": "dev-master#4af50f2",
         "rmccue/requests": ">=1.0",
         "cmfcmf/openweathermap-php-api": "dev-master",
         "spatie/emoji": "dev-master",
