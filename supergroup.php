@@ -721,7 +721,7 @@ function get_chat_rules($update, $MadelineProto)
                     );
                 } catch (Exception $e) {
                     var_dump($e->getMessage());
-                    if ($e->getMessage() == "USER_IS_BLOCKED" or $e->getMessage() == "PEER_ID_INVALID") {
+                    if ($e->getMessage() == "USER_IS_BLOCKED" or $e->getMessage() == "PEER_ID_INVALID" or $e->getMessage() == "The provided peer id is invalid") {
                         if (isset($default['entities'])) unset($default['entities']);
                         $default['peer'] = $peer;
                         $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
