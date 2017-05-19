@@ -244,7 +244,6 @@ function from_mod($update, $MadelineProto)
             ['message']['from_id']
         )['bot_api_id'];
         if (!isset($MadelineProto->API->cache[$ch_id])) {
-var_dump($MadelineProto->API->cache);
             $MadelineProto->API->cache[$ch_id] = [];
         }
         if (!isset($MadelineProto->API->cache[$ch_id]['mods'])) {

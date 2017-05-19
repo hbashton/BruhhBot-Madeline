@@ -726,7 +726,7 @@ function get_chat_rules($update, $MadelineProto)
                         $default['peer'] = $peer;
                         $botusername = preg_replace("/@/", "",getenv("BOT_API_USERNAME"));
                         $url = "https://telegram.me/$botusername?start=rules-$ch_id";
-                        $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Get the rules!", 'url' => $url, ];
+                        $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => "Get the rules!", 'url' => $url];
                         $buttons = [$keyboardButtonUrl];
                         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
                         $rows = [$row];

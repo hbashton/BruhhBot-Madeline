@@ -97,7 +97,6 @@ function lock_callback($update, $MadelineProto)
         $locked[$ch_id] = [];
     }
     if (preg_match_all('/-on/', $val, $matches)) {
-        var_dump(true);
         $val = preg_replace("/-on/", "", $val);
         $newtext = "\xE2\x9D\x8C";
         $newonoff = "off";

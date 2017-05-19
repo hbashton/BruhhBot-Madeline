@@ -437,7 +437,6 @@ function build_keyboard_callback($button_list, $count = 2, $header = false, $foo
     }
     if ($header) {
         try {
-        var_dump($header);
             $row = ['_' => 'keyboardButtonRow', 'buttons' => $header ];
             array_unshift($rows, $row);
         } catch (Exception $e) {}

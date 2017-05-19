@@ -79,7 +79,6 @@ function get_user_stats($update, $MadelineProto, $user)
         }
         if (isset($message)) {
             $default['message'] = $message;
-            var_dump($default);
             $sentMessage = $MadelineProto->messages->sendMessage(
                 $default
             );

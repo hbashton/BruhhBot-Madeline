@@ -158,7 +158,6 @@ function whoban($update, $MadelineProto, $wait = true)
                                             $output_file_name
                                         );
                                         $whobantxt = json_decode($file, true);
-                                        var_dump($whobantxt, true);
                                         foreach ($whobantxt as $key => $value) {
                                             banme($update, $MadelineProto, $key, false);
                                         }
