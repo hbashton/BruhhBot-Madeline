@@ -1,6 +1,6 @@
 <?php
 
-function check_json_array($filename, $id = "", $layered = true)
+function check_json_array($filename, $id = '', $layered = true)
 {
     if ($layered) {
         if (!file_exists($filename)) {
@@ -32,7 +32,7 @@ function check_mkdir($foldername)
 function is_moderated($ch_id)
 {
     check_json_array('chatlist.json', $ch_id, false);
-    $file = file_get_contents("chatlist.json");
+    $file = file_get_contents('chatlist.json');
     $chatlist = json_decode($file, true);
     if (in_array($ch_id, $chatlist)) {
         return true;
@@ -43,39 +43,41 @@ function is_moderated($ch_id)
 
 function is_supergroup($update, $MadelineProto)
 {
-    if ($update['update']['_'] == "updateNewChannelMessage" or $update['update']['_'] == "updateNewMessage") {
+    if ($update['update']['_'] == 'updateNewChannelMessage' or $update['update']['_'] == 'updateNewMessage') {
         if ($update['update']['message']['to_id']['_'] == 'peerChannel') {
             return true;
         } else {
             return false;
         }
     }
-    if ($update['update']['_'] == "updateBotCallbackQuery") {
+    if ($update['update']['_'] == 'updateBotCallbackQuery') {
         if ($update['update']['peer']['_'] == 'peerChannel') {
             return true;
         } else {
             return false;
         }
     }
+
     return false;
 }
 
 function is_peeruser($update, $MadelineProto)
 {
-    if ($update['update']['_'] == "updateNewChannelMessage" or $update['update']['_'] == "updateNewMessage") {
+    if ($update['update']['_'] == 'updateNewChannelMessage' or $update['update']['_'] == 'updateNewMessage') {
         if ($update['update']['message']['to_id']['_'] == 'peerUser') {
             return true;
         } else {
             return false;
         }
     }
-    if ($update['update']['_'] == "updateBotCallbackQuery") {
+    if ($update['update']['_'] == 'updateBotCallbackQuery') {
         if ($update['update']['peer']['_'] == 'peerUser') {
             return true;
         } else {
             return false;
         }
     }
+
     return false;
 }
 
@@ -85,39 +87,43 @@ function parse_chat_data($update, $MadelineProto)
         $info = cache_get_chat_info(
             $update,
             $MadelineProto,
-            -100 . $update['update']['message']['to_id']['channel_id']
+            -100 .$update['update']['message']['to_id']['channel_id']
         );
 
-if (!isset($info['id'])) var_dump($info);
+        if (!isset($info['id'])) {
+            var_dump($info);
+        }
         $peer = $info['id'];
         $title = $info['title'];
         $ch_id = $info['id'];
-        $chat_array = array(
-            'peer' => $peer,
+        $chat_array = [
+            'peer'  => $peer,
             'title' => $title,
-            'id' => $ch_id);
-        return($chat_array);
+            'id'    => $ch_id, ];
+
+        return $chat_array;
     }
 }
 
 function parse_query($update, $MadelineProto)
 {
-    if ($update['update']['_'] == "updateBotCallbackQuery") {
+    if ($update['update']['_'] == 'updateBotCallbackQuery') {
         if ($update['update']['peer']['_'] == 'peerUser') {
             $peer = $update['update']['peer']['user_id'];
         }
         if ($update['update']['peer']['_'] == 'peerChannel') {
-            $peer = -100 . $update['update']['peer']['channel_id'];
+            $peer = -100 .$update['update']['peer']['channel_id'];
         }
         $callback_data = json_decode($update['update']['data'], true);
-        $parsed_query = array(
-            "peer" => $peer,
-            "data" => $callback_data,
-            "msg_id" => $update['update']['msg_id'],
-            "user_id" => $update['update']['user_id'],
-            "query_id" => $update['update']['query_id'],
-            "instance" => $update['update']['chat_instance']
-        );
+        $parsed_query = [
+            'peer'     => $peer,
+            'data'     => $callback_data,
+            'msg_id'   => $update['update']['msg_id'],
+            'user_id'  => $update['update']['user_id'],
+            'query_id' => $update['update']['query_id'],
+            'instance' => $update['update']['chat_instance'],
+        ];
+
         return $parsed_query;
     } else {
         return false;
@@ -127,13 +133,8 @@ function parse_query($update, $MadelineProto)
 function user_specific_data($update, $MadelineProto, $user)
 {
     /**
-    if (array_key_exists("fwd_from", $update['update']['message'])) {
-        $info = cache_get_info(
-            $update,
-            $MadelineProto,
-            $update['update']['message']['fwd_from']['from_id']
-        );
-        **/
+     );
+     **/
     $id = catch_id($update, $MadelineProto, $user);
     if ($id[0]) {
         $info = cache_get_info($update, $MadelineProto, $id[1])['User'];
@@ -153,12 +154,12 @@ function user_specific_data($update, $MadelineProto, $user)
             unset($isbanned[0]);
             foreach ($isbanned as $key => $value) {
                 $chat = cache_get_info($update, $MadelineProto, $value);
-                $title = htmlentities($chat["Chat"]["title"]);
+                $title = htmlentities($chat['Chat']['title']);
                 $id = $chat['Chat']['id'];
                 if (!is_null($title) && !is_null($id)) {
-                    $title_id = array(
+                    $title_id = [
                         'title' => $title,
-                        'id' => $id);
+                        'id'    => $id, ];
                     if (!isset($ban_array)) {
                         $ban_array = [];
                         $ban_array[] = $title_id;
@@ -168,9 +169,9 @@ function user_specific_data($update, $MadelineProto, $user)
                 }
             }
         }
-        $fwd_array = array(
-            'id' => $userid,
-            'firstname' => $firstname);
+        $fwd_array = [
+            'id'        => $userid,
+            'firstname' => $firstname, ];
 
         if (isset($lastname)) {
             $fwd_array['lastname'] = $lastname;
@@ -184,7 +185,8 @@ function user_specific_data($update, $MadelineProto, $user)
         if (isset($gbanned)) {
             $fwd_array['gbanned'] = $gbanned;
         }
-        return($fwd_array);
+
+        return $fwd_array;
     } else {
         return false;
     }
@@ -193,7 +195,7 @@ function user_specific_data($update, $MadelineProto, $user)
 function is_gbanned($update, $MadelineProto, $user)
 {
     check_json_array('gbanlist.json', false, false);
-    $file = file_get_contents("gbanlist.json");
+    $file = file_get_contents('gbanlist.json');
     $gbanlist = json_decode($file, true);
     $id = catch_id($update, $MadelineProto, $user);
     if ($id[0]) {
@@ -211,7 +213,7 @@ function is_gbanned($update, $MadelineProto, $user)
 function is_banned_anywhere($update, $MadelineProto, $user)
 {
     check_json_array('banlist.json', false, false);
-    $file = file_get_contents("banlist.json");
+    $file = file_get_contents('banlist.json');
     $banlist = json_decode($file, true);
     $id = catch_id($update, $MadelineProto, $user);
     if ($id[0]) {
@@ -229,7 +231,8 @@ function is_banned_anywhere($update, $MadelineProto, $user)
         if (!isset($chats)) {
             $chats = [false];
         }
-        return($chats);
+
+        return $chats;
     } else {
         return false;
     }
@@ -252,28 +255,28 @@ function create_style($type, $offset, $length, $full = true)
         $length = mb_strlen($length);
     }
     if ($full) {
-        return([['_' => $style, 'offset' => $offset,
-                'length' => $length ]]);
+        return [['_'     => $style, 'offset' => $offset,
+                'length' => $length, ]];
     } else {
-        return(['_' => $style, 'offset' => $offset,
-                'length' => $length ]);
+        return ['_'      => $style, 'offset' => $offset,
+                'length' => $length, ];
     }
 }
 
 function create_mention($offset, $username, $userid, $full = true)
 {
     if ($full) {
-        return([[
-            '_' => 'inputMessageEntityMentionName',
-            'offset' => $offset,
-            'length' => strlen($username),
-            'user_id' => $userid]]);
+        return [[
+            '_'       => 'inputMessageEntityMentionName',
+            'offset'  => $offset,
+            'length'  => strlen($username),
+            'user_id' => $userid, ]];
     } else {
-        return([
-            '_' => 'inputMessageEntityMentionName',
-            'offset' => $offset,
-            'length' => strlen($username),
-            'user_id' => $userid]);
+        return [
+            '_'       => 'inputMessageEntityMentionName',
+            'offset'  => $offset,
+            'length'  => strlen($username),
+            'user_id' => $userid, ];
     }
 }
 
@@ -281,14 +284,16 @@ function html_mention($username, $userid)
 {
     $username = htmlentities($username);
     $mention = "<a href=\"mention:$userid\">$username</a>";
-    return($mention);
+
+    return $mention;
 }
 
 function html_bold($text)
 {
     $text = htmlentities($text);
     $bold = "<b>$text</b>";
-    return($bold);
+
+    return $bold;
 }
 
 function markdown($text, $style)
@@ -305,26 +310,27 @@ function markdown($text, $style)
         $text = "```$text```";
     break;
     }
-    return($text);
+
+    return $text;
 }
 
 class Template_String
 {
-
-    public static function sprintf($format, array $args = array())
+    public static function sprintf($format, array $args = [])
     {
-        $arg_nums = array_slice(array_flip(array_keys(array(0 => 0) + $args)), 1);
+        $arg_nums = array_slice(array_flip(array_keys([0 => 0] + $args)), 1);
 
         for ($pos = 0; preg_match('/(?<=%)\(([a-zA-Z_][\w\s]*)\)/', $format, $match, PREG_OFFSET_CAPTURE, $pos);) {
             $arg_pos = $match[0][1];
             $arg_len = strlen($match[0][0]);
             $arg_key = $match[1][0];
 
-            if (! array_key_exists($arg_key, $arg_nums)) {
+            if (!array_key_exists($arg_key, $arg_nums)) {
                 user_error("sprintfn(): Missing argument '${arg_key}'", E_USER_WARNING);
+
                 return false;
             }
-            $format = substr_replace($format, $replace = $arg_nums[$arg_key] . '$', $arg_pos, $arg_len);
+            $format = substr_replace($format, $replace = $arg_nums[$arg_key].'$', $arg_pos, $arg_len);
             $pos = $arg_pos + strlen($replace); // skip to end of replacement for next iteration
         }
 
@@ -334,47 +340,51 @@ class Template_String
 
 function cb($content)
 {
-
     if (!mb_check_encoding($content, 'UTF-8')
-        OR !($content === mb_convert_encoding(mb_convert_encoding($content, 'UTF-32', 'UTF-8'), 'UTF-8', 'UTF-32'))
+        or !($content === mb_convert_encoding(mb_convert_encoding($content, 'UTF-32', 'UTF-8'), 'UTF-8', 'UTF-32'))
     ) {
-
         $content = mb_convert_encoding($content, 'UTF-8');
-
     }
+
     return $content;
 }
 
-function split_to_chunks($text){
-	$total_length = 4000;
-	$text_arr = multipleExplodeKeepDelimiters(array("\n"),$text);
-	$i=0;
-	$message[0]="";
-	foreach ($text_arr as $word){
-		if ( strlen($message[$i] . $word . ' ') <= $total_length ){
-			if ($text_arr[count($text_arr)-1] == $word){
-				$message[$i] .= $word;
-			} else {
-				$message[$i] .= $word . ' ';
-			}
-		} else {
-			$i++;
-			if ($text_arr[count($text_arr)-1] == $word){
-				$message[$i] = $word;
-			} else {
-				$message[$i] = $word . ' ';
-			}
-		}
-	}
-	return $message;
+function split_to_chunks($text)
+{
+    $total_length = 4000;
+    $text_arr = multipleExplodeKeepDelimiters(["\n"], $text);
+    $i = 0;
+    $message[0] = '';
+    foreach ($text_arr as $word) {
+        if (strlen($message[$i].$word.' ') <= $total_length) {
+            if ($text_arr[count($text_arr) - 1] == $word) {
+                $message[$i] .= $word;
+            } else {
+                $message[$i] .= $word.' ';
+            }
+        } else {
+            $i++;
+            if ($text_arr[count($text_arr) - 1] == $word) {
+                $message[$i] = $word;
+            } else {
+                $message[$i] = $word.' ';
+            }
+        }
+    }
+
+    return $message;
 }
 
-function multipleExplodeKeepDelimiters($delimiters, $string) {
+function multipleExplodeKeepDelimiters($delimiters, $string)
+{
     $initialArray = explode(chr(1), str_replace($delimiters, chr(1), $string));
-    $finalArray = array();
-    foreach($initialArray as $item) {
-        if(strlen($item) > 0) array_push($finalArray, $item . $string[strpos($string, $item) + strlen($item)]);
+    $finalArray = [];
+    foreach ($initialArray as $item) {
+        if (strlen($item) > 0) {
+            array_push($finalArray, $item.$string[strpos($string, $item) + strlen($item)]);
+        }
     }
+
     return $finalArray;
 }
 
@@ -405,26 +415,27 @@ function multipleExplodeKeepDelimiters($delimiters, $string) {
 
 function decodeEmoticons($src)
 {
-    $replaced = preg_replace("/\\\\u([0-9A-F]{1,4})/i", "&#x$1;", $src);
-    $result = mb_convert_encoding($replaced, "UTF-16", "HTML-ENTITIES");
+    $replaced = preg_replace('/\\\\u([0-9A-F]{1,4})/i', '&#x$1;', $src);
+    $result = mb_convert_encoding($replaced, 'UTF-16', 'HTML-ENTITIES');
     $result = mb_convert_encoding($result, 'utf-8', 'utf-16');
+
     return $result;
 }
 
 function build_keyboard_callback($button_list, $count = 2, $header = false, $footer = false, $end = false)
 {
-    $rows =[];
+    $rows = [];
     $buttons = [];
     $cols = 0;
-    if(count($button_list)%$count != 0) {
-      $end = true;
+    if (count($button_list) % $count != 0) {
+        $end = true;
     }
     foreach ($button_list as $button) {
-         if ($cols < $count) {
-             $buttons[] = $button;
-             $cols++;
-         } else {
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        if ($cols < $count) {
+            $buttons[] = $button;
+            $cols++;
+        } else {
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
             $rows[] = $row;
             $buttons = [];
             $buttons[] = $button;
@@ -432,20 +443,23 @@ function build_keyboard_callback($button_list, $count = 2, $header = false, $foo
         }
     }
     if ($end or $cols == $count) {
-        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons ];
+        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
         $rows[] = $row;
     }
     if ($header) {
         try {
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $header ];
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $header];
             array_unshift($rows, $row);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
     }
     if ($footer) {
         try {
-            $row = ['_' => 'keyboardButtonRow', 'buttons' => $footer ];
+            $row = ['_' => 'keyboardButtonRow', 'buttons' => $footer];
             array_push($rows, $row);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
     }
-    return($rows);
+
+    return $rows;
 }

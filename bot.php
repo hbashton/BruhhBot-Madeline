@@ -1,21 +1,6 @@
 #!/usr/bin/env php
 <?php
 /**
-    Copyright (C) 2016-2017 Hunter Ashton
-
-    This file is part of BruhhBot.
-
-    BruhhBot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    BruhhBot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
 require 'vendor/autoload.php';
@@ -52,12 +37,14 @@ ini_set('memory_limit', '1000M'); // fix errors
 if (file_exists('session.madeline')) {
     try {
         $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+    }
 }
 if (file_exists('bot.madeline')) {
     try {
         $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
-    } catch (Exception $e) {}
+    } catch (Exception $e) {
+    }
 }
 if (file_exists('.env')) {
     $dotenv = new Dotenv\Dotenv(__DIR__);
@@ -70,11 +57,11 @@ if (isset($argv[1])) {
     $dumpme = false;
 }
 
-$settings = json_decode(getenv("MTPROTO_SETTINGS"), true);
-$settings['msg_array_limit'] = array(
+$settings = json_decode(getenv('MTPROTO_SETTINGS'), true);
+$settings['msg_array_limit'] = [
 'incoming' => 600,
-'outgoing' => 600
-);
+'outgoing' => 600,
+];
 
 if (!isset($uMadelineProto)) {
     $uMadelineProto = new \danog\MadelineProto\API($settings);
@@ -88,23 +75,22 @@ if (!isset($uMadelineProto)) {
     \danog\MadelineProto\Logger::log($sentCode);
     echo 'Enter the code you received: ';
     $code = fgets(
-        STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']
-        ['length'] : 5) + 1
+        STDIN, (isset($sentCode['type']['length']) ? $sentCode['type']['length'] : 5) + 1
     );
     $authorization = $uMadelineProto->complete_phone_login($code);
 
-        \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
-        if ($authorization['_'] === 'account.noPassword') {
-            throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
-        }
-        if ($authorization['_'] === 'account.password') {
-            \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
-            $authorization = $uMadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
-        }
-        if ($authorization['_'] === 'account.needSignup') {
-            \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
-            $authorization = $uMadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
-        }
+    \danog\MadelineProto\Logger::log([$authorization], \danog\MadelineProto\Logger::NOTICE);
+    if ($authorization['_'] === 'account.noPassword') {
+        throw new \danog\MadelineProto\Exception('2FA is enabled but no password is set!');
+    }
+    if ($authorization['_'] === 'account.password') {
+        \danog\MadelineProto\Logger::log(['2FA is enabled'], \danog\MadelineProto\Logger::NOTICE);
+        $authorization = $uMadelineProto->complete_2fa_login(readline('Please enter your password (hint '.$authorization['hint'].'): '));
+    }
+    if ($authorization['_'] === 'account.needSignup') {
+        \danog\MadelineProto\Logger::log(['Registering new user'], \danog\MadelineProto\Logger::NOTICE);
+        $authorization = $uMadelineProto->complete_signup($code, readline('Please enter your first name: '), readline('Please enter your last name (can be empty): '));
+    }
 
     \danog\MadelineProto\Logger::log([$authorization]);
     echo 'Serializing MadelineProto to session.madeline...'.PHP_EOL;
@@ -148,13 +134,14 @@ if (!isset($MadelineProto)) {
 }
 if (file_exists('custom_responses.json')) {
     try {
-        $MadelineProto->responses = json_decode(file_get_contents("custom_responses.json"), true);
-    } catch (Exception $e) {}
+        $MadelineProto->responses = json_decode(file_get_contents('custom_responses.json'), true);
+    } catch (Exception $e) {
+    }
 } else {
-    $MadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+    $MadelineProto->responses = json_decode(file_get_contents('responses.json'), true);
 }
-$MadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
-$MadelineProto->engine = new StringTemplate\Engine;
+$MadelineProto->hints = json_decode(file_get_contents('hints.json'), true);
+$MadelineProto->engine = new StringTemplate\Engine();
 $MadelineProto->flooder = [];
 $MadelineProto->API->is_bot_present = [];
 $MadelineProto->API->cache = [];
@@ -166,14 +153,15 @@ $MadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERN
 $MadelineProto->API->uMadelineProto = $uMadelineProto;
 if (file_exists('custom_responses.json')) {
     try {
-        $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("custom_responses.json"), true);
-    } catch (Exception $e) {}
+        $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents('custom_responses.json'), true);
+    } catch (Exception $e) {
+    }
 } else {
-    $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
+    $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents('responses.json'), true);
 }
-$MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents("responses.json"), true);
-$MadelineProto->API->uMadelineProto->hints = json_decode(file_get_contents("hints.json"), true);
-$MadelineProto->API->uMadelineProto->engine = new StringTemplate\Engine;
+$MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents('responses.json'), true);
+$MadelineProto->API->uMadelineProto->hints = json_decode(file_get_contents('hints.json'), true);
+$MadelineProto->API->uMadelineProto->engine = new StringTemplate\Engine();
 $MadelineProto->API->uMadelineProto->flooder = [];
 $MadelineProto->API->uMadelineProto->API->is_bot_present = [];
 $MadelineProto->API->uMadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
@@ -189,7 +177,7 @@ while (true) {
     try {
         $updates = $MadelineProto->API->get_updates(
             ['offset' => $offset,
-            'limit' => 50000, 'timeout' => 0]
+            'limit'   => 50000, 'timeout' => 0, ]
         );
     } catch (Exception $e) {
         $MadelineProto = new \danog\MadelineProto\API($settings);
@@ -207,7 +195,7 @@ while (true) {
         );
         $updates = $MadelineProto->API->get_updates(
             ['offset' => $offset,
-            'limit' => 50000, 'timeout' => 0]
+            'limit'   => 50000, 'timeout' => 0, ]
         );
     }
     if (end($updates)) {

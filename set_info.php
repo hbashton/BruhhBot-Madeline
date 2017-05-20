@@ -1,23 +1,7 @@
 <?php
 /**
-    Copyright (C) 2016-2017 Hunter Ashton
-
-    This file is part of BruhhBot.
-
-    BruhhBot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    BruhhBot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-
 function set_chat_photo($update, $MadelineProto, $wait = true)
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
@@ -30,14 +14,16 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod(
@@ -50,37 +36,34 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
                         if (isset($MadelineProto->from_user_chat_photo)) {
                             if ($MadelineProto->from_user_chat_photo == $fromid) {
                                 if (array_key_exists(
-                                    "media",
+                                    'media',
                                     $update['update']['message']
                                 )
                                 ) {
                                     $mediatype = $update['update']['message']['media']['_'];
-                                    if ($mediatype == "messageMediaPhoto") {
-                                        $hash = $update
-                                        ['update']['message']['media']['photo']
-                                        ['access_hash'];
-                                        $id = $update
-                                        ['update']['message']['media']['photo']['id'];
+                                    if ($mediatype == 'messageMediaPhoto') {
+                                        $hash = $update['update']['message']['media']['photo']['access_hash'];
+                                        $id = $update['update']['message']['media']['photo']['id'];
                                         $inputPhoto = [
-                                            '_' => 'inputPhoto',
-                                            'id' => $id,
-                                            'access_hash' => $hash];
+                                            '_'           => 'inputPhoto',
+                                            'id'          => $id,
+                                            'access_hash' => $hash, ];
                                         $inputChatPhoto = [
-                                            '_' => 'inputChatPhoto',
-                                            'id' => $inputPhoto];
+                                            '_'  => 'inputChatPhoto',
+                                            'id' => $inputPhoto, ];
                                         try {
                                             $changePhoto = $uMadelineProto->
                                             channels->editPhoto(
                                                 ['channel' => $ch_id,
-                                                'photo' => $inputChatPhoto]
+                                                'photo'    => $inputChatPhoto, ]
                                             );
                                             \danog\MadelineProto\Logger::log(
                                                 $changePhoto
                                             );
                                             $str = $MadelineProto->responses['set_chat_photo']['success'];
-                                            $repl = array(
-                                                "title" => $title
-                                            );
+                                            $repl = [
+                                                'title' => $title,
+                                            ];
                                             $message = $MadelineProto->engine->render($str, $repl);
                                             $default['message'] = $message;
                                             $alert = "<code>$from_name changed the photo for $title</code>";
@@ -136,14 +119,16 @@ function set_chat_title($update, $MadelineProto, $msg)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod(
@@ -156,13 +141,13 @@ function set_chat_title($update, $MadelineProto, $msg)
                         if ($msg) {
                             try {
                                 $editTitle = $uMadelineProto->channels->editTitle(
-                                    ['channel' => $ch_id, 'title' => $msg ]
+                                    ['channel' => $ch_id, 'title' => $msg]
                                 );
                                 \danog\MadelineProto\Logger::log($editTitle);
                                 $str = $MadelineProto->responses['set_chat_title']['success'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                                 $alert = "<code>$from_name changed the name of $title to \"$msg\"</code>";
@@ -200,11 +185,11 @@ function set_chat_username($update, $MadelineProto, $msg)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod(
@@ -216,27 +201,27 @@ function set_chat_username($update, $MadelineProto, $msg)
                     ) {
                         if ($msg) {
                             try {
-                                if ($msg == "clear") {
-                                    $msg = "";
+                                if ($msg == 'clear') {
+                                    $msg = '';
                                     $changeUsername = $uMadelineProto->channels->updateUsername(
-                                    ['channel' => $ch_id, 'username' => $msg ]
+                                    ['channel' => $ch_id, 'username' => $msg]
                                     );
                                     \danog\MadelineProto\Logger::log($changeUsername);
                                     $str = $MadelineProto->responses['set_chat_username']['clear'];
-                                    $repl = array(
-                                        "title" => $title
-                                    );
+                                    $repl = [
+                                        'title' => $title,
+                                    ];
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 } else {
                                     $changeUsername = $MadelineProto->channels->updateUsername(
-                                        ['channel' => $ch_id, 'username' => $msg ]
+                                        ['channel' => $ch_id, 'username' => $msg]
                                     );
                                     \danog\MadelineProto\Logger::log($changeUsername);
                                     $str = $MadelineProto->responses['set_chat_username']['success'];
-                                    $repl = array(
-                                        "msg" => $msg
-                                    );
+                                    $repl = [
+                                        'msg' => $msg,
+                                    ];
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
@@ -278,14 +263,16 @@ function set_chat_about($update, $MadelineProto, $msg)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod(
@@ -304,13 +291,13 @@ function set_chat_about($update, $MadelineProto, $msg)
                             }
                             try {
                                 $editAbout = $uMadelineProto->channels->editAbout(
-                                    ['channel' => $ch_id, 'about' => $msg ]
+                                    ['channel' => $ch_id, 'about' => $msg]
                                 );
                                 \danog\MadelineProto\Logger::log($editAbout);
                                 $str = $MadelineProto->responses['set_chat_about']['success'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                                 $alert = "<code>$from_name changed the description of $title to \"$msg\"</code>";
@@ -352,14 +339,16 @@ function set_chat_rules($update, $MadelineProto, $msg)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod(
@@ -370,19 +359,19 @@ function set_chat_rules($update, $MadelineProto, $msg)
                     )
                     ) {
                         if ($msg) {
-                            if ($msg != "clear") {
-                                check_json_array("settings.json", $ch_id);
-                                $file = file_get_contents("settings.json");
+                            if ($msg != 'clear') {
+                                check_json_array('settings.json', $ch_id);
+                                $file = file_get_contents('settings.json');
                                 $settings = json_decode($file, true);
-                                $settings[$ch_id]["rules"] = $msg;
+                                $settings[$ch_id]['rules'] = $msg;
                                 file_put_contents('settings.json', json_encode($settings));
                                 $default['message'] = "Alright, I've set the rules for $title. You can get them with /rules";
                                 $alert = "<code>$from_name changed the rules in $title to:\n\"$msg\"</code>";
                             } else {
-                                check_json_array("settings.json", $ch_id);
-                                $file = file_get_contents("settings.json");
+                                check_json_array('settings.json', $ch_id);
+                                $file = file_get_contents('settings.json');
                                 $settings = json_decode($file, true);
-                                $settings[$ch_id]["rules"] = "";
+                                $settings[$ch_id]['rules'] = '';
                                 file_put_contents('settings.json', json_encode($settings));
                                 $default['message'] = "Alright, I've cleared the rules for $title. Total anarchy";
                                 $alert = "<code>$from_name cleared the rules in $title</code>";
@@ -421,14 +410,16 @@ function set_chat_welcome($update, $MadelineProto, $msg)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod(
@@ -439,21 +430,23 @@ function set_chat_welcome($update, $MadelineProto, $msg)
                     )
                     ) {
                         if ($msg) {
-                            if ($msg != "clear") {
-                                check_json_array("settings.json", $ch_id);
-                                $file = file_get_contents("settings.json");
+                            if ($msg != 'clear') {
+                                check_json_array('settings.json', $ch_id);
+                                $file = file_get_contents('settings.json');
                                 $settings = json_decode($file, true);
-                                $settings[$ch_id]["custom_welcome"] = $msg;
+                                $settings[$ch_id]['custom_welcome'] = $msg;
                                 file_put_contents('settings.json', json_encode($settings));
                                 $default['message'] = "I've set the welcome message for $title.";
                                 $alert = "<code>$from_name set the welcome message in $title as \"$msg\"</code>";
                             } else {
-                                check_json_array("settings.json", $ch_id);
-                                $file = file_get_contents("settings.json");
+                                check_json_array('settings.json', $ch_id);
+                                $file = file_get_contents('settings.json');
                                 $settings = json_decode($file, true);
-                                if (isset($settings[$ch_id]["custom_welcome"])) unset($settings[$ch_id]["custom_welcome"]);
+                                if (isset($settings[$ch_id]['custom_welcome'])) {
+                                    unset($settings[$ch_id]['custom_welcome']);
+                                }
                                 file_put_contents('settings.json', json_encode($settings));
-                                $default['message'] = "Welcome set to default";
+                                $default['message'] = 'Welcome set to default';
                                 $alert = "<code>$from_name cleared the welcome message in $title</code>";
                             }
                         } else {

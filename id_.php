@@ -1,20 +1,5 @@
 <?php
 /**
-    Copyright (C) 2016-2017 Hunter Ashton
-
-    This file is part of BruhhBot.
-
-    BruhhBot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    BruhhBot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
 function catch_id($update, $MadelineProto, $user)
@@ -38,17 +23,17 @@ function catch_id($update, $MadelineProto, $user)
                         ) {
                             $username = $user_['User']['first_name'];
                         } else {
-                            $username = "no-name-user";
+                            $username = 'no-name-user';
                         }
                         if (isset($user_['User']['first_name'])) {
                             $firstname = $user_['User']['first_name'];
                         } else {
-                            $firstname = "no-name-user";
+                            $firstname = 'no-name-user';
                         }
                         $userid = $user_['bot_api_id'];
                         break;
                     } catch (Exception $e) {
-                        return array(false);
+                        return [false];
                     }
                 }
             }
@@ -68,17 +53,17 @@ function catch_id($update, $MadelineProto, $user)
                     ) {
                         $username = $user_['User']['first_name'];
                     } else {
-                        $username = "no-name-user";
+                        $username = 'no-name-user';
                     }
                     if (isset($user_['User']['first_name'])) {
                         $firstname = $user_['User']['first_name'];
                     } else {
-                        $firstname = "no-name-user";
+                        $firstname = 'no-name-user';
                     }
                     $userid = $user_['bot_api_id'];
-                    $return = array(true, $userid, $username, $firstname);
+                    $return = [true, $userid, $username, $firstname];
                 } catch (Exception $e) {
-                    return array(false);
+                    return [false];
                 }
             }
         }
@@ -104,20 +89,20 @@ function catch_id($update, $MadelineProto, $user)
                             ) {
                                 $username = $user_['User']['first_name'];
                             } else {
-                                $username = "no-name-user";
+                                $username = 'no-name-user';
                             }
                             $userid = $user_['bot_api_id'];
                             if (isset($user_['User']['first_name'])) {
                                 $firstname = $user_['User']['first_name'];
                             } else {
-                                $firstname = "no-name-user";
+                                $firstname = 'no-name-user';
                             }
-                            $return = array(true, $userid, $username, $firstname);
+                            $return = [true, $userid, $username, $firstname];
                         }
                     }
                 }
             } catch (Exception $e) {
-                return array(false);
+                return [false];
             }
         }
     } else {
@@ -135,21 +120,22 @@ function catch_id($update, $MadelineProto, $user)
                 ) {
                     $username = $user_['User']['first_name'];
                 } else {
-                    $username = "no-name-user";
+                    $username = 'no-name-user';
                 }
                 $userid = $user_['bot_api_id'];
                 if (isset($user_['User']['first_name'])) {
                     $firstname = $user_['User']['first_name'];
                 } else {
-                    $firstname = "no-name-user";
+                    $firstname = 'no-name-user';
                 }
-                $return = array(true, $userid, $username, $firstname);
+                $return = [true, $userid, $username, $firstname];
             }
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
     }
     if (isset($userid)) {
-        return array(true, $userid, $username, $firstname);
+        return [true, $userid, $username, $firstname];
     } else {
-        return array(false);
+        return [false];
     }
 }

@@ -9,10 +9,10 @@ function wholist($update, $MadelineProto)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                );
+                ];
             if (from_admin($update, $MadelineProto)
                 or from_master($update, $MadelineProto)
             ) {
@@ -22,27 +22,29 @@ function wholist($update, $MadelineProto)
                     if (array_key_exists('user', $key)) {
                         $id = $key['user']['id'];
                         $participant = catch_id($update, $MadelineProto, $id);
-                        if (!isset($participant[2])) continue;
+                        if (!isset($participant[2])) {
+                            continue;
+                        }
                         $message = $message.$participant[2]." $id"."\n";
                     }
                 }
                 $filename = "who/who$ch_id";
-                check_mkdir("who");
+                check_mkdir('who');
                 file_put_contents($filename, $message);
                 $inputFile = $MadelineProto->upload($filename, 'wholist');
                 $inputMedia = [
-                    '_' => 'inputMediaUploadedDocument',
-                    'file' => $inputFile,
-                    'mime_type' => 'magic/magic',
-                    'caption' => "List of participants for $title",
+                    '_'          => 'inputMediaUploadedDocument',
+                    'file'       => $inputFile,
+                    'mime_type'  => 'magic/magic',
+                    'caption'    => "List of participants for $title",
                     'attributes' => [[
-                        '_' => 'documentAttributeFilename',
-                        'file_name' => 'wholist.txt'
-                        ]]
+                        '_'         => 'documentAttributeFilename',
+                        'file_name' => 'wholist.txt',
+                        ]],
                     ];
                 $sentMedia = $MadelineProto->messages->sendMedia(
                     ['peer' => $peer,
-                    'media' => $inputMedia]
+                    'media' => $inputMedia, ]
                 );
                 if (isset($sentMedia)) {
                     \danog\MadelineProto\Logger::log($sentMedia);
@@ -61,10 +63,10 @@ function whofile($update, $MadelineProto)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                );
+                ];
             $message = [];
             if (from_admin($update, $MadelineProto)
                 or from_master($update, $MadelineProto)
@@ -74,27 +76,29 @@ function whofile($update, $MadelineProto)
                     if (array_key_exists('user', $key)) {
                         $id = $key['user']['id'];
                         $participant = catch_id($update, $MadelineProto, $id);
-                        if (!isset($participant[2])) continue;
+                        if (!isset($participant[2])) {
+                            continue;
+                        }
                         $message[$id] = $participant[2];
                     }
                 }
                 $filename = "who/whofile$ch_id";
-                check_mkdir("who");
+                check_mkdir('who');
                 file_put_contents($filename, json_encode($message));
                 $inputFile = $MadelineProto->upload($filename, 'whofile');
                 $inputMedia = [
-                    '_' => 'inputMediaUploadedDocument',
-                    'file' => $inputFile,
-                    'mime_type' => 'magic/magic',
-                    'caption' => "",
+                    '_'          => 'inputMediaUploadedDocument',
+                    'file'       => $inputFile,
+                    'mime_type'  => 'magic/magic',
+                    'caption'    => '',
                     'attributes' => [[
-                        '_' => 'documentAttributeFilename',
-                        'file_name' => 'whofile.txt'
-                        ]]
+                        '_'         => 'documentAttributeFilename',
+                        'file_name' => 'whofile.txt',
+                        ]],
                     ];
                 $sentMedia = $MadelineProto->messages->sendMedia(
                     ['peer' => $peer,
-                    'media' => $inputMedia]
+                    'media' => $inputMedia, ]
                 );
                 if (isset($sentMedia)) {
                     \danog\MadelineProto\Logger::log($sentMedia);
@@ -114,10 +118,10 @@ function whoban($update, $MadelineProto, $wait = true)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                );
+                ];
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master(
@@ -128,27 +132,21 @@ function whoban($update, $MadelineProto, $wait = true)
                     if (isset($MadelineProto->wait_for_whoban)) {
                         if ($MadelineProto->wait_for_whoban == $fromid) {
                             if (array_key_exists(
-                                "media",
+                                'media',
                                 $update['update']['message']
                             )
                             ) {
                                 $mediatype = $update['update']['message']['media']['_'];
-                                if ($mediatype == "messageMediaDocument") {
-                                    $hash = $update
-                                    ['update']['message']['media']['document']
-                                    ['access_hash'];
-                                    $id = $update
-                                    ['update']['message']['media']['document']['id'];
-                                    $ver = $update
-                                    ['update']['message']['media']['document']
-                                    ['version'];
-                                    $Document = $update
-                                    ['update']['message']['media'];
+                                if ($mediatype == 'messageMediaDocument') {
+                                    $hash = $update['update']['message']['media']['document']['access_hash'];
+                                    $id = $update['update']['message']['media']['document']['id'];
+                                    $ver = $update['update']['message']['media']['document']['version'];
+                                    $Document = $update['update']['message']['media'];
                                     try {
                                         $output_file_name =
                                         $MadelineProto->download_to_dir(
                                             $Document,
-                                            "who"
+                                            'who'
                                         );
                                         \danog\MadelineProto\Logger::log(
                                             $output_file_name
@@ -162,21 +160,20 @@ function whoban($update, $MadelineProto, $wait = true)
                                             banme($update, $MadelineProto, $key, false);
                                         }
                                         $default['message'] = $message;
-
                                     } catch (Exception $e) {
-                                        $message = "something went horribly wrong ^.^";
+                                        $message = 'something went horribly wrong ^.^';
                                         $default['message'] = $message;
                                     }
                                     unset($MadelineProto->wait_for_whoban);
                                 } else {
-                                    $message = "The message you sent was not a".
-                                    "document! Try again ";
+                                    $message = 'The message you sent was not a'.
+                                    'document! Try again ';
                                     $default['message'] = $message;
                                     unset($MadelineProto->wait_for_whoban);
                                 }
                             } else {
-                                $message = "The message you sent was not a document!".
-                                " Try again ";
+                                $message = 'The message you sent was not a document!'.
+                                ' Try again ';
                                 $default['message'] = $message;
                                 unset($MadelineProto->wait_for_whoban);
                             }
@@ -184,7 +181,7 @@ function whoban($update, $MadelineProto, $wait = true)
                     } else {
                         $MadelineProto->wait_for_whoban = $fromid;
                         $message = "Just send the /whofile and I'll ".
-                        "bring down the banhammer";
+                        'bring down the banhammer';
                         $default['message'] = $message;
                     }
                 }
@@ -211,10 +208,10 @@ function whobanall($update, $MadelineProto, $wait = true)
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                );
+                ];
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_bot_admin($update, $MadelineProto)) {
                 if (from_master(
@@ -225,27 +222,21 @@ function whobanall($update, $MadelineProto, $wait = true)
                     if (isset($MadelineProto->wait_for_whobanall)) {
                         if ($MadelineProto->wait_for_whobanall == $fromid) {
                             if (array_key_exists(
-                                "media",
+                                'media',
                                 $update['update']['message']
                             )
                             ) {
                                 $mediatype = $update['update']['message']['media']['_'];
-                                if ($mediatype == "messageMediaDocument") {
-                                    $hash = $update
-                                    ['update']['message']['media']['document']
-                                    ['access_hash'];
-                                    $id = $update
-                                    ['update']['message']['media']['document']['id'];
-                                    $ver = $update
-                                    ['update']['message']['media']['document']
-                                    ['version'];
-                                    $Document = $update
-                                    ['update']['message']['media'];
+                                if ($mediatype == 'messageMediaDocument') {
+                                    $hash = $update['update']['message']['media']['document']['access_hash'];
+                                    $id = $update['update']['message']['media']['document']['id'];
+                                    $ver = $update['update']['message']['media']['document']['version'];
+                                    $Document = $update['update']['message']['media'];
                                     try {
                                         $output_file_name =
                                         $MadelineProto->download_to_dir(
                                             $Document,
-                                            "who"
+                                            'who'
                                         );
                                         \danog\MadelineProto\Logger::log(
                                             $output_file_name
@@ -262,23 +253,22 @@ function whobanall($update, $MadelineProto, $wait = true)
                                         foreach ($whobantxt as $key => $value) {
                                             banall($update, $MadelineProto, $key, false, false, true);
                                         }
-                                        $message = "ALL DONE!";
+                                        $message = 'ALL DONE!';
                                         $default['message'] = $message;
-    
                                     } catch (Exception $e) {
-                                        $message = "something went horribly wrong ^.^";
+                                        $message = 'something went horribly wrong ^.^';
                                         $default['message'] = $message;
                                     }
                                     unset($MadelineProto->wait_for_whobanall);
                                 } else {
-                                    $message = "The message you sent was not a".
-                                    "document! Try again ";
+                                    $message = 'The message you sent was not a'.
+                                    'document! Try again ';
                                     $default['message'] = $message;
                                     unset($MadelineProto->wait_for_whobanall);
                                 }
                             } else {
-                                $message = "The message you sent was not a document! ".
-                                " Try again ";
+                                $message = 'The message you sent was not a document! '.
+                                ' Try again ';
                                 $default['message'] = $message;
                                 unset($MadelineProto->wait_for_whobanall);
                             }
@@ -286,7 +276,7 @@ function whobanall($update, $MadelineProto, $wait = true)
                     } else {
                         $MadelineProto->wait_for_whobanall = $fromid;
                         $message = "Just send the /whofile and I'll ".
-                        "bring down the banhammer";
+                        'bring down the banhammer';
                         $default['message'] = $message;
                     }
                 }
