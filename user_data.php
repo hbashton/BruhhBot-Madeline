@@ -1,6 +1,6 @@
 <?php
 
-function get_user_stats($update, $MadelineProto, $user) 
+function get_user_stats($update, $MadelineProto, $user)
 {
     $msg_id = $update['update']['message']['id'];
     if (is_peeruser($update, $MadelineProto)) {
@@ -17,12 +17,12 @@ function get_user_stats($update, $MadelineProto, $user)
         $cont = true;
     }
     if (!$update['update']['message']['out'] && isset($cont)) {
-        $default = array(
-            'peer' => $peer,
+        $default = [
+            'peer'            => $peer,
             'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html'
-        );
-        if ($user !== "" or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
+            'parse_mode'      => 'html',
+        ];
+        if ($user !== '' or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
             $msg_id = $update['update']['message']['id'];
             $catch = catch_id($update, $MadelineProto, $user);
             if ($catch[0]) {
@@ -75,7 +75,7 @@ function get_user_stats($update, $MadelineProto, $user)
                 $message = "I don't know anyone by the name of $user";
             }
         } else {
-            $message = "Use <code>/stats @username</code> to get some info about a user";
+            $message = 'Use <code>/stats @username</code> to get some info about a user';
         }
         if (isset($message)) {
             $default['message'] = $message;
