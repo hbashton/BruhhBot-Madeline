@@ -9,10 +9,14 @@
         {
             "type": "git",
             "url": "https://github.com/danog/phpseclib"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/hbashton/MadelineProto"
         }
     ],
     "require": {
-        "danog/madelineproto": "dev-master#615e3f0",
+        "danog/madelineproto": "dev-myfork",
         "rmccue/requests": ">=1.0",
         "cmfcmf/openweathermap-php-api": "dev-master",
         "spatie/emoji": "dev-master",
