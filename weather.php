@@ -1,24 +1,8 @@
 <?php
 /**
-    Copyright (C) 2016-2017 Hunter Ashton
-
-    This file is part of BruhhBot.
-
-    BruhhBot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    BruhhBot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-use Cmfcmf\OpenWeatherMap;
-use Cmfcmf\OpenWeatherMap\Exception as OWMException;
+
 /* server timezone */
 define('CONST_SERVER_TIMEZONE', 'UTC');
 
@@ -45,20 +29,20 @@ function getweather($update, $MadelineProto, $area)
     }
     if ($cont) {
         $msg_id = $update['update']['message']['id'];
-        $default = array(
-            'peer' => $peer,
+        $default = [
+            'peer'            => $peer,
             'reply_to_msg_id' => $msg_id,
-            'parse_mode' => 'html'
-            );
+            'parse_mode'      => 'html',
+            ];
         $cloudkey = getenv('WEATHER_KEY');
         $emoji = 'Spatie\Emoji\Emoji';
         $response = Requests::get(
-            "https://maps.googleapis.com/maps/api/geocode/json?address="
-            . str_replace(" ", "%20", $area)
+            'https://maps.googleapis.com/maps/api/geocode/json?address='
+            .str_replace(' ', '%20', $area)
         );
         $status = $response->status_code;
         // var_dump($status);
-        $headers = array('Accept' => 'application/json');
+        $headers = ['Accept' => 'application/json'];
         $responsej = json_decode($response->body, true);
         if ($responsej['status'] == 'OK') {
             $lat = $responsej['results'][0]['geometry']['location']['lat'];
@@ -112,13 +96,13 @@ function getweather($update, $MadelineProto, $area)
                 $icon = "\xe2\x98\x81\xef\xb8\x8f";
                 break;
             default:
-                $icon = "";
+                $icon = '';
                 break;
             }
             $message = "The current temperature in <b>$addr</b> is $tempf/$tempc (feels like $atempf/$atempc). It's currently $desc $icon.\n<b>Forecast</b>: $forecast";
             $default['message'] = $message;
         } else {
-            $message = 'What the actual hell is "' . $area . '"';
+            $message = 'What the actual hell is "'.$area.'"';
             $default['message'] = $message;
         }
         if (isset($default['message'])) {

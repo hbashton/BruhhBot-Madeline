@@ -1,23 +1,8 @@
 <?php
 /**
-    Copyright (C) 2016-2017 Hunter Ashton
-
-    This file is part of BruhhBot.
-
-    BruhhBot is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    BruhhBot is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
     along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
  */
-function banme($update, $MadelineProto, $msg = "", $send = true)
+function banme($update, $MadelineProto, $msg = '', $send = true)
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
@@ -28,13 +13,15 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html',
-                );
+                'parse_mode'      => 'html',
+                ];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id)) {
@@ -58,7 +45,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                     $username = $id[2];
                                     $mention = html_mention($username, $userid);
                                     check_json_array('banlist.json', $ch_id);
-                                    $file = file_get_contents("banlist.json");
+                                    $file = file_get_contents('banlist.json');
                                     $banlist = json_decode($file, true);
                                     if (isset($banlist[$ch_id])) {
                                         if (!in_array($userid, $banlist[$ch_id])) {
@@ -68,10 +55,10 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                                 json_encode($banlist)
                                             );
                                             $str = $MadelineProto->responses['banme']['banned'];
-                                            $repl = array(
-                                                "mention" => $mention,
-                                                "title" => $title
-                                            );
+                                            $repl = [
+                                                'mention' => $mention,
+                                                'title'   => $title,
+                                            ];
                                             $message = $MadelineProto->engine->render($str, $repl);
                                             $default['message'] = $message;
                                             $alert = "<code>$from_name banned $username in $title.</code>";
@@ -79,8 +66,8 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                                 $kick = $MadelineProto->
                                                 channels->kickFromChannel(
                                                     ['channel' => $peer,
-                                                    'user_id' => $userid,
-                                                    'kicked' => true]
+                                                    'user_id'  => $userid,
+                                                    'kicked'   => true, ]
                                                 );
                                             } catch (
                                                 \danog\MadelineProto\RPCErrorException
@@ -89,9 +76,9 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                             }
                                         } else {
                                             $str = $MadelineProto->responses['banme']['already'];
-                                            $repl = array(
-                                                "mention" => $mention
-                                            );
+                                            $repl = [
+                                                'mention' => $mention,
+                                            ];
                                             $message = $MadelineProto->engine->render($str, $repl);
                                             $default['message'] = $message;
                                         }
@@ -101,10 +88,11 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                             $kick = $uMadelineProto->
                                             channels->kickFromChannel(
                                                 ['channel' => $peer,
-                                                'user_id' => $userid,
-                                                'kicked' => true, ]
+                                                'user_id'  => $userid,
+                                                'kicked'   => true, ]
                                             );
-                                        } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                        }
                                         $alert = "<code>$from_name banned $username in $title.</code>";
                                         array_push($banlist[$ch_id], $userid);
                                         file_put_contents(
@@ -112,17 +100,17 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
                                             json_encode($banlist)
                                         );
                                         $str = $MadelineProto->responses['banme']['banned'];
-                                        $repl = array(
-                                            "mention" => $mention,
-                                            "title" => $title
-                                        );
+                                        $repl = [
+                                            'mention' => $mention,
+                                            'title'   => $title,
+                                        ];
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
                                 }
                             } else {
                                 $str = $MadelineProto->responses['banme']['idk'];
-                                $repl = array("msg" => $msg);
+                                $repl = ['msg' => $msg];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
@@ -149,8 +137,7 @@ function banme($update, $MadelineProto, $msg = "", $send = true)
     }
 }
 
-
-function unbanme($update, $MadelineProto, $msg = "")
+function unbanme($update, $MadelineProto, $msg = '')
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
@@ -161,13 +148,15 @@ function unbanme($update, $MadelineProto, $msg = "")
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html',
-            );
+                'parse_mode'      => 'html',
+            ];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id)) {
@@ -182,7 +171,7 @@ function unbanme($update, $MadelineProto, $msg = "")
                                 $username = $id[2];
                                 $mention = html_mention($username, $userid);
                                 check_json_array('banlist.json', $ch_id);
-                                $file = file_get_contents("banlist.json");
+                                $file = file_get_contents('banlist.json');
                                 $banlist = json_decode($file, true);
                                 if (isset($banlist[$ch_id])) {
                                     if (in_array($userid, $banlist[$ch_id])) {
@@ -198,40 +187,41 @@ function unbanme($update, $MadelineProto, $msg = "")
                                             json_encode($banlist)
                                         );
                                         $str = $MadelineProto->responses['unbanme']['unbanned'];
-                                        $repl = array(
-                                            "mention" => $mention,
-                                            "title" => $title
-                                        );
+                                        $repl = [
+                                            'mention' => $mention,
+                                            'title'   => $title,
+                                        ];
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                         try {
                                             $kick = $uMadelineProto->
                                             channels->kickFromChannel(
                                                 ['channel' => $peer,
-                                                'user_id' => $userid,
-                                                'kicked' => false]
+                                                'user_id'  => $userid,
+                                                'kicked'   => false, ]
                                             );
-                                        } catch (\danog\MadelineProto\RPCErrorException $e) {}
+                                        } catch (\danog\MadelineProto\RPCErrorException $e) {
+                                        }
                                         $alert = "<code>$from_name unbanned $username in $title.</code>";
                                     } else {
                                         $str = $MadelineProto->responses['unbanme']['already'];
-                                        $repl = array(
-                                            "mention" => $mention
-                                        );
+                                        $repl = [
+                                            'mention' => $mention,
+                                        ];
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
                                 } else {
                                     $str = $MadelineProto->responses['unbanme']['already'];
-                                    $repl = array(
-                                        "mention" => $mention
-                                    );
+                                    $repl = [
+                                        'mention' => $mention,
+                                    ];
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
                             } else {
                                 $str = $MadelineProto->responses['unbanme']['idk'];
-                                $repl = array("msg" => $msg);
+                                $repl = ['msg' => $msg];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
@@ -260,8 +250,7 @@ function unbanme($update, $MadelineProto, $msg = "")
     }
 }
 
-
-function kickhim($update, $MadelineProto, $msg = "")
+function kickhim($update, $MadelineProto, $msg = '')
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
@@ -272,13 +261,15 @@ function kickhim($update, $MadelineProto, $msg = "")
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html',
-            );
+                'parse_mode'      => 'html',
+            ];
             $fromid = cache_from_user_info($update, $MadelineProto);
-            if (!isset($fromid['bot_api_id'])) return;
+            if (!isset($fromid['bot_api_id'])) {
+                return;
+            }
             $fromid = $fromid['bot_api_id'];
             $from_name = catch_id($update, $MadelineProto, $fromid)[2];
             if (is_moderated($ch_id)) {
@@ -305,27 +296,27 @@ function kickhim($update, $MadelineProto, $msg = "")
                                         $kick = $uMadelineProto->
                                         channels->kickFromChannel(
                                             ['channel' => $peer,
-                                            'user_id' => $userid,
-                                            'kicked' => true]
+                                            'user_id'  => $userid,
+                                            'kicked'   => true, ]
                                         );
                                         $kickback = $uMadelineProto->
                                         channels->kickFromChannel(
                                             ['channel' => $peer,
-                                            'user_id' => $userid,
-                                            'kicked' => false]
+                                            'user_id'  => $userid,
+                                            'kicked'   => false, ]
                                         );
                                         $str = $MadelineProto->responses['kickhim']['kicked'];
-                                        $repl = array(
-                                            "mention" => $mention,
-                                            "title" => $title
-                                        );
+                                        $repl = [
+                                            'mention' => $mention,
+                                            'title'   => $title,
+                                        ];
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                                         $str = $MadelineProto->responses['kickhim']['already'];
-                                        $repl = array(
-                                            "mention" => $mention
-                                        );
+                                        $repl = [
+                                            'mention' => $mention,
+                                        ];
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                     }
@@ -333,9 +324,9 @@ function kickhim($update, $MadelineProto, $msg = "")
                                 }
                             } else {
                                 $str = $MadelineProto->responses['kickhim']['idk'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
@@ -377,11 +368,11 @@ function kickme($update, $MadelineProto)
             $peer = $chat['peer'];
             $ch_id = $chat['id'];
             $title = htmlentities($chat['title']);
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html',
-            );
+                'parse_mode'      => 'html',
+            ];
             $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
@@ -392,20 +383,20 @@ function kickme($update, $MadelineProto)
                         try {
                             $kick = $uMadelineProto->channels->kickFromChannel(
                                 ['channel' => $peer,
-                                'user_id' => $userid,
-                                'kicked' => true]
+                                'user_id'  => $userid,
+                                'kicked'   => true, ]
                             );
                             $kickback = $uMadelineProto->
                             channels->kickFromChannel(
                                 ['channel' => $peer,
-                                'user_id' => $userid,
-                                'kicked' => false]
+                                'user_id'  => $userid,
+                                'kicked'   => false, ]
                             );
                             $str = $MadelineProto->responses['kickme']['kicked'];
-                            $repl = array(
-                                "mention" => $mention,
-                                "title" => $title
-                            );
+                            $repl = [
+                                'mention' => $mention,
+                                'title'   => $title,
+                            ];
                             $message = $MadelineProto->engine->render($str, $repl);
                             $default['message'] = $message;
                         } catch (\danog\MadelineProto\RPCErrorException $e) {
@@ -439,14 +430,14 @@ function getbanlist($update, $MadelineProto)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html',
-            );
+                'parse_mode'      => 'html',
+            ];
             if (is_moderated($ch_id)) {
                 check_json_array('banlist.json', $ch_id);
-                $file = file_get_contents("banlist.json");
+                $file = file_get_contents('banlist.json');
                 $banlist = json_decode($file, true);
                 if (isset($banlist[$ch_id])) {
                     foreach ($banlist[$ch_id] as $i => $key) {
@@ -456,9 +447,9 @@ function getbanlist($update, $MadelineProto)
                             $mention = $username;
                             if (!isset($message)) {
                                 $str = $MadelineProto->responses['getbanlist']['header'];
-                                $repl = array(
-                                    "title" => $title
-                                );
+                                $repl = [
+                                    'title' => $title,
+                                ];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $message = $message."[x] $mention - $key\r\n";
                             } else {
@@ -469,9 +460,9 @@ function getbanlist($update, $MadelineProto)
                 }
                 if (!isset($message)) {
                     $str = $MadelineProto->responses['getbanlist']['none'];
-                    $repl = array(
-                        "title" => $title
-                    );
+                    $repl = [
+                        'title' => $title,
+                    ];
                     $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                     $sentMessage = $MadelineProto->messages->sendMessage(
@@ -492,7 +483,7 @@ function getbanlist($update, $MadelineProto)
     }
 }
 
-function unbanall($update, $MadelineProto, $msg = "")
+function unbanall($update, $MadelineProto, $msg = '')
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
@@ -502,11 +493,11 @@ function unbanall($update, $MadelineProto, $msg = "")
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html',
-            );
+                'parse_mode'      => 'html',
+            ];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_master($update, $MadelineProto)) {
@@ -519,7 +510,7 @@ function unbanall($update, $MadelineProto, $msg = "")
                                 $username = $id[2];
                                 $mention = html_mention($username, $userid);
                                 check_json_array('gbanlist.json', false, false);
-                                $file = file_get_contents("gbanlist.json");
+                                $file = file_get_contents('gbanlist.json');
                                 $gbanlist = json_decode($file, true);
                                 if (array_key_exists($userid, $gbanlist)) {
                                     unset($gbanlist[$userid]);
@@ -528,33 +519,33 @@ function unbanall($update, $MadelineProto, $msg = "")
                                         json_encode($gbanlist)
                                     );
                                     $str = $MadelineProto->responses['unbanall']['unbanned'];
-                                    $repl = array(
-                                        "mention" => $mention
-                                    );
+                                    $repl = [
+                                        'mention' => $mention,
+                                    ];
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                     try {
                                         $kick = $MadelineProto->
                                         channels->kickFromChannel(
                                             ['channel' => $peer,
-                                            'user_id' => $userid,
-                                            'kicked' => false]
+                                            'user_id'  => $userid,
+                                            'kicked'   => false, ]
                                         );
                                     } catch (\danog\MadelineProto\RPCErrorException $e) {
                                     }
                                 } else {
                                     $str = $MadelineProto->responses['unbanall']['already'];
-                                    $repl = array(
-                                        "mention" => $mention
-                                    );
+                                    $repl = [
+                                        'mention' => $mention,
+                                    ];
                                     $message = $MadelineProto->engine->render($str, $repl);
                                     $default['message'] = $message;
                                 }
                             } else {
                                 $str = $MadelineProto->responses['unbanall']['idk'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                             }
@@ -583,7 +574,7 @@ function unbanall($update, $MadelineProto, $msg = "")
     }
 }
 
-function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, $confident = false)
+function banall($update, $MadelineProto, $msg = '', $reason = '', $send = true, $confident = false)
 {
     $uMadelineProto = $MadelineProto->API->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
@@ -593,11 +584,11 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-                );
+                'parse_mode'      => 'html',
+                ];
             $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
             if (is_moderated($ch_id)) {
                 if (is_bot_admin($update, $MadelineProto)) {
@@ -622,10 +613,10 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                     $mention = html_mention($username, $userid);
                                     $mention2 = html_mention($fromuser, $fromid);
                                     check_json_array('gbanlist.json', false, false);
-                                    $file = file_get_contents("gbanlist.json");
+                                    $file = file_get_contents('gbanlist.json');
                                     $gbanlist = json_decode($file, true);
                                     check_json_array('reasons.json', false, false);
-                                    $file = file_get_contents("reasons.json");
+                                    $file = file_get_contents('reasons.json');
                                     $reasons = json_decode($file, true);
                                     if (!array_key_exists($userid, $gbanlist)) {
                                         $gbanlist[$userid] = $username;
@@ -637,11 +628,11 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                             if (preg_match('/"([^"]+)"/', $reason, $m)) {
                                                 $reasons[$userid] = $m[1];
                                                 $str = $MadelineProto->responses['banall']['banned_all'];
-                                                $repl = array(
-                                                    "mention2" => $mention2,
-                                                    "mention" => $mention,
-                                                    "reason" => $m[1]
-                                                );
+                                                $repl = [
+                                                    'mention2' => $mention2,
+                                                    'mention'  => $mention,
+                                                    'reason'   => $m[1],
+                                                ];
                                                 $message = $MadelineProto->engine->render($str, $repl);
                                                 $default['message'] = $message;
                                                 file_put_contents(
@@ -654,9 +645,9 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                             }
                                         } else {
                                             $str = $MadelineProto->responses['banall']['banned'];
-                                            $repl = array(
-                                                "mention" => $mention
-                                            );
+                                            $repl = [
+                                                'mention' => $mention,
+                                            ];
                                             $message = $MadelineProto->engine->render($str, $repl);
                                             $default['message'] = $message;
                                         }
@@ -664,20 +655,19 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                             $kick = $uMadelineProto->
                                             channels->kickFromChannel(
                                                 ['channel' => $peer,
-                                                'user_id' => $userid,
-                                                'kicked' => true]
+                                                'user_id'  => $userid,
+                                                'kicked'   => true, ]
                                             );
                                         } catch (
                                         \danog\MadelineProto\RPCErrorException
                                         $e
                                         ) {
                                         }
-
                                     } else {
                                         $str = $MadelineProto->responses['banall']['already'];
-                                        $repl = array(
-                                            "mention" => $mention
-                                        );
+                                        $repl = [
+                                            'mention' => $mention,
+                                        ];
                                         $message = $MadelineProto->engine->render($str, $repl);
                                         $default['message'] = $message;
                                         $all = false;
@@ -687,9 +677,9 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                                 }
                             } else {
                                 $str = $MadelineProto->responses['banall']['idk'];
-                                $repl = array(
-                                    "msg" => $msg
-                                );
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
                                 $message = $MadelineProto->engine->render($str, $repl);
                                 $default['message'] = $message;
                                 $all = false;
@@ -732,17 +722,17 @@ function banall($update, $MadelineProto, $msg = "", $reason = "", $send = true, 
                     ban_from_moderated($MadelineProto, $msg, [$ch_id]);
                 }
             } else {
-                if ($msg != "" && isset($userid)) {
+                if ($msg != '' && isset($userid)) {
                     $timetowait = 1800 - $diff;
                     $msg_id = $update['update']['message']['id'];
                     $chat = parse_chat_data($update, $MadelineProto);
                     $peer = $chat['peer'];
                     $ch_id = $chat['id'];
-                    $default = array(
-                        'peer' => $peer,
+                    $default = [
+                        'peer'            => $peer,
                         'reply_to_msg_id' => $msg_id,
-                        'message' => "Please wait $timetowait seconds before using !banall. The user has been added to the gbanlist"
-                    );
+                        'message'         => "Please wait $timetowait seconds before using !banall. The user has been added to the gbanlist",
+                    ];
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
                     );
@@ -762,17 +752,17 @@ function getgbanlist($update, $MadelineProto)
             $peer = $chat['peer'];
             $title = htmlentities($chat['title']);
             $ch_id = $chat['id'];
-            $default = array(
-                'peer' => $peer,
+            $default = [
+                'peer'            => $peer,
                 'reply_to_msg_id' => $msg_id,
-                'parse_mode' => 'html'
-            );
+                'parse_mode'      => 'html',
+            ];
             if (is_moderated($ch_id)) {
                 check_json_array('gbanlist.json', false, false);
-                $file = file_get_contents("gbanlist.json");
+                $file = file_get_contents('gbanlist.json');
                 $gbanlist = json_decode($file, true);
                 check_json_array('reasons.json', false, false);
-                $file = file_get_contents("reasons.json");
+                $file = file_get_contents('reasons.json');
                 $reasons = json_decode($file, true);
                 foreach ($gbanlist as $i => $key) {
                     $id = $i;
@@ -780,9 +770,9 @@ function getgbanlist($update, $MadelineProto)
                     $mention = $username;
                     if (!isset($message)) {
                         $str = $MadelineProto->responses['getgbanlist']['header'];
-                        $repl = array(
-                            "title" => $title
-                        );
+                        $repl = [
+                            'title' => $title,
+                        ];
                         $message = $MadelineProto->engine->render($str, $repl);
                         if (array_key_exists($id, $reasons)) {
                             $reason = $reasons[$id];
