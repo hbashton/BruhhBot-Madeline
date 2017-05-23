@@ -33,14 +33,17 @@ while true; do
   fi
   alive=$(ps aux | grep "$pid" | grep -v "grep" | wc -l)
   if [ "$alive" == "0" ]; then
+    revived=$((revived+1))
+    if [ "$revived" -ge "3" ]; then
+      echo "Bot died 3 times, fix it"
+      if [ -f bot.pid ]; then
+          rm bot.pid
+      fi
+      exit
+    fi
     echo "Bot dead. Reviving"
     php bot.php & export pid=$!
     echo -n "$pid" > bot.pid
-    if [ "$revived" -gt "3" ]; then
-        echo "Bot died 3 times, fix it"
-        clean_up
-    fi
-    revived=$((revived+1))
   fi
   sleep 1
   elapsed=$((elapsed+1))
