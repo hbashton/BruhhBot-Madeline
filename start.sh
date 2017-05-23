@@ -13,6 +13,7 @@ php bot.php & export pid=$!
 echo -n "$pid" > bot.pid
 echo "The PID of the bot is $pid. If you run this script in the background, to stop it, just remove the bot.pid file created in this folder"
 elapsed=0
+revived=0
 while true; do
   if [ "$elapsed" -gt "3600" ]; then
     elapsed=0
@@ -35,6 +36,11 @@ while true; do
     echo "Bot dead. Reviving"
     php bot.php & export pid=$!
     echo -n "$pid" > bot.pid
+    if [ "$revived" -gt "3" ]; then
+        echo "Bot died 3 times, fix it"
+        clean_up
+    fi
+    revived=$((revived+1))
   fi
   sleep 1
   elapsed=$((elapsed+1))
