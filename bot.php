@@ -33,7 +33,7 @@ require_once 'user_data.php';
 require_once 'weather.php';
 require_once 'who_functions.php';
 
-ini_set('memory_limit', '1000M'); // fix errors
+ini_set('memory_limit', '-1'); // fix errors
 if (file_exists('session.madeline')) {
     try {
         $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
@@ -197,6 +197,40 @@ while (true) {
             ['offset' => $offset,
             'limit'   => 50000, 'timeout' => 0, ]
         );
+        if (file_exists('custom_responses.json')) {
+            try {
+                $MadelineProto->responses = json_decode(file_get_contents('custom_responses.json'), true);
+            } catch (Exception $e) {
+            }
+        } else {
+            $MadelineProto->responses = json_decode(file_get_contents('responses.json'), true);
+        }
+        $MadelineProto->hints = json_decode(file_get_contents('hints.json'), true);
+        $MadelineProto->engine = new StringTemplate\Engine();
+        $MadelineProto->flooder = [];
+        $MadelineProto->API->is_bot_present = [];
+        $MadelineProto->API->cache = [];
+        $MadelineProto->API->cached_full = [];
+        $MadelineProto->API->cached_user = [];
+        $MadelineProto->API->cached_data = [];
+        $MadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
+        $MadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
+        $MadelineProto->API->uMadelineProto = $uMadelineProto;
+        if (file_exists('custom_responses.json')) {
+            try {
+                $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents('custom_responses.json'), true);
+            } catch (Exception $e) {
+            }
+        } else {
+            $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents('responses.json'), true);
+        }
+        $MadelineProto->API->uMadelineProto->responses = json_decode(file_get_contents('responses.json'), true);
+        $MadelineProto->API->uMadelineProto->hints = json_decode(file_get_contents('hints.json'), true);
+        $MadelineProto->API->uMadelineProto->engine = new StringTemplate\Engine();
+        $MadelineProto->API->uMadelineProto->flooder = [];
+        $MadelineProto->API->uMadelineProto->API->is_bot_present = [];
+        $MadelineProto->API->uMadelineProto->API->bot_id = $MadelineProto->get_info(getenv('BOT_USERNAME'))['bot_api_id'];
+        $MadelineProto->API->uMadelineProto->API->bot_api_id = $MadelineProto->get_info(getenv('BOT_API_USERNAME'))['bot_api_id'];
     }
     if (end($updates)) {
         $offset = end($updates)['update_id'] + 1;
