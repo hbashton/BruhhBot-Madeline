@@ -7,7 +7,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
     if (is_peeruser($update, $MadelineProto)) {
         $userid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];
         if (is_master($MadelineProto, $userid)) {
-            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+            $uMadelineProto = $MadelineProto->uMadelineProto;
             $msg_id = $update['update']['message']['id'];
             $default = [
             'peer'            => $userid,
@@ -40,7 +40,7 @@ function create_new_supergroup($update, $MadelineProto, $msg)
                         $MadelineProto,
                         getenv('MASTER_USERNAME')
                     )['bot_api_id'];
-                    $bot_api_id = $MadelineProto->API->bot_api_id;
+                    $bot_api_id = $MadelineProto->bot_api_id;
                     $channel_id = -100 .$newgroup['updates'][1]['channel_id'];
                     $invite_master = $uMadelineProto->channels->inviteToChannel(
                         ['channel' => $channel_id,
@@ -100,7 +100,7 @@ function export_new_invite($update, $MadelineProto)
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         try {
-                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->uMadelineProto;
                             $exportInvite = $uMadelineProto->channels->exportInvite(
                                 ['channel' => $peer]
                             );
@@ -150,7 +150,7 @@ function public_toggle($update, $MadelineProto, $msg)
                     if (from_admin_mod($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) && in_array($msg, $arr)) {
                             try {
-                                $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                                $uMadelineProto = $MadelineProto->uMadelineProto;
                                 if ($msg == 'on') {
                                     $uMadelineProto->channels->toggleInvites(
                                         ['channel' => $peer, 'enabled' => true]
@@ -219,7 +219,7 @@ function invite_user($update, $MadelineProto, $msg)
                             $mention = html_mention($username, $userid);
                             if (isset($userid)) {
                                 try {
-                                    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                                    $uMadelineProto = $MadelineProto->uMadelineProto;
                                     $inviteuser = $uMadelineProto->channels->inviteToChannel(
                                         ['channel' => $peer, 'users' => [$userid]]
                                     );
@@ -275,7 +275,7 @@ function import_chat_invite($update, $MadelineProto, $msg)
             ];
         if ($msg && preg_match_all('/https:\/\/t.me\/joinchat\//', $msg, $matches)) {
             try {
-                $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                $uMadelineProto = $MadelineProto->uMadelineProto;
                 $msg = preg_replace('/https:\/\/t.me\/joinchat\//', '', $msg);
                 $importchat = $uMadelineProto->messages->importChatInvite(['hash' => $msg]);
                 $message = getenv('BOT_USERNAME').' has successfully joined the chat';
@@ -294,7 +294,7 @@ function import_chat_invite($update, $MadelineProto, $msg)
         }
         if ($msg && preg_match_all('/@/', $msg, $matches)) {
             try {
-                $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                $uMadelineProto = $MadelineProto->uMadelineProto;
                 $importchat = $uMadelineProto->channels->joinChannel(['channel' => $msg]);
                 $message = getenv('BOT_USERNAME').' has successfully joined the chat';
                 $default['message'] = $message;

@@ -4,7 +4,7 @@
  */
 function set_chat_photo($update, $MadelineProto, $wait = true)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -109,7 +109,7 @@ function set_chat_photo($update, $MadelineProto, $wait = true)
 
 function set_chat_title($update, $MadelineProto, $msg)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -176,7 +176,7 @@ function set_chat_title($update, $MadelineProto, $msg)
 
 function set_chat_username($update, $MadelineProto, $msg)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -253,7 +253,7 @@ function set_chat_username($update, $MadelineProto, $msg)
 
 function set_chat_about($update, $MadelineProto, $msg)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -329,7 +329,7 @@ function set_chat_about($update, $MadelineProto, $msg)
 
 function set_chat_rules($update, $MadelineProto, $msg)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -400,7 +400,7 @@ function set_chat_rules($update, $MadelineProto, $msg)
 
 function set_chat_welcome($update, $MadelineProto, $msg)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];

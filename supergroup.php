@@ -21,7 +21,7 @@ function addadmin($update, $MadelineProto, $msg = '')
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_master($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->uMadelineProto;
                             $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
@@ -87,7 +87,7 @@ function rmadmin($update, $MadelineProto, $msg = '')
                 if (is_bot_admin($update, $MadelineProto)) {
                     if (from_master($update, $MadelineProto, $mods, true)) {
                         if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
-                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->uMadelineProto;
                             $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
@@ -370,7 +370,7 @@ function pinmessage($update, $MadelineProto, $silent, $user = false)
                         )
                         ) {
                             if (!$user) {
-                                $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                                $uMadelineProto = $MadelineProto->uMadelineProto;
                             }
                             try {
                                 $pin_id = $update['update']['message']['reply_to_msg_id'];
@@ -437,7 +437,7 @@ function delmessage($update, $MadelineProto)
                             $update['update']['message']
                         )
                         ) {
-                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->uMadelineProto;
                             try {
                                 $del_id = $update['update']['message']['reply_to_msg_id'];
                                 $delete = $uMadelineProto->channels->deleteMessages(
@@ -484,7 +484,7 @@ function delmessage_user($update, $MadelineProto, $msg = '')
                 if (is_bot_admin($update, $MadelineProto, true)) {
                     if (from_admin_mod($update, $MadelineProto)) {
                         if ($msg) {
-                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->uMadelineProto;
                             $id = catch_id($update, $MadelineProto, $msg);
                             if ($id[0]) {
                                 $userid = $id[1];
@@ -559,7 +559,7 @@ function purgemessage($update, $MadelineProto)
                             $update['update']['message']
                         )
                         ) {
-                            $uMadelineProto = $MadelineProto->API->uMadelineProto;
+                            $uMadelineProto = $MadelineProto->uMadelineProto;
                             try {
                                 $del_id = $update['update']['message']['reply_to_msg_id'];
                                 $default['message'] = "Deleted all messages after $del_id..";
@@ -681,7 +681,7 @@ function pinalert($update, $MadelineProto)
 
 function get_chat_rules($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -751,7 +751,7 @@ function get_chat_rules($update, $MadelineProto)
 
 function get_chat_rules_deeplink($update, $MadelineProto, $ch_id)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     $msg_id = $update['update']['message']['id'];
     $chat = cache_get_info($update, $MadelineProto, $ch_id, true);
     $fromid = cache_from_user_info($update, $MadelineProto)['bot_api_id'];

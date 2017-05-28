@@ -18,7 +18,7 @@ class check_locked extends Threaded
         require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
-        $uMadelineProto = $MadelineProto->API->uMadelineProto;
+        $uMadelineProto = $MadelineProto->uMadelineProto;
         if (bot_present($update, $MadelineProto, true)) {
             if (is_supergroup($update, $MadelineProto)) {
                 $chat = parse_chat_data($update, $MadelineProto);
@@ -158,7 +158,7 @@ class check_flood extends Threaded
         require 'require_exceptions.php';
         $update = $this->update;
         $MadelineProto = $this->MadelineProto;
-        $uMadelineProto = $MadelineProto->API->uMadelineProto;
+        $uMadelineProto = $MadelineProto->uMadelineProto;
         if (bot_present($update, $MadelineProto, true)) {
             if (is_supergroup($update, $MadelineProto)) {
                 try {

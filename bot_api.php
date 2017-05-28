@@ -7,10 +7,10 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
             $chat = parse_chat_data($update, $MadelineProto);
             $peer = $chat['peer'];
         }
-        if (isset($MadelineProto->API->is_bot_present[$peer])) {
-            $diff = time() - $MadelineProto->API->is_bot_present[$peer]['timestamp'];
+        if (isset($MadelineProto->is_bot_present[$peer])) {
+            $diff = time() - $MadelineProto->is_bot_present[$peer]['timestamp'];
             if ($diff < 600) {
-                if (!$MadelineProto->API->is_bot_present[$peer]['return']) {
+                if (!$MadelineProto->is_bot_present[$peer]['return']) {
                     if (!$silent) {
                         $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
                         $msg_id = $update['update']['message']['id'];
@@ -34,7 +34,7 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
         if (!$user) {
             $admins = cache_get_chat_info($update, $MadelineProto);
             $peer = $admins['id'];
-            $bot_id = $MadelineProto->API->bot_id;
+            $bot_id = $MadelineProto->bot_id;
             foreach ($admins['participants'] as $key) {
                 if (array_key_exists('user', $key)) {
                     $id = $key['user']['id'];
@@ -44,7 +44,7 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
                     }
                 }
                 if ($id == $bot_id) {
-                    $MadelineProto->API->is_bot_present[$peer] = ['timestamp' => time(), 'return' => true];
+                    $MadelineProto->is_bot_present[$peer] = ['timestamp' => time(), 'return' => true];
 
                     return true;
                 }
@@ -52,7 +52,7 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
         } else {
             $admins = cache_get_chat_info($update, $MadelineProto);
             $peer = $admins['id'];
-            $bot_id = $MadelineProto->API->bot_api_id;
+            $bot_id = $MadelineProto->bot_api_id;
             foreach ($admins['participants'] as $key) {
                 if (array_key_exists('user', $key)) {
                     $id = $key['user']['id'];
@@ -62,7 +62,7 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
                     }
                 }
                 if ($id == $bot_id) {
-                    $MadelineProto->API->is_bot_present[$peer] = ['timestamp' => time(), 'return' => true];
+                    $MadelineProto->is_bot_present[$peer] = ['timestamp' => time(), 'return' => true];
 
                     return true;
                 }
@@ -81,15 +81,15 @@ function bot_present($update, $MadelineProto, $silent = false, $peer = false, $u
             );
             \danog\MadelineProto\Logger::log($sentMessage);
         }
-        $MadelineProto->API->is_bot_present[$peer] = ['timestamp' => time(), 'return' => false];
+        $MadelineProto->is_bot_present[$peer] = ['timestamp' => time(), 'return' => false];
 
         return false;
     } catch (Exception $e) {
-        $MadelineProto->API->is_bot_present[$peer] = ['timestamp' => time(), 'return' => false];
+        $MadelineProto->is_bot_present[$peer] = ['timestamp' => time(), 'return' => false];
 
         return false;
     }
-    $MadelineProto->API->is_bot_present[$peer] = ['timestamp' => time(), 'return' => false];
+    $MadelineProto->is_bot_present[$peer] = ['timestamp' => time(), 'return' => false];
 
     return false;
 }

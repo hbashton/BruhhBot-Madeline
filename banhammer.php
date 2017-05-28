@@ -4,7 +4,7 @@
  */
 function banme($update, $MadelineProto, $msg = '', $send = true)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -139,7 +139,7 @@ function banme($update, $MadelineProto, $msg = '', $send = true)
 
 function unbanme($update, $MadelineProto, $msg = '')
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -252,7 +252,7 @@ function unbanme($update, $MadelineProto, $msg = '')
 
 function kickhim($update, $MadelineProto, $msg = '')
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -360,7 +360,7 @@ function kickhim($update, $MadelineProto, $msg = '')
 
 function kickme($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -422,7 +422,7 @@ function kickme($update, $MadelineProto)
 
 function getbanlist($update, $MadelineProto)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -485,7 +485,7 @@ function getbanlist($update, $MadelineProto)
 
 function unbanall($update, $MadelineProto, $msg = '')
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];
@@ -576,7 +576,7 @@ function unbanall($update, $MadelineProto, $msg = '')
 
 function banall($update, $MadelineProto, $msg = '', $reason = '', $send = true, $confident = false)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (bot_present($update, $MadelineProto)) {
         if (is_supergroup($update, $MadelineProto)) {
             $msg_id = $update['update']['message']['id'];

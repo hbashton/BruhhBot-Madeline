@@ -191,7 +191,7 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
-    $uMadelineProto = $MadelineProto->API->uMadelineProto;
+    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -228,8 +228,8 @@ function savefrom($update, $MadelineProto, $name)
                     if (!array_key_exists('from', $saved[$ch_id])) {
                         $saved[$ch_id]['from'] = [];
                     }
-                    $bot_api_id = $MadelineProto->API->bot_api_id;
-                    $bot_id = $MadelineProto->API->bot_id;
+                    $bot_api_id = $MadelineProto->bot_api_id;
+                    $bot_id = $MadelineProto->bot_id;
                     try {
                         $forwardMessage = $MadelineProto->messages->forwardMessages(
                             ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $bot_id]
