@@ -36,13 +36,13 @@ require_once 'who_functions.php';
 ini_set('memory_limit', '-1'); // fix errors
 if (file_exists('session.madeline')) {
     try {
-        $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline');
+        $uMadelineProto = \danog\MadelineProto\Serialization::deserialize('session.madeline', true);
     } catch (Exception $e) {
     }
 }
 if (file_exists('bot.madeline')) {
     try {
-        $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline');
+        $MadelineProto = \danog\MadelineProto\Serialization::deserialize('bot.madeline', true);
     } catch (Exception $e) {
     }
 }
@@ -101,7 +101,8 @@ if (!isset($uMadelineProto)) {
 
     echo 'Deserializing MadelineProto from session.madeline...'.PHP_EOL;
     $uMadelineProto = \danog\MadelineProto\Serialization::deserialize(
-        'session.madeline'
+        'session.madeline',
+        true
     );
     $MadelineProto = new \danog\MadelineProto\API($settings);
     $authorization = $MadelineProto->bot_login(getenv('BOT_TOKEN'));
@@ -114,7 +115,8 @@ if (!isset($uMadelineProto)) {
 
     echo 'Deserializing MadelineProto from bot.madeline...'.PHP_EOL;
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
-        'bot.madeline'
+        'bot.madeline',
+        true
     );
 }
 if (!isset($MadelineProto)) {
@@ -129,7 +131,8 @@ if (!isset($MadelineProto)) {
 
     echo 'Deserializing MadelineProto from bot.madeline...'.PHP_EOL;
     $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
-        'bot.madeline'
+        'bot.madeline',
+        true
     );
 }
 if (file_exists('custom_responses.json')) {
@@ -191,7 +194,8 @@ while (true) {
 
         echo 'Deserializing MadelineProto from bot.madeline...'.PHP_EOL;
         $MadelineProto = \danog\MadelineProto\Serialization::deserialize(
-            'bot.madeline'
+            'bot.madeline',
+            true
         );
         $updates = $MadelineProto->get_updates(
             ['offset' => $offset,
