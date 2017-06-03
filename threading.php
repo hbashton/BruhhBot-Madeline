@@ -832,15 +832,11 @@ function NewChatAddUser($update, $MadelineProto)
                                 if ($settings[$ch_id]['show_rules_welcome']) {
                                     $botusername = preg_replace('/@/', '', getenv('BOT_API_USERNAME'));
                                     $url = "https://telegram.me/$botusername?start=rules-$ch_id";
-                                    $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => 'Rules', 'url' => $url];
-                                    $buttons = [$keyboardButtonUrl];
-                                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                                    $rows = [$row];
-                                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
-                                    $default['reply_markup'] = $replyInlineMarkup;
+                                    $message = "[Rules](buttonurl:$url) $message";
                                 }
                             }
                             $default['message'] = $message;
+                            $default['no_webpage'] = true;
                             $default['parse_mode'] = 'markdown';
                             try {
                                 $sentMessage = $MadelineProto->
@@ -1008,15 +1004,11 @@ function NewChatJoinedByLink($update, $MadelineProto)
                                 if ($settings[$ch_id]['show_rules_welcome']) {
                                     $botusername = preg_replace('/@/', '', getenv('BOT_API_USERNAME'));
                                     $url = "https://telegram.me/$botusername?start=rules-$ch_id";
-                                    $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => 'Rules', 'url' => $url];
-                                    $buttons = [$keyboardButtonUrl];
-                                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                                    $rows = [$row];
-                                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
-                                    $default['reply_markup'] = $replyInlineMarkup;
+                                    $message = "[Rules](buttonurl:$url) $message";
                                 }
                             }
                             $default['message'] = $message;
+                            $default['no_webpage'] = true;
                             $default['parse_mode'] = 'markdown';
                             try {
                                 $sentMessage = $MadelineProto->
