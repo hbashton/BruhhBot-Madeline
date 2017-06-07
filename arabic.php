@@ -1,4 +1,20 @@
 <?php
+/**
+ * Copyright (C) 2016-2017 Hunter Ashton
+ * This file is part of BruhhBot.
+ * BruhhBot is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * BruhhBot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with BruhhBot. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 
 function check_utf8($str)
 {
@@ -49,10 +65,6 @@ function is_arabic($str)
         $str = mb_convert_encoding($str, mb_detect_encoding($str), 'UTF-8');
     }
 
-    /*
-    $str = str_split($str); <- this function is not mb safe, it splits by bytes, not characters. we cannot use it
-    $str = preg_split('//u',$str); <- this function woulrd probably work fine but there was a bug reported in some php version so it pslits by bytes and not chars as well
-    */
     preg_match_all('/.|\n/u', $str, $matches);
     $chars = $matches[0];
     $arabic_count = 0;
