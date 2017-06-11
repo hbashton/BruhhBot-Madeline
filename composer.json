@@ -17,7 +17,8 @@
         "cmfcmf/openweathermap-php-api": "dev-master",
         "spatie/emoji": "dev-master",
         "nicmart/string-template": "~0.1",
-        "erusev/parsedown": "^1.6"
+        "erusev/parsedown": "^1.6",
+        "packfire/php5.3-compat": "dev-master"
     },
     "authors": [
         {
