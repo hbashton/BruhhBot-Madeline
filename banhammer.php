@@ -769,8 +769,7 @@ function getgbanlist($update, $MadelineProto)
             $ch_id = $chat['id'];
             $default = [
                 'peer'            => $peer,
-                'reply_to_msg_id' => $msg_id,
-                'parse_mode'      => 'html',
+                'reply_to_msg_id' => $msg_id
             ];
             if (is_moderated($ch_id)) {
                 check_json_array('gbanlist.json', false, false);
@@ -784,21 +783,17 @@ function getgbanlist($update, $MadelineProto)
                     $username = $key;
                     $mention = $username;
                     if (!isset($message)) {
-                        $str = $MadelineProto->responses['getgbanlist']['header'];
-                        $repl = [
-                            'title' => $title,
-                        ];
-                        $message = $MadelineProto->engine->render($str, $repl);
+                        $message = "Really bad people!\n";
                         if (array_key_exists($id, $reasons)) {
                             $reason = $reasons[$id];
-                            $message = $message."[x] $mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
+                            $message = $message."[x] $mention - $id\nReason: $reason\n";
                         } else {
                             $message = $message."[x] $mention - $id\n";
                         }
                     } else {
                         if (array_key_exists($id, $reasons)) {
                             $reason = $reasons[$id];
-                            $message = $message."[x] $mention - $id\n<code>Reason: ".htmlentities($reason)."</code>\n";
+                            $message = $message."[x] $mention - $id\nReason: $reason\n";
                         } else {
                             $message = $message."[x] $mention - $id\n";
                         }
@@ -806,34 +801,25 @@ function getgbanlist($update, $MadelineProto)
                 }
                 if (!isset($message)) {
                     $message = $MadelineProto->responses['getgbanlist']['none'];
-                    $default['message'] = $message;
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        $default
-                    );
-                } else {
-                    if (mb_strlen($message) > 4000) {
-                        $message = split_to_chunks($message);
-                    }
                 }
-                $default['message'] = $message;
-                if (is_array($message)) {
-                    foreach ($message as $value) {
-                        $default['message'] = $value;
-                        $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
-                        \danog\MadelineProto\Logger::log($sentMessage);
-                    }
-                } else {
-                    if (!isset($sentMessage)) {
-                        $default['message'] = $message;
-                        $sentMessage = $MadelineProto->messages->sendMessage(
-                            $default
-                        );
-                    }
-                    if (isset($sentMessage)) {
-                        \danog\MadelineProto\Logger::log($sentMessage);
-                    }
+                file_put_contents('gbanlist.txt', $message);
+                $inputFile = $MadelineProto->upload('gbanlist.txt', 'gbanlist');
+                $inputMedia = [
+                    '_'          => 'inputMediaUploadedDocument',
+                    'file'       => $inputFile,
+                    'mime_type'  => 'magic/magic',
+                    'caption'    => "List of globally banned users",
+                    'attributes' => [[
+                        '_'         => 'documentAttributeFilename',
+                        'file_name' => 'gbanlist.txt',
+                        ]],
+                    ];
+                $sentMedia = $MadelineProto->messages->sendMedia(
+                    ['peer' => $peer,
+                    'media' => $inputMedia, ]
+                );
+                if (isset($sentMedia)) {
+                    \danog\MadelineProto\Logger::log($sentMedia);
                 }
             }
         }

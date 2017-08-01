@@ -90,6 +90,7 @@ composer.lock
 #json db
 *.json
 *.pid
+gbanlist.txt
 !configuration.json
 !responses.json
 !hints.json
