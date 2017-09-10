@@ -378,10 +378,6 @@ function NewChannelMessage($update, $MadelineProto)
                             set_chat_welcome($update, $MadelineProto, $msg);
                             break;
 
-                        case 'modlist':
-                            modlist($update, $MadelineProto);
-                            break;
-
                         case 'banlist':
                             getbanlist($update, $MadelineProto);
                             break;
