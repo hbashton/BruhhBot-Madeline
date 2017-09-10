@@ -3,6 +3,7 @@
     {
     "Basics":"<b>Basic Commands</b>\nThese are some of the basic commands, which should be known to most",
     "Save":"<b>Save Commands</b>\nYou can use these commands to save and retrieve various messages",
+    "Filter":"<b>Filter Commands</b>\nYou can use these commands to save filters that make the bot automatically reply with a preset phrase",
     "AntiSpam":"<b>Lock Commands</b>\nHere you can lock media and other message types from being sent. You can also modify these in settings",
     "Group":"<b>Group Commands</b>\nUse these commands specifically to moderate and modify your group",
     "Banhammer":"<b>Banhammer Commands</b>\nBOOM! Wield Char's hammer with pride. Keep spammers out of your chat with these commands",
@@ -26,6 +27,10 @@
         {
         "Save":"<b>save</b> <code>name message</code> - Save <code>message</code> under <code>name</code> to be retrieved later with <code>#name</code> \n<b>save</b> <code>from name</code> - Save a message [by reply] under <code>name</code> to be retrieved later with <code>#name</code>\n<b>save</b> <code>clear name</code> - Clear the saved message under <code>name</code>\n\n<code>You can use HTML formatting (documented below) or standard markdown in /save, to make your messages cleaner and easier to read.</code>\n<pre>Supported tags:\n&lt;br&gt; a newline\n&lt;b&gt; &lt;i&gt;bold works ok, internal tags are stripped&lt;/i&gt; &lt;/b&gt;\n&lt;strong&gt;bold&lt;/strong&gt;\n&lt;em&gt;italic&lt;/em&gt;\n&lt;i&gt;italic&lt;/i&gt;\n&lt;code&gt;inline fixed-width code&lt;/code&gt;\n&lt;pre&gt;pre-formatted fixed-width code block&lt;/pre&gt;\n&lt;a href=&quot;https://github.com&quot;&gt;URL&lt;/a&gt;\n&lt;a href=&quot;mention:@username&quot;&gt;Mention by username&lt;/a&gt;\n&lt;a href=&quot;mention:186785362&quot;&gt;Mention by user id&lt;/a&gt;\n&lt;pre language=&quot;json&quot;&gt;Pre tags can have a language attribute&lt;/pre&gt;</pre>",
         "Saved":"<b>saved</b> - Get a list of saved messages!"
+        },
+    "Filter":
+        {
+        "Filter":"<b>filter</b> <code>name reply</code> - Make it so that every time someone says <code>name</code> the bot will reply with <code>reply</code>.\n<b>filter from</b> <code>name</code> - Reply to a message with this, so that every time someone says <code>name</code>, the bot will forward the [replied to] message\n<b>filter clear</b> <code>name</code> - Clear the filter listed under name\n<b>list</b> - Retrieve a list of all the filters in that chat"
         },
     "AntiSpam":
         {

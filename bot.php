@@ -29,6 +29,7 @@ require_once 'callback.php';
 require_once 'callback_handlers.php';
 require_once 'check_msg.php';
 require_once 'data_parse.php';
+require_once 'filter.php';
 require_once 'id_.php';
 require_once 'invite.php';
 require_once 'lock.php';

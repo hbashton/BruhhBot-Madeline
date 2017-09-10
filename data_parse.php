@@ -476,3 +476,11 @@ function build_keyboard_callback($button_list, $count = 2, $header = false, $foo
 
     return $rows;
 }
+
+function contains($str, array $arr)
+{
+    foreach($arr as $a) {
+        if (stripos($str,$a) !== false) return array(true,$a);
+    }
+    return array(false);
+}

@@ -286,5 +286,17 @@
         "already":"<b>{title}</b> is already the group where I save messages",
         "success":"I will now save my messages in <b>{title}</b>",
         "mods":"Who are you? Not my creator that's for sure"
+    },
+    "add_filter":
+    {
+        "mods":"Only mods get to add filters.",
+        "success":"Filter <code>{name}</code> has been saved",
+        "help":"Use <code>/filter name reply</code> to reply to all messages that have <code>name</code> in them with <code>reply</code>!"
+    },
+    "filterfrom":
+    {
+        "mods":"Only mods get to add filters.",
+        "success":"Filter <code>{name}</code> has been saved",
+        "help":"Use <code>/filter from name</code> in reply to a message to forward the message replied to every time someone says <code>name</code>!"
     }
 }

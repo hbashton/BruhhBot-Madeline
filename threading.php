@@ -236,6 +236,11 @@ function NewChannelMessage($update, $MadelineProto)
                     $update['update']['message']['message'][0],
                     0, 1
                 );
+                $msg = $update['update']['message']['message'];
+                $msg_arr = explode(' ', trim($msg));
+                if ($msg_arr[0] !== "/filter") {
+                    check_for_filter($update, $MadelineProto, $msg);
+                }
                 if (preg_match_all('/#/', $first_char, $matches)) {
                     $msg = substr(
                             $update['update']['message']['message'], 1
@@ -448,8 +453,29 @@ function NewChannelMessage($update, $MadelineProto)
                             }
                             break;
 
+                        case 'filter':
+                            if (isset($msg_arr[1])) {
+                                $name = $msg_arr[1];
+                                unset($msg_arr[1]);
+                            } else {
+                                $name = false;
+                            }
+                            unset($msg_arr[0]);
+                            $msg = implode(' ', $msg_arr);
+                            $name_ = strtolower($name);
+                            if ($name_ == 'clear') {
+                                clear_filter($update, $MadelineProto, $msg);
+                            } else {
+                                add_filter($update, $MadelineProto, $msg, $name);
+                            }
+                            break;
+
                         case 'saved':
                             saved_get($update, $MadelineProto);
+                            break;
+
+                        case 'list':
+                            get_filters($update, $MadelineProto);
                             break;
 
                         case 'pin':
