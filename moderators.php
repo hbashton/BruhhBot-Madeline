@@ -59,67 +59,71 @@ function is_master($MadelineProto, $userid)
 
 function from_admin($update, $MadelineProto, $str = '', $send = false)
 {
-    $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
-    $userid = $MadelineProto->get_info(
-        $update['update']['message']['from_id']
-    )['bot_api_id'];
-    if (!isset($MadelineProto->cache[$ch_id])) {
-        $MadelineProto->cache[$ch_id] = [];
-    }
-    if (!isset($MadelineProto->cache[$ch_id]['admins'])) {
-        $MadelineProto->cache[$ch_id]['admins'] = [];
-    }
-    if (isset($MadelineProto->cache[$ch_id]['admins'][$userid])) {
-        $diff = time() - $MadelineProto->cache[$ch_id]['admins'][$userid]['timestamp'];
-        if ($diff < 300) {
-            return $MadelineProto->cache[$ch_id]['admins'][$userid]['return'];
+    try {
+        $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
+        $userid = $MadelineProto->get_info(
+            $update['update']['message']['from_id']
+        )['bot_api_id'];
+        if (!isset($MadelineProto->cache[$ch_id])) {
+            $MadelineProto->cache[$ch_id] = [];
         }
-    }
-    $admins = cache_get_chat_info($update, $MadelineProto);
-    foreach ($admins['participants'] as $key) {
-        if (array_key_exists('user', $key)) {
-            $id = $key['user']['id'];
-        } else {
-            if (array_key_exists('bot', $key)) {
-                $id = $key['bot']['id'];
+        if (!isset($MadelineProto->cache[$ch_id]['admins'])) {
+            $MadelineProto->cache[$ch_id]['admins'] = [];
+        }
+        if (isset($MadelineProto->cache[$ch_id]['admins'][$userid])) {
+            $diff = time() - $MadelineProto->cache[$ch_id]['admins'][$userid]['timestamp'];
+            if ($diff < 300) {
+                return $MadelineProto->cache[$ch_id]['admins'][$userid]['return'];
             }
         }
-        if ($id == $userid) {
-            if (array_key_exists('role', $key)) {
-                if ($key['role'] == 'moderator'
-                    or $key['role'] == 'creator'
-                    or $key['role'] == 'editor'
-                    or $key['role'] == 'admin'
-                ) {
-                    $mod = true;
-                    break;
+        $admins = cache_get_chat_info($update, $MadelineProto);
+        foreach ($admins['participants'] as $key) {
+            if (array_key_exists('user', $key)) {
+                $id = $key['user']['id'];
+            } else {
+                if (array_key_exists('bot', $key)) {
+                    $id = $key['bot']['id'];
+                }
+            }
+            if ($id == $userid) {
+                if (array_key_exists('role', $key)) {
+                    if ($key['role'] == 'moderator'
+                        or $key['role'] == 'creator'
+                        or $key['role'] == 'editor'
+                        or $key['role'] == 'admin'
+                    ) {
+                        $mod = true;
+                        break;
+                    } else {
+                        $mod = false;
+                        break;
+                    }
                 } else {
                     $mod = false;
                     break;
                 }
-            } else {
-                $mod = false;
-                break;
             }
+            $mod = false;
         }
-        $mod = false;
-    }
-    if ($mod or from_master($update, $MadelineProto)) {
-        $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => true];
+        if ($mod or from_master($update, $MadelineProto)) {
+            $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => true];
 
-        return true;
-    } else {
-        if ($send) {
-            $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
-            $msg_id = $update['update']['message']['id'];
-            $message = $str;
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
-            );
-            \danog\MadelineProto\Logger::log($sentMessage);
+            return true;
+        } else {
+            if ($send) {
+                $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
+                $msg_id = $update['update']['message']['id'];
+                $message = $str;
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
+            $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
+
+            return false;
         }
-        $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
-
+    } catch (Exception $e) {
         return false;
     }
 }
