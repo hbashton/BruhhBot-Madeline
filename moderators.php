@@ -59,11 +59,79 @@ function is_master($MadelineProto, $userid)
 
 function from_admin($update, $MadelineProto, $str = '', $send = false)
 {
-    if (bot_present($update, $MadelineProto, true)) {
-        $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
-        $userid = $MadelineProto->get_info(
-            $update['update']['message']['from_id']
-        )['bot_api_id'];
+    $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
+    $userid = $MadelineProto->get_info(
+        $update['update']['message']['from_id']
+    )['bot_api_id'];
+    if (!isset($MadelineProto->cache[$ch_id])) {
+        $MadelineProto->cache[$ch_id] = [];
+    }
+    if (!isset($MadelineProto->cache[$ch_id]['admins'])) {
+        $MadelineProto->cache[$ch_id]['admins'] = [];
+    }
+    if (isset($MadelineProto->cache[$ch_id]['admins'][$userid])) {
+        $diff = time() - $MadelineProto->cache[$ch_id]['admins'][$userid]['timestamp'];
+        if ($diff < 300) {
+            return $MadelineProto->cache[$ch_id]['admins'][$userid]['return'];
+        }
+    }
+    $admins = cache_get_chat_info($update, $MadelineProto);
+    foreach ($admins['participants'] as $key) {
+        if (array_key_exists('user', $key)) {
+            $id = $key['user']['id'];
+        } else {
+            if (array_key_exists('bot', $key)) {
+                $id = $key['bot']['id'];
+            }
+        }
+        if ($id == $userid) {
+            if (array_key_exists('role', $key)) {
+                if ($key['role'] == 'moderator'
+                    or $key['role'] == 'creator'
+                    or $key['role'] == 'editor'
+                ) {
+                    $mod = true;
+                    break;
+                } else {
+                    $mod = false;
+                    break;
+                }
+            } else {
+                $mod = false;
+                break;
+            }
+        }
+        $mod = false;
+    }
+    if ($mod or from_master($update, $MadelineProto)) {
+        $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => true];
+
+        return true;
+    } else {
+        if ($send) {
+            $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
+            $msg_id = $update['update']['message']['id'];
+            $message = $str;
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
+            );
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
+        $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
+
+        return false;
+    }
+}
+
+function is_admin($update, $MadelineProto, $userid, $send = false, $ch_id = false)
+{
+    try {
+        if (!$ch_id) {
+            $admins = cache_get_chat_info($update, $MadelineProto);
+        } else {
+            $admins = cache_get_info($update, $MadelineProto, $ch_id, true);
+        }
+        $ch_id = $admins['id'];
         if (!isset($MadelineProto->cache[$ch_id])) {
             $MadelineProto->cache[$ch_id] = [];
         }
@@ -76,7 +144,6 @@ function from_admin($update, $MadelineProto, $str = '', $send = false)
                 return $MadelineProto->cache[$ch_id]['admins'][$userid]['return'];
             }
         }
-        $admins = cache_get_chat_info($update, $MadelineProto);
         foreach ($admins['participants'] as $key) {
             if (array_key_exists('user', $key)) {
                 $id = $key['user']['id'];
@@ -104,7 +171,7 @@ function from_admin($update, $MadelineProto, $str = '', $send = false)
             }
             $mod = false;
         }
-        if ($mod or from_master($update, $MadelineProto)) {
+        if ($mod or is_master($MadelineProto, $userid)) {
             $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => true];
 
             return true;
@@ -122,85 +189,6 @@ function from_admin($update, $MadelineProto, $str = '', $send = false)
 
             return false;
         }
-    } else {
-        $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
-
-        return false;
-    }
-}
-
-function is_admin($update, $MadelineProto, $userid, $send = false, $ch_id = false)
-{
-    try {
-        if (bot_present($update, $MadelineProto, true, $ch_id)) {
-            if (!$ch_id) {
-                $admins = cache_get_chat_info($update, $MadelineProto);
-            } else {
-                $admins = cache_get_info($update, $MadelineProto, $ch_id, true);
-            }
-            $ch_id = $admins['id'];
-            if (!isset($MadelineProto->cache[$ch_id])) {
-                $MadelineProto->cache[$ch_id] = [];
-            }
-            if (!isset($MadelineProto->cache[$ch_id]['admins'])) {
-                $MadelineProto->cache[$ch_id]['admins'] = [];
-            }
-            if (isset($MadelineProto->cache[$ch_id]['admins'][$userid])) {
-                $diff = time() - $MadelineProto->cache[$ch_id]['admins'][$userid]['timestamp'];
-                if ($diff < 300) {
-                    return $MadelineProto->cache[$ch_id]['admins'][$userid]['return'];
-                }
-            }
-            foreach ($admins['participants'] as $key) {
-                if (array_key_exists('user', $key)) {
-                    $id = $key['user']['id'];
-                } else {
-                    if (array_key_exists('bot', $key)) {
-                        $id = $key['bot']['id'];
-                    }
-                }
-                if ($id == $userid) {
-                    if (array_key_exists('role', $key)) {
-                        if ($key['role'] == 'moderator'
-                            or $key['role'] == 'creator'
-                            or $key['role'] == 'editor'
-                        ) {
-                            $mod = true;
-                            break;
-                        } else {
-                            $mod = false;
-                            break;
-                        }
-                    } else {
-                        $mod = false;
-                        break;
-                    }
-                }
-                $mod = false;
-            }
-            if ($mod or is_master($MadelineProto, $userid)) {
-                $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => true];
-
-                return true;
-            } else {
-                if ($send) {
-                    $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
-                    $msg_id = $update['update']['message']['id'];
-                    $message = $str;
-                    $sentMessage = $MadelineProto->messages->sendMessage(
-                        ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
-                    );
-                    \danog\MadelineProto\Logger::log($sentMessage);
-                }
-                $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
-
-                return false;
-            }
-        } else {
-            $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
-
-            return false;
-        }
     } catch (Exception $e) {
         $MadelineProto->cache[$ch_id]['admins'][$userid] = ['timestamp' => time(), 'return' => false];
 
@@ -213,21 +201,19 @@ function is_bot_admin($update, $MadelineProto, $send = false)
     try {
         $chat = cache_get_chat_info($update, $MadelineProto);
         $peer = $chat['id'];
-        $bot_id = $MadelineProto->bot_id;
         $bot_api_id = $MadelineProto->bot_api_id;
-        $mod = is_admin($update, $MadelineProto, $bot_id);
+        $mod = is_admin($update, $MadelineProto, $bot_api_id);
         if ($mod) {
             return true;
         } else {
             if ($send) {
                 $msg_id = $update['update']['message']['id'];
-                $message = 'My helper bot has to be an admin for me to work properly. Message me /start for more info';
+                $message = 'I need to be an admin with all priveleges to work properly.';
                 $sentMessage = $MadelineProto->messages->sendMessage(
                     ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
                 );
                 \danog\MadelineProto\Logger::log($sentMessage);
             }
-
             return false;
         }
     } catch (Exception $e) {
@@ -237,45 +223,39 @@ function is_bot_admin($update, $MadelineProto, $send = false)
 
 function from_mod($update, $MadelineProto)
 {
-    if (bot_present($update, $MadelineProto, true)) {
-        $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
-        $userid = $MadelineProto->get_info(
-            $update['update']['message']['from_id']
-        )['bot_api_id'];
-        if (!isset($MadelineProto->cache[$ch_id])) {
-            $MadelineProto->cache[$ch_id] = [];
+    $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
+    $userid = $MadelineProto->get_info(
+        $update['update']['message']['from_id']
+    )['bot_api_id'];
+    if (!isset($MadelineProto->cache[$ch_id])) {
+        $MadelineProto->cache[$ch_id] = [];
+    }
+    if (!isset($MadelineProto->cache[$ch_id]['mods'])) {
+        $MadelineProto->cache[$ch_id]['mods'] = [];
+    }
+    if (isset($MadelineProto->cache[$ch_id]['mods'][$userid])) {
+        $diff = time() - $MadelineProto->cache[$ch_id]['mods'][$userid]['timestamp'];
+        if ($diff < 300) {
+            return $MadelineProto->cache[$ch_id]['mods'][$userid]['return'];
         }
-        if (!isset($MadelineProto->cache[$ch_id]['mods'])) {
-            $MadelineProto->cache[$ch_id]['mods'] = [];
+    }
+    if (!file_exists('promoted.json')) {
+        $json_data = [];
+        $json_data[$ch_id] = [];
+        file_put_contents('promoted.json', json_encode($json_data));
+    }
+    $file = file_get_contents('promoted.json');
+    $promoted = json_decode($file, true);
+    if (isset($promoted[$ch_id])) {
+        if (in_array($userid, $promoted[$ch_id])) {
+            $mod = true;
+        } else {
+            $mod = false;
         }
-        if (isset($MadelineProto->cache[$ch_id]['mods'][$userid])) {
-            $diff = time() - $MadelineProto->cache[$ch_id]['mods'][$userid]['timestamp'];
-            if ($diff < 300) {
-                return $MadelineProto->cache[$ch_id]['mods'][$userid]['return'];
-            }
-        }
-        if (!file_exists('promoted.json')) {
-            $json_data = [];
-            $json_data[$ch_id] = [];
-            file_put_contents('promoted.json', json_encode($json_data));
-        }
-        $file = file_get_contents('promoted.json');
-        $promoted = json_decode($file, true);
-        if (isset($promoted[$ch_id])) {
-            if (in_array($userid, $promoted[$ch_id])) {
-                $mod = true;
-            } else {
-                $mod = false;
-            }
-            if ($mod or from_master($update, $MadelineProto)) {
-                $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => true];
+        if ($mod or from_master($update, $MadelineProto)) {
+            $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => true];
 
-                return true;
-            } else {
-                $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => false];
-
-                return false;
-            }
+            return true;
         } else {
             $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => false];
 
@@ -290,44 +270,38 @@ function from_mod($update, $MadelineProto)
 
 function is_mod($update, $MadelineProto, $userid, $ch_id = false)
 {
-    if (bot_present($update, $MadelineProto, true, $ch_id)) {
-        if (!$ch_id) {
-            $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
+    if (!$ch_id) {
+        $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
+    }
+    if (!isset($MadelineProto->cache[$ch_id])) {
+        $MadelineProto->cache[$ch_id] = [];
+    }
+    if (!isset($MadelineProto->cache[$ch_id]['mods'])) {
+        $MadelineProto->cache[$ch_id]['mods'] = [];
+    }
+    if (isset($MadelineProto->cache[$ch_id]['mods'][$userid])) {
+        $diff = time() - $MadelineProto->cache[$ch_id]['mods'][$userid]['timestamp'];
+        if ($diff < 300) {
+            return $MadelineProto->cache[$ch_id]['mods'][$userid]['return'];
         }
-        if (!isset($MadelineProto->cache[$ch_id])) {
-            $MadelineProto->cache[$ch_id] = [];
+    }
+    if (!file_exists('promoted.json')) {
+        $json_data = [];
+        $json_data[$ch_id] = [];
+        file_put_contents('promoted.json', json_encode($json_data));
+    }
+    $file = file_get_contents('promoted.json');
+    $promoted = json_decode($file, true);
+    if (isset($promoted[$ch_id])) {
+        if (in_array($userid, $promoted[$ch_id])) {
+            $mod = true;
+        } else {
+            $mod = false;
         }
-        if (!isset($MadelineProto->cache[$ch_id]['mods'])) {
-            $MadelineProto->cache[$ch_id]['mods'] = [];
-        }
-        if (isset($MadelineProto->cache[$ch_id]['mods'][$userid])) {
-            $diff = time() - $MadelineProto->cache[$ch_id]['mods'][$userid]['timestamp'];
-            if ($diff < 300) {
-                return $MadelineProto->cache[$ch_id]['mods'][$userid]['return'];
-            }
-        }
-        if (!file_exists('promoted.json')) {
-            $json_data = [];
-            $json_data[$ch_id] = [];
-            file_put_contents('promoted.json', json_encode($json_data));
-        }
-        $file = file_get_contents('promoted.json');
-        $promoted = json_decode($file, true);
-        if (isset($promoted[$ch_id])) {
-            if (in_array($userid, $promoted[$ch_id])) {
-                $mod = true;
-            } else {
-                $mod = false;
-            }
-            if ($mod or is_master($MadelineProto, $userid)) {
-                $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => true];
+        if ($mod or is_master($MadelineProto, $userid)) {
+            $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => true];
 
-                return true;
-            } else {
-                $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => false];
-
-                return false;
-            }
+            return true;
         } else {
             $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => false];
 

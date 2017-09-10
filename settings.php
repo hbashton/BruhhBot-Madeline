@@ -106,81 +106,79 @@ function get_settings($update, $MadelineProto)
 
 function settings_menu($update, $MadelineProto)
 {
-    if (bot_present($update, $MadelineProto)) {
-        if (is_supergroup($update, $MadelineProto)) {
-            $msg_id = $update['update']['message']['id'];
-            $mods = $MadelineProto->responses['welcome_toggle']['mods'];
-            $chat = parse_chat_data($update, $MadelineProto);
-            $title = htmlentities($chat['title']);
-            $peer = $chat['peer'];
-            $ch_id = $chat['id'];
-            $userid = cache_from_user_info($update, $MadelineProto);
-            if (isset($userid['bot_api_id'])) {
-                $userid = $userid['bot_api_id'];
-            } else {
-                return;
-            }
-            $default = [
-                'peer'            => $userid,
-                'reply_to_msg_id' => $msg_id,
-                'parse_mode'      => 'html',
-                'message'         => "Here's the settings menu for $title! Feel free to explore",
-                ];
-            $rows = [];
-            if (is_moderated($ch_id)) {
-                if (is_bot_admin($update, $MadelineProto)) {
-                    if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $mods = $MadelineProto->responses['welcome_toggle']['mods'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $title = htmlentities($chat['title']);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $userid = cache_from_user_info($update, $MadelineProto);
+        if (isset($userid['bot_api_id'])) {
+            $userid = $userid['bot_api_id'];
+        } else {
+            return;
+        }
+        $default = [
+            'peer'            => $userid,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode'      => 'html',
+            'message'         => "Here's the settings menu for $title! Feel free to explore",
+            ];
+        $rows = [];
+        if (is_moderated($ch_id)) {
+            if (is_bot_admin($update, $MadelineProto)) {
+                if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                    $buttons = [
+                        ['_' => 'keyboardButtonCallback', 'text' => 'Locked', 'data' => json_encode([
+                            'q' => 'locked',     // query
+                            'c' => $ch_id, ])],  // chat
+                        ['_' => 'keyboardButtonCallback', 'text' => 'Group Settings', 'data' => json_encode([
+                            'q' => 'group_settings', // query
+                            'c' => $ch_id, ])],     // chat
+                    ];
+                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
+                    $rows[] = $row;
+                    $button = [
+                        ['_' => 'keyboardButtonCallback', 'text' => 'User Settings', 'data' => json_encode([
+                            'q' => 'user_settings',
+                            'c' => $ch_id, ])],
+                    ];
+                    $row = ['_' => 'keyboardButtonRow', 'buttons' => $button];
+                    $rows[] = $row;
+                    if (is_chat_owner($update, $MadelineProto, $ch_id, $userid)) {
                         $buttons = [
-                            ['_' => 'keyboardButtonCallback', 'text' => 'Locked', 'data' => json_encode([
-                                'q' => 'locked',     // query
-                                'c' => $ch_id, ])],  // chat
-                            ['_' => 'keyboardButtonCallback', 'text' => 'Group Settings', 'data' => json_encode([
-                                'q' => 'group_settings', // query
-                                'c' => $ch_id, ])],     // chat
+                            ['_' => 'keyboardButtonCallback', 'text' => 'Moderators', 'data' => json_encode([
+                                'q' => 'moderators_menu',
+                                'c' => $ch_id, ])],
                         ];
                         $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
                         $rows[] = $row;
-                        $button = [
-                            ['_' => 'keyboardButtonCallback', 'text' => 'User Settings', 'data' => json_encode([
-                                'q' => 'user_settings',
-                                'c' => $ch_id, ])],
-                        ];
-                        $row = ['_' => 'keyboardButtonRow', 'buttons' => $button];
-                        $rows[] = $row;
-                        if (is_chat_owner($update, $MadelineProto, $ch_id, $userid)) {
-                            $buttons = [
-                                ['_' => 'keyboardButtonCallback', 'text' => 'Moderators', 'data' => json_encode([
-                                    'q' => 'moderators_menu',
-                                    'c' => $ch_id, ])],
-                            ];
-                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                            $rows[] = $row;
-                        }
-                        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
-                        $default['reply_markup'] = $replyInlineMarkup;
-                        try {
-                            if (isset($default['message'])) {
-                                $sentMessage = $MadelineProto->messages->sendMessage(
-                                    $default
-                                );
-                                \danog\MadelineProto\Logger::log($sentMessage);
-                            }
-                        } catch (Exception $e) {
-                            $default['peer'] = $peer;
-                            $botusername = preg_replace('/@/', '', getenv('BOT_API_USERNAME'));
-                            $url = "https://telegram.me/$botusername?start=settings-$ch_id";
-                            $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => 'Start a chat with me!', 'url' => $url];
-                            $buttons = [$keyboardButtonUrl];
-                            $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
-                            $rows = [$row];
-                            $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
-                            $default['reply_markup'] = $replyInlineMarkup;
-                            $default['message'] = "Please start a chat with me so I can send you the settings for $title";
+                    }
+                    $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
+                    $default['reply_markup'] = $replyInlineMarkup;
+                    try {
+                        if (isset($default['message'])) {
                             $sentMessage = $MadelineProto->messages->sendMessage(
-                                    $default
-                                );
+                                $default
+                            );
                             \danog\MadelineProto\Logger::log($sentMessage);
                         }
+                    } catch (Exception $e) {
+                        $default['peer'] = $peer;
+                        $botusername = preg_replace('/@/', '', getenv('BOT_API_USERNAME'));
+                        $url = "https://telegram.me/$botusername?start=settings-$ch_id";
+                        $keyboardButtonUrl = ['_' => 'keyboardButtonUrl', 'text' => 'Start a chat with me!', 'url' => $url];
+                        $buttons = [$keyboardButtonUrl];
+                        $row = ['_' => 'keyboardButtonRow', 'buttons' => $buttons];
+                        $rows = [$row];
+                        $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
+                        $default['reply_markup'] = $replyInlineMarkup;
+                        $default['message'] = "Please start a chat with me so I can send you the settings for $title";
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                                $default
+                            );
+                        \danog\MadelineProto\Logger::log($sentMessage);
                     }
                 }
             }

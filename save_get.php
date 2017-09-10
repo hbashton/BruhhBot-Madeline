@@ -124,15 +124,11 @@ function getme($update, $MadelineProto, $name)
         $peerUSER = true;
     }
     if (is_supergroup($update, $MadelineProto)) {
-        if (bot_present($update, $MadelineProto, true)) {
-            $chat = parse_chat_data($update, $MadelineProto);
-            $peer = $chat['peer'];
-            $ch_id = $chat['id'];
-            $cont = true;
-            $peerUSER = false;
-        } else {
-            $cont = false;
-        }
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $ch_id = $chat['id'];
+        $cont = true;
+        $peerUSER = false;
     }
     if (!$update['update']['message']['out'] && $cont) {
         $name = cb($name);
@@ -206,7 +202,6 @@ function getme($update, $MadelineProto, $name)
 
 function savefrom($update, $MadelineProto, $name)
 {
-    $uMadelineProto = $MadelineProto->uMadelineProto;
     if (is_peeruser($update, $MadelineProto)) {
         $peer = cache_get_info(
             $update,
@@ -244,21 +239,29 @@ function savefrom($update, $MadelineProto, $name)
                         $saved[$ch_id]['from'] = [];
                     }
                     $bot_api_id = $MadelineProto->bot_api_id;
-                    $bot_id = $MadelineProto->bot_id;
-                    try {
-                        $forwardMessage = $MadelineProto->messages->forwardMessages(
-                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $bot_id]
-                        );
-                    } catch (Exception $e) {
-                        $forwardMessage = $uMadelineProto->messages->forwardMessages(
-                            ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $bot_api_id]
-                        );
-                    }
-                    foreach ($forwardMessage['updates'] as $i) {
-                        if ($i['_'] == 'updateMessageID') {
-                            $fwd_id = $i['id'];
-                            $fwd_chat = $bot_id;
+                    $file = file_get_contents('settings.json');
+                    $settings = json_decode($file, true);
+                    if (isset($settings['save_group'])) {
+                        try {
+                            $forwardMessage = $MadelineProto->messages->forwardMessages(
+                                ['from_peer' => $ch_id, 'id' => [$msg_id], 'to_peer' => $settings['save_group']]
+                            );
+                        } catch (Exception $e) {
+                            var_dump($e->getMessage());
                         }
+                        foreach ($forwardMessage['updates'] as $i) {
+                            if ($i['_'] == 'updateMessageID') {
+                                $fwd_id = $i['id'];
+                                $fwd_chat = $settings['save_group'];
+                            }
+                        }
+                    } else {
+                        $default['message'] = 'The creator of this bot has not set up a group for me to save replied to messages in yet.';
+                        $sentMessage = $MadelineProto->messages->sendMessage(
+                            $default
+                        );
+                        \danog\MadelineProto\Logger::log($sentMessage);
+                        return;
                     }
                     $saved[$ch_id]['from'][$name] = [];
                     $saved[$ch_id]['from'][$name]['chat'] = $fwd_chat;

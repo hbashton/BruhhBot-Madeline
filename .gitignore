@@ -85,7 +85,7 @@ sessions
 docs_md
 
 .env
-composer.lock
+*lock
 /who
 #json db
 *.json

@@ -20,8 +20,7 @@
         "Weather":"<b>weather</b> <code>area</code> - Get the weather, and temperature, for any given area!",
         "Welcome":"<b>welcome</b> <code>message</code> - Set the welcome message! You can use HTML formatting and the following variables:\n<pre>{username}: will be replaced with the username\n{name}: will be replaced with the name\n{mention}: will be replaced with a mention of the user\n{id}: will be replaced with the user's id\n{title}: will be replaced with the group title</pre>\nExample:<code>/welcome the title of this group is {title}</code>",
         "Stats":"<b>stats</b> <code>[@username|ID|by reply]</code> - Get their name, username, and bot-related information about them",
-        "ID":"<b>id</b> <code>[@username|ID|by reply]</code> - Get a users ID from their username, or vice versa",
-        "Join":"<b>join</b> <code>[invite link|@username]</code> - Invite my partner to the group! <code>Note: if you choose to use an invite link, the link must be in the format [https://t.me/joinchat/...]</code>"
+        "ID":"<b>id</b> <code>[@username|ID|by reply]</code> - Get a users ID from their username, or vice versa"
         },
     "Save":
         {
@@ -33,7 +32,7 @@
         "Lock":"<b>lock</b> <code>[lock type]</code> - Lock certain messages, making the bot remove them when they're sent.",
         "Unlock":"<b>unlock</b> <code>[lock type]</code> - Unlock certain messages, letting people send them as they please",
         "Setflood":"<b>setflood</b> <code>integer</code> - Set the flood limit. When users cross that limit, if flood is locked, they're kicked.",
-        "Del":"<b>del</b> <code>[by reply]</code> - Delete a message by reply.\n<b>del</b> <code>[@username|ID]</code> - Delete the ENTIRE HISTORY of a user from a chat.",
+        "Del":"<b>del</b> <code>[by reply]</code> - Delete a message by reply.",
         "Purge":"<b>purge</b> <code>[by reply]</code> - Delete all messages after the message you replied to. (Exercise EXTREME caution! You don't wanna lose you're whole chat)."
         },
     "Group":
@@ -43,7 +42,6 @@
         "Setname":"<b>setname</b> <code>name</code> - Set the group title!",
         "Setabout":"<b>setabout</b> <code>\"about\"</code> - Change the about section of the group description. You MUST provide <code>\"about\"</code> in double quotes.",
         "Rules":"<b>setrules</b> <code>rules</code> - Set the rules for the group.\n<b>setrules</b> <code>clear</code> - Clear the rules for the group.\n<b>rules</b> - See the rules for the group.",
-        "Invite":"<b>invite</b> <code>[@username|ID]</code> - Invite a user to the group! <code>Note: the user must have their privacy settings set to allow the bot to invite them, and the group must allow the bot to add users.</code>",
         "Adminlist":"<b>adminlist</b> - Get a list of administrators for the group. If you spam this command, you'll just make them mad, so don't use this over and over."
         },
     "Banhammer":
@@ -57,15 +55,13 @@
         },
     "Mutehammer":
         {
-        "Mute":"<b>mute</b> <code>[@username|ID|by reply]</code> - Mute a user, so that the bot deletes all their messages as they're sent\n<b>mute</b> <code>all</code> - Mute everyone, minus admins and moderators",
-        "Unmute":"<b>unmute</b> <code>@username/ID</code> - Unmute a user, giving them the right of free speech once more\n<b>unmute</b> <code>all</code> - Unmute everyone, and bring back free speech",
-        "Mutelist":"<b>mutelist</b> - Get a list of the pests that have been silenced in the current chat."
+        "Mute":"<b>mute</b> <code>[@username|ID|by reply]</code> - Mute a user, so that the bot deletes all their messages as they're sent",
+        "Unmute":"<b>unmute</b> <code>@username/ID</code> - Unmute a user, giving them the right of free speech once more"
         },
     "Moderators":
         {
         "Promote":"<b>promote</b> <code>[@username|ID|by reply]</code> - Promote someone to moderator status",
-        "Demote":"<b>demote</b> <code>[@username|ID|by reply]</code> - Demote someone back to user status",
-        "Modlist":"<b>modlist</b> - Get a list of moderators for the current chat."
+        "Demote":"<b>demote</b> <code>[@username|ID|by reply]</code> - Demote someone back to user status"
         }
     }
 }

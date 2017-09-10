@@ -19,43 +19,29 @@
 
 function lockme($update, $MadelineProto, $msg)
 {
-    if (bot_present($update, $MadelineProto)) {
-        if (is_supergroup($update, $MadelineProto)) {
-            $msg_id = $update['update']['message']['id'];
-            $mods = $MadelineProto->responses['lockme']['mods'];
-            $chat = parse_chat_data($update, $MadelineProto);
-            $peer = $chat['peer'];
-            $title = htmlentities($chat['title']);
-            $ch_id = $chat['id'];
-            $default = [
-                'peer'            => $peer,
-                'reply_to_msg_id' => $msg_id,
-                'parse_mode'      => 'html',
-                ];
-            if (is_moderated($ch_id)) {
-                $coniguration = file_get_contents('configuration.json');
-                $cfg = json_decode($coniguration, true);
-                if (!empty($msg)) {
-                    if (in_array($msg, $cfg['types'])) {
-                        if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                            check_json_array('locked.json', $ch_id);
-                            $file = file_get_contents('locked.json');
-                            $locked = json_decode($file, true);
-                            if (isset($locked[$ch_id])) {
-                                if (!in_array($msg, $locked[$ch_id])) {
-                                    if ($msg == 'flood') {
-                                        $locked[$ch_id]['floodlimit'] = 10;
-                                    }
-                                    array_push($locked[$ch_id], $msg);
-                                    file_put_contents('locked.json', json_encode($locked));
-                                    $message = $cfg['lock'][$msg];
-                                    $default['message'] = $message;
-                                } else {
-                                    $message = $cfg['lock']['already'][$msg];
-                                    $default['message'] = $message;
-                                }
-                            } else {
-                                $locked[$ch_id] = [];
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $mods = $MadelineProto->responses['lockme']['mods'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = htmlentities($chat['title']);
+        $ch_id = $chat['id'];
+        $default = [
+            'peer'            => $peer,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode'      => 'html',
+            ];
+        if (is_moderated($ch_id)) {
+            $coniguration = file_get_contents('configuration.json');
+            $cfg = json_decode($coniguration, true);
+            if (!empty($msg)) {
+                if (in_array($msg, $cfg['types'])) {
+                    if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                        check_json_array('locked.json', $ch_id);
+                        $file = file_get_contents('locked.json');
+                        $locked = json_decode($file, true);
+                        if (isset($locked[$ch_id])) {
+                            if (!in_array($msg, $locked[$ch_id])) {
                                 if ($msg == 'flood') {
                                     $locked[$ch_id]['floodlimit'] = 10;
                                 }
@@ -63,183 +49,191 @@ function lockme($update, $MadelineProto, $msg)
                                 file_put_contents('locked.json', json_encode($locked));
                                 $message = $cfg['lock'][$msg];
                                 $default['message'] = $message;
-                            }
-                        }
-                    } else {
-                        $str = $MadelineProto->responses['lockme']['invalid'];
-                        $repl = [
-                            'msg' => $msg,
-                        ];
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
-                    }
-                } else {
-                    $message = $MadelineProto->responses['lockme']['help'];
-                    $default['message'] = $message;
-                }
-            }
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
-            if (isset($sentMessage)) {
-                \danog\MadelineProto\Logger::log($sentMessage);
-            }
-        }
-    }
-}
-
-function unlockme($update, $MadelineProto, $msg)
-{
-    if (bot_present($update, $MadelineProto)) {
-        if (is_supergroup($update, $MadelineProto)) {
-            $msg_id = $update['update']['message']['id'];
-            $mods = $MadelineProto->responses['unlockme']['mods'];
-            $chat = parse_chat_data($update, $MadelineProto);
-            $peer = $chat['peer'];
-            $title = htmlentities($chat['title']);
-            $ch_id = $chat['id'];
-            $default = [
-                'peer'            => $peer,
-                'reply_to_msg_id' => $msg_id,
-                'parse_mode'      => 'html',
-                ];
-            if (is_moderated($ch_id)) {
-                $coniguration = file_get_contents('configuration.json');
-                $cfg = json_decode($coniguration, true);
-                if (!empty($msg)) {
-                    if (in_array($msg, $cfg['types'])) {
-                        if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                            check_json_array('locked.json', $ch_id);
-                            $file = file_get_contents('locked.json');
-                            $locked = json_decode($file, true);
-                            if (isset($locked[$ch_id])) {
-                                if (in_array($msg, $locked[$ch_id])) {
-                                    if (($key = array_search(
-                                        $msg,
-                                        $locked[$ch_id]
-                                    )) !== false
-                                    ) {
-                                        unset($locked[$ch_id][$key]);
-                                    }
-                                    if ($msg == 'flood') {
-                                        unset($locked[$ch_id]['floodlimit']);
-                                    }
-                                    file_put_contents('locked.json', json_encode($locked));
-                                    $message = $cfg['unlock'][$msg];
-                                    $default['message'] = $message;
-                                } else {
-                                    $message = $cfg['unlock']['already'][$msg];
-                                    $default['message'] = $message;
-                                }
                             } else {
-                                $locked[$ch_id] = [];
-                                if ($msg == 'flood') {
-                                    unset($locked[$ch_id]['floodlimit']);
-                                }
-                                file_put_contents('locked.json', json_encode($locked));
-                                $message = $cfg['unlock']['already'][$msg];
+                                $message = $cfg['lock']['already'][$msg];
                                 $default['message'] = $message;
                             }
+                        } else {
+                            $locked[$ch_id] = [];
+                            if ($msg == 'flood') {
+                                $locked[$ch_id]['floodlimit'] = 10;
+                            }
+                            array_push($locked[$ch_id], $msg);
+                            file_put_contents('locked.json', json_encode($locked));
+                            $message = $cfg['lock'][$msg];
+                            $default['message'] = $message;
                         }
-                    } else {
-                        $str = $MadelineProto->responses['unlockme']['invalid'];
-                        $repl = [
-                            'msg' => $msg,
-                        ];
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
                     }
                 } else {
-                    $str = $MadelineProto->responses['unlockme']['help'];
+                    $str = $MadelineProto->responses['lockme']['invalid'];
                     $repl = [
                         'msg' => $msg,
                     ];
                     $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
+            } else {
+                $message = $MadelineProto->responses['lockme']['help'];
+                $default['message'] = $message;
             }
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        }
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
+        }
+    }
+}
+
+function unlockme($update, $MadelineProto, $msg)
+{
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $mods = $MadelineProto->responses['unlockme']['mods'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = htmlentities($chat['title']);
+        $ch_id = $chat['id'];
+        $default = [
+            'peer'            => $peer,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode'      => 'html',
+            ];
+        if (is_moderated($ch_id)) {
+            $coniguration = file_get_contents('configuration.json');
+            $cfg = json_decode($coniguration, true);
+            if (!empty($msg)) {
+                if (in_array($msg, $cfg['types'])) {
+                    if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                        check_json_array('locked.json', $ch_id);
+                        $file = file_get_contents('locked.json');
+                        $locked = json_decode($file, true);
+                        if (isset($locked[$ch_id])) {
+                            if (in_array($msg, $locked[$ch_id])) {
+                                if (($key = array_search(
+                                    $msg,
+                                    $locked[$ch_id]
+                                )) !== false
+                                ) {
+                                    unset($locked[$ch_id][$key]);
+                                }
+                                if ($msg == 'flood') {
+                                    unset($locked[$ch_id]['floodlimit']);
+                                }
+                                file_put_contents('locked.json', json_encode($locked));
+                                $message = $cfg['unlock'][$msg];
+                                $default['message'] = $message;
+                            } else {
+                                $message = $cfg['unlock']['already'][$msg];
+                                $default['message'] = $message;
+                            }
+                        } else {
+                            $locked[$ch_id] = [];
+                            if ($msg == 'flood') {
+                                unset($locked[$ch_id]['floodlimit']);
+                            }
+                            file_put_contents('locked.json', json_encode($locked));
+                            $message = $cfg['unlock']['already'][$msg];
+                            $default['message'] = $message;
+                        }
+                    }
+                } else {
+                    $str = $MadelineProto->responses['unlockme']['invalid'];
+                    $repl = [
+                        'msg' => $msg,
+                    ];
+                    $message = $MadelineProto->engine->render($str, $repl);
+                    $default['message'] = $message;
+                }
+            } else {
+                $str = $MadelineProto->responses['unlockme']['help'];
+                $repl = [
+                    'msg' => $msg,
+                ];
+                $message = $MadelineProto->engine->render($str, $repl);
+                $default['message'] = $message;
             }
-            if (isset($sentMessage)) {
-                \danog\MadelineProto\Logger::log($sentMessage);
-            }
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        }
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
         }
     }
 }
 
 function setflood($update, $MadelineProto, $msg)
 {
-    if (bot_present($update, $MadelineProto)) {
-        if (is_supergroup($update, $MadelineProto)) {
-            $msg_id = $update['update']['message']['id'];
-            $mods = $MadelineProto->responses['setflood']['mods'];
-            $chat = parse_chat_data($update, $MadelineProto);
-            $peer = $chat['peer'];
-            $title = htmlentities($chat['title']);
-            $ch_id = $chat['id'];
-            $default = [
-                'peer'            => $peer,
-                'reply_to_msg_id' => $msg_id,
-                'parse_mode'      => 'html',
-                ];
-            if (is_moderated($ch_id)) {
-                if (!empty($msg)) {
-                    if (is_numeric($msg)) {
-                        if ($msg > 1) {
-                            if (from_admin_mod($update, $MadelineProto, $mods, true)) {
-                                check_json_array('locked.json', $ch_id);
-                                $file = file_get_contents('locked.json');
-                                $locked = json_decode($file, true);
-                                if (isset($locked[$ch_id])) {
-                                    $locked[$ch_id]['floodlimit'] = (int) $msg;
-                                    file_put_contents('locked.json', json_encode($locked));
-                                    $str = $MadelineProto->responses['setflood']['success'];
-                                    $repl = [
-                                        'msg' => $msg,
-                                    ];
-                                    $message = $MadelineProto->engine->render($str, $repl);
-                                    $default['message'] = $message;
-                                } else {
-                                    $locked[$ch_id] = [];
-                                    $locked[$ch_id]['floodlimit'] = (int) $msg;
-                                    file_put_contents('locked.json', json_encode($locked));
-                                    $str = $MadelineProto->responses['setflood']['success'];
-                                    $repl = [
-                                        'msg' => $msg,
-                                    ];
-                                    $message = $MadelineProto->engine->render($str, $repl);
-                                    $default['message'] = $message;
-                                }
+    if (is_supergroup($update, $MadelineProto)) {
+        $msg_id = $update['update']['message']['id'];
+        $mods = $MadelineProto->responses['setflood']['mods'];
+        $chat = parse_chat_data($update, $MadelineProto);
+        $peer = $chat['peer'];
+        $title = htmlentities($chat['title']);
+        $ch_id = $chat['id'];
+        $default = [
+            'peer'            => $peer,
+            'reply_to_msg_id' => $msg_id,
+            'parse_mode'      => 'html',
+            ];
+        if (is_moderated($ch_id)) {
+            if (!empty($msg)) {
+                if (is_numeric($msg)) {
+                    if ($msg > 1) {
+                        if (from_admin_mod($update, $MadelineProto, $mods, true)) {
+                            check_json_array('locked.json', $ch_id);
+                            $file = file_get_contents('locked.json');
+                            $locked = json_decode($file, true);
+                            if (isset($locked[$ch_id])) {
+                                $locked[$ch_id]['floodlimit'] = (int) $msg;
+                                file_put_contents('locked.json', json_encode($locked));
+                                $str = $MadelineProto->responses['setflood']['success'];
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
+                                $message = $MadelineProto->engine->render($str, $repl);
+                                $default['message'] = $message;
+                            } else {
+                                $locked[$ch_id] = [];
+                                $locked[$ch_id]['floodlimit'] = (int) $msg;
+                                file_put_contents('locked.json', json_encode($locked));
+                                $str = $MadelineProto->responses['setflood']['success'];
+                                $repl = [
+                                    'msg' => $msg,
+                                ];
+                                $message = $MadelineProto->engine->render($str, $repl);
+                                $default['message'] = $message;
                             }
-                        } else {
-                            $default['message'] = 'Please use a number greater than 1';
                         }
                     } else {
-                        $str = $MadelineProto->responses['setflood']['invalid'];
-                        $repl = [
-                            'msg' => $msg,
-                        ];
-                        $message = $MadelineProto->engine->render($str, $repl);
-                        $default['message'] = $message;
+                        $default['message'] = 'Please use a number greater than 1';
                     }
                 } else {
-                    $message = $MadelineProto->responses['setflood']['help'];
+                    $str = $MadelineProto->responses['setflood']['invalid'];
+                    $repl = [
+                        'msg' => $msg,
+                    ];
+                    $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
+            } else {
+                $message = $MadelineProto->responses['setflood']['help'];
+                $default['message'] = $message;
             }
-            if (isset($default['message'])) {
-                $sentMessage = $MadelineProto->messages->sendMessage(
-                    $default
-                );
-            }
-            if (isset($sentMessage)) {
-                \danog\MadelineProto\Logger::log($sentMessage);
-            }
+        }
+        if (isset($default['message'])) {
+            $sentMessage = $MadelineProto->messages->sendMessage(
+                $default
+            );
+        }
+        if (isset($sentMessage)) {
+            \danog\MadelineProto\Logger::log($sentMessage);
         }
     }
 }

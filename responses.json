@@ -16,7 +16,7 @@
         "mods":"Only mods can use me to kick butts!",
         "banmod":"You can't ban mods?!?!",
         "banned":"{mention} banned from <b>{title}</b>",
-        "already":"<code>User {mention} already banned",
+        "already":"User {mention} already banned",
         "idk":"I don't know a {msg}, who's that?",
         "help":"Use <code>/ban @username</code> to ban someone from this chat!"
     },
@@ -279,8 +279,10 @@
         "success":"Message <code>{name}</code> has been saved",
         "help":"Save a message by reply with <code>/save from name</code>"
     },
-    "bot_present":
+    "add_save_group":
     {
-        "not":"Please add {botname}. It's my helper, without it I don't function properly."
+        "already":"<b>{title}</b> is already the group where I save messages",
+        "success":"I will now save my messages in <b>{title}</b>",
+        "mods":"Who are you? Not my creator that's for sure"
     }
 }
