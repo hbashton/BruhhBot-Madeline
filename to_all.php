@@ -48,11 +48,12 @@ function ban_from_moderated($MadelineProto, $userid, $except = [])
     foreach ($chatlist as $peer) {
         if (!in_array($peer, $except)) {
             try {
+                $channelBannedRights = ['_' => 'channelBannedRights', 'view_messages' => true, 'until_date' => 999999999];
                 $kick = $MadelineProto->
-                channels->kickFromChannel(
+                channels->editBanned(
                     ['channel' => $peer,
-                    'user_id'  => $userid,
-                    'kicked'   => true, ]
+                    'user_id' => $userid,
+                    'banned_rights' => $channelBannedRights ]
                 );
                 \danog\MadelineProto\Logger::log($kick);
             } catch (Exception $e) {
@@ -70,11 +71,12 @@ function unban_from_moderated($MadelineProto, $userid, $except = [])
     foreach ($chatlist as $peer) {
         if (!in_array($peer, $except)) {
             try {
+                $channelBannedRights = ['_' => 'channelBannedRights', 'view_messages' => false, 'send_messages' => false, 'send_media' => false, 'send_stickers' => false, 'send_gifs' => false, 'send_games' => false, 'send_inline' => false, 'embed_links' => false, 'until_date' => 999999999];
                 $kick = $MadelineProto->
-                channels->kickFromChannel(
+                channels->editBanned(
                     ['channel' => $peer,
-                    'user_id'  => $userid,
-                    'kicked'   => false, ]
+                    'user_id' => $userid,
+                    'banned_rights' => $channelBannedRights ]
                 );
                 \danog\MadelineProto\Logger::log($kick);
             } catch (Exception $e) {
