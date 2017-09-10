@@ -42,12 +42,10 @@ Finally, deploy your bot
 
 | Item          | Type           | Description  |
 | ------------- |:--------------:| ------------:|
-`MTPROTO_NUMBER` | (int) | The phone number you used to sign the bot up to telegram
-`MTPROTO_SETTINGS` | (json) | Your API ID and HASH 
+`MTPROTO_SETTINGS` | (json) | Your API ID and HASH
 `MASTER_USERNAME` | (string) | Your username
-`SUDO` | (array) |An array of User ID's that are considered "sudo" users, and can control the bot just like you
+`SUDO` | (array) |An array of User ID's that are considered "sudo" users, and can control the bot with the same priveleges as the creator
 `WEATHER_KEY` | (string) | Obtained from [DarkSky](https://darksky.net/dev/)
-`BOT_USERNAME` | (string) | The username of your bot created with a phone number
 `BOT_TOKEN` | (string) | Your API token received from [@BotFather](http://telegram.me/botfather)
 `BOT_API_USERNAME` | (string) | The username you assigned to your bot from [@BotFather](http://telegram.me/botfather)
 

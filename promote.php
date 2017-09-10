@@ -42,23 +42,22 @@ function promoteme($update, $MadelineProto, $msg = '')
                 if (!empty($msg) or array_key_exists('reply_to_msg_id', $update['update']['message'])) {
                     $id = catch_id($update, $MadelineProto, $msg);
                     if ($id[0]) {
-                        var_dump('hi1');
                         $userid = $id[1];
                         $username = $id[2];
                         $mention = html_mention($username, $userid);
-                        $channelAdminRights = ['_' => 'channelAdminRights', 'change_info' => true, 'post_messages' => true, 'edit_messages' => true, 'delete_messages' => true, 'ban_users' => true, 'invite_users' => true, 'invite_link' => true, 'pin_messages' => true];
+                        $channelAdminRights = ['_' => 'channelAdminRights', 'change_info' => true, 'delete_messages' => true, 'ban_users' => true, 'invite_users' => true, 'pin_messages' => true, 'add_admins' => true];
                         try {
                         $editAdmin = $MadelineProto->
                         channels->editAdmin(
                             ['channel' => $peer,
-                            'user_id' => $fromid,
+                            'user_id' => $userid,
                             'admin_rights' => $channelAdminRights]
                         );
                         \danog\MadelineProto\Logger::log($editAdmin);
                         } catch (Exception $e) {
                             var_dump($e->getMessage());
+                            var_dump($e->rpc);
                         }
-                        var_dump('hi2');
                         $str = $MadelineProto->responses['promoteme']['success'];
                         $repl = [
                             'mention' => $mention,
@@ -119,11 +118,11 @@ function demoteme($update, $MadelineProto, $msg = '')
                     $userid = $id[1];
                     $username = $id[2];
                     $mention = html_mention($username, $userid);
-                    $channelAdminRights = ['_' => 'channelAdminRights', 'change_info' => false, 'post_messages' => false, 'edit_messages' => false, 'delete_messages' => false, 'ban_users' => false, 'invite_users' => false, 'invite_link' => false, 'pin_messages' => false];
+                    $channelAdminRights = ['_' => 'channelAdminRights', 'change_info' => false, 'delete_messages' => false, 'ban_users' => false, 'invite_users' => false, 'pin_messages' => false, 'add_admins' => false];
                     $editAdmin = $MadelineProto->
                     channels->editAdmin(
                         ['channel' => $peer,
-                        'user_id' => $fromid,
+                        'user_id' => $userid,
                         'admin_rights' => $channelAdminRights ]
                     );
                     $str = $MadelineProto->responses['demoteme']['success'];

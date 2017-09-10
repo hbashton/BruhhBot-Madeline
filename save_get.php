@@ -52,11 +52,9 @@ function saveme($update, $MadelineProto, $msg, $name, $user = false)
                     if ($msg) {
                         $msg = $msg;
                         savefrom($update, $MadelineProto, $msg);
-
                         return;
                     } else {
                         savefrom($update, $MadelineProto, false);
-
                         return;
                     }
                 }

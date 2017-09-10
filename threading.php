@@ -477,12 +477,6 @@ function NewChannelMessage($update, $MadelineProto)
                             set_chat_photo($update, $MadelineProto);
                             break;
 
-                        case 'invite':
-                            unset($msg_arr[0]);
-                            $msg = implode(' ', $msg_arr);
-                            invite_user($update, $MadelineProto, $msg);
-                            break;
-
                         case 'setname':
                             unset($msg_arr[0]);
                             $msg = implode(' ', $msg_arr);
