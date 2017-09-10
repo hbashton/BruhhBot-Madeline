@@ -297,7 +297,7 @@ function purgemessage($update, $MadelineProto)
 
                             return;
                         } catch (Exception $e) {
-                            $error = $e->getMessage;
+                            $error = $e->getMessage();
                             $default['message'] = "Purge failed. Error:\n$error";
                         }
                     } else {
