@@ -229,36 +229,24 @@ function is_bot_admin($update, $MadelineProto, $send = false)
 
 function from_mod($update, $MadelineProto)
 {
-    $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
-    $userid = $MadelineProto->get_info(
-        $update['update']['message']['from_id']
-    )['bot_api_id'];
-    if (!isset($MadelineProto->cache[$ch_id])) {
-        $MadelineProto->cache[$ch_id] = [];
-    }
-    if (!isset($MadelineProto->cache[$ch_id]['mods'])) {
-        $MadelineProto->cache[$ch_id]['mods'] = [];
-    }
-    if (isset($MadelineProto->cache[$ch_id]['mods'][$userid])) {
-        $diff = time() - $MadelineProto->cache[$ch_id]['mods'][$userid]['timestamp'];
-        if ($diff < 300) {
-            return $MadelineProto->cache[$ch_id]['mods'][$userid]['return'];
+    try {
+        $ch_id = -100 .$update['update']['message']['to_id']['channel_id'];
+        $userid = $MadelineProto->get_info(
+            $update['update']['message']['from_id']
+        )['bot_api_id'];
+        if (!isset($MadelineProto->cache[$ch_id])) {
+            $MadelineProto->cache[$ch_id] = [];
         }
-    }
-    if (!file_exists('promoted.json')) {
-        $json_data = [];
-        $json_data[$ch_id] = [];
-        file_put_contents('promoted.json', json_encode($json_data));
-    }
-    $file = file_get_contents('promoted.json');
-    $promoted = json_decode($file, true);
-    if (isset($promoted[$ch_id])) {
-        if (in_array($userid, $promoted[$ch_id])) {
-            $mod = true;
-        } else {
-            $mod = false;
+        if (!isset($MadelineProto->cache[$ch_id]['mods'])) {
+            $MadelineProto->cache[$ch_id]['mods'] = [];
         }
-        if ($mod or from_master($update, $MadelineProto)) {
+        if (isset($MadelineProto->cache[$ch_id]['mods'][$userid])) {
+            $diff = time() - $MadelineProto->cache[$ch_id]['mods'][$userid]['timestamp'];
+            if ($diff < 300) {
+                return $MadelineProto->cache[$ch_id]['mods'][$userid]['return'];
+            }
+        }
+        if (from_master($update, $MadelineProto)) {
             $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => true];
 
             return true;
@@ -267,7 +255,7 @@ function from_mod($update, $MadelineProto)
 
             return false;
         }
-    } else {
+    } catch (Exception $e) {
         $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => false];
 
         return false;
