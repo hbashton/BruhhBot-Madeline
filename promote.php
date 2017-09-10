@@ -47,13 +47,13 @@ function promoteme($update, $MadelineProto, $msg = '')
                         $mention = html_mention($username, $userid);
                         $channelAdminRights = ['_' => 'channelAdminRights', 'change_info' => true, 'delete_messages' => true, 'ban_users' => true, 'invite_users' => true, 'pin_messages' => true, 'add_admins' => true];
                         try {
-                        $editAdmin = $MadelineProto->
-                        channels->editAdmin(
-                            ['channel' => $peer,
-                            'user_id' => $userid,
-                            'admin_rights' => $channelAdminRights]
-                        );
-                        \danog\MadelineProto\Logger::log($editAdmin);
+                            $editAdmin = $MadelineProto->
+                            channels->editAdmin(
+                                ['channel' => $peer,
+                                'user_id' => $userid,
+                                'admin_rights' => $channelAdminRights]
+                            );
+                            \danog\MadelineProto\Logger::log($editAdmin);
                         } catch (Exception $e) {
                             var_dump($e->getMessage());
                             var_dump($e->rpc);
@@ -74,6 +74,9 @@ function promoteme($update, $MadelineProto, $msg = '')
                         $message = $MadelineProto->engine->render($str, $repl);
                         $default['message'] = $message;
                     }
+                } else {
+                    $message = $MadelineProto->responses['promoteme']['help'];
+                    $default['message'] = $message;
                 }
             }
         }
@@ -141,6 +144,9 @@ function demoteme($update, $MadelineProto, $msg = '')
                     $message = $MadelineProto->engine->render($str, $repl);
                     $default['message'] = $message;
                 }
+            } else {
+                $message = $MadelineProto->responses['demoteme']['help'];
+                $default['message'] = $message;
             }
         }
         if (isset($default['message'])) {

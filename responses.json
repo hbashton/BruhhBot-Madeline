@@ -223,14 +223,16 @@
         "mods":"Only the best get to promote people. You're not the best",
         "success":"User {mention} is now a moderator of <b>{title}</b>",
         "already":"User {mention} is already a moderator of <b>{title}</b>",
-        "idk":"I don't know a {msg}, who's that?"
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>promote @username</code> to promote someone in this chat."
     },
     "demoteme":
     {
         "mods":"Wow. Mr. I'm not admin over here is trying to <b>DEMOTE</b> people.",
         "success":"User {mention} is NO LONGER a moderator of <b>{title}</b>",
         "fail":"User {mention} is not currently a moderator of <b>{title}</b>",
-        "idk":"I don't know a {msg}, who's that?"
+        "idk":"I don't know a {msg}, who's that?",
+        "help":"Use <code>demote @username</code> to demote someone in this chat."
     },
     "set_chat_photo":
     {
