@@ -149,9 +149,9 @@ function getme($update, $MadelineProto, $name)
                     if (!is_array($i)) {
                         if ($i == $name) {
                             if (base64_encode(base64_decode($saved[$ch_id][$i])) === $saved[$ch_id][$i]) {
-                                $message = "$name:\r\n".base64_decode($saved[$ch_id][$i]);
+                                $message = base64_decode($saved[$ch_id][$i]);
                             } else {
-                                $message = "$name:\r\n".$saved[$ch_id][$i];
+                                $message = $saved[$ch_id][$i];
                             }
                             $default['message'] = $message;
                             $default['entities'] = $boldname;
@@ -177,7 +177,7 @@ function getme($update, $MadelineProto, $name)
                     );
                 } catch (Exception $e) {
                     var_dump($e->getMessage());
-                    $default['message'] = 'HTML of this message formatted incorrectly.';
+                    $default['message'] = 'HTML of this message formatted incorrectly, or the message was empty (did you have a button and no text?)';
                     $sentMessage = $MadelineProto->messages->sendMessage(
                         $default
                     );
