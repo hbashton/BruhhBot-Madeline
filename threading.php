@@ -344,22 +344,14 @@ function NewChannelMessage($update, $MadelineProto)
                             unset($msg_arr[0]);
                             $msg = implode(' ', $msg_arr);
                             $msg_ = strtolower($msg);
-                            if ($msg_ == 'all') {
-                                muteall($update, $MadelineProto);
-                            } else {
-                                muteme($update, $MadelineProto, $msg);
-                            }
+                            muteme($update, $MadelineProto, $msg);
                             break;
 
                         case 'unmute':
                             unset($msg_arr[0]);
                             $msg = implode(' ', $msg_arr);
                             $msg_ = strtolower($msg);
-                            if ($msg_ == 'all') {
-                                unmuteall($update, $MadelineProto);
-                            } else {
-                                unmuteme($update, $MadelineProto, $msg);
-                            }
+                            unmuteme($update, $MadelineProto, $msg);
                             break;
 
                         case 'settings':
