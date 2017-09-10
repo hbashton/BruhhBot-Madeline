@@ -89,6 +89,7 @@ function from_admin($update, $MadelineProto, $str = '', $send = false)
                 if ($key['role'] == 'moderator'
                     or $key['role'] == 'creator'
                     or $key['role'] == 'editor'
+                    or $key['role'] == 'admin'
                 ) {
                     $mod = true;
                     break;
@@ -157,6 +158,7 @@ function is_admin($update, $MadelineProto, $userid, $send = false, $ch_id = fals
                     if ($key['role'] == 'moderator'
                         or $key['role'] == 'creator'
                         or $key['role'] == 'editor'
+                        or $key['role'] == 'admin'
                     ) {
                         $mod = true;
                         break;

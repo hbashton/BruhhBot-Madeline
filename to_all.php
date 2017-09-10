@@ -132,6 +132,7 @@ function alert_moderators($MadelineProto, $ch_id, $text)
             if ($key['role'] == 'moderator'
                 or $key['role'] == 'creator'
                 or $key['role'] == 'editor'
+                or $key['role'] == 'admin'
             ) {
                 $mod = true;
             } else {
@@ -187,6 +188,7 @@ function alert_moderators_forward($MadelineProto, $ch_id, $msg_id)
             if ($key['role'] == 'moderator'
                 or $key['role'] == 'creator'
                 or $key['role'] == 'editor'
+                or $key['role'] == 'admin'
             ) {
                 $mod = true;
             } else {
