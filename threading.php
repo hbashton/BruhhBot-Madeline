@@ -293,13 +293,7 @@ function NewChannelMessage($update, $MadelineProto)
                             break;
 
                         case 'del':
-                            if (isset($msg_arr[1])) {
-                                unset($msg_arr[0]);
-                                $msg = implode(' ', $msg_arr);
-                                delmessage_user($update, $MadelineProto, $msg);
-                            } else {
-                                delmessage($update, $MadelineProto);
-                            }
+                            delmessage($update, $MadelineProto);
                             break;
 
                         case 'purge':
