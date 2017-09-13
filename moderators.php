@@ -19,25 +19,29 @@
 
 function from_master($update, $MadelineProto, $str = '', $send = false)
 {
-    $user = cache_from_user_info($update, $MadelineProto);
-    $master = cache_get_info($update, $MadelineProto, getenv('MASTER_USERNAME'));
-    if ($user['bot_api_id'] == $master['bot_api_id']
-        or in_array($user['bot_api_id'], json_decode(getenv('SUDO'), true))
-        or $user['bot_api_id'] == $MadelineProto->bot_api_id
-        or $user['bot_api_id'] == $MadelineProto->bot_id
-    ) {
-        return true;
-    } else {
-        if ($send) {
-            $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
-            $msg_id = $update['update']['message']['id'];
-            $message = $str;
-            $sentMessage = $MadelineProto->messages->sendMessage(
-                ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
-            );
-            \danog\MadelineProto\Logger::log($sentMessage);
-        }
+    try {
+        $user = cache_from_user_info($update, $MadelineProto);
+        $master = cache_get_info($update, $MadelineProto, getenv('MASTER_USERNAME'));
+        if ($user['bot_api_id'] == $master['bot_api_id']
+            or in_array($user['bot_api_id'], json_decode(getenv('SUDO'), true))
+            or $user['bot_api_id'] == $MadelineProto->bot_api_id
+            or $user['bot_api_id'] == $MadelineProto->bot_id
+        ) {
+            return true;
+        } else {
+            if ($send) {
+                $peer = $MadelineProto->get_info($update['update']['message']['to_id'])['InputPeer'];
+                $msg_id = $update['update']['message']['id'];
+                $message = $str;
+                $sentMessage = $MadelineProto->messages->sendMessage(
+                    ['peer' => $peer, 'reply_to_msg_id' => $msg_id, 'message' => $message]
+                );
+                \danog\MadelineProto\Logger::log($sentMessage);
+            }
 
+            return false;
+        }
+    } catch (Exception $e) {
         return false;
     }
 }
