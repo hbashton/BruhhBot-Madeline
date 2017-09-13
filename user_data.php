@@ -84,6 +84,13 @@ function get_user_stats($update, $MadelineProto, $user)
                 }
                 if (isset($gbanned)) {
                     $message = $message."\r\nGlobally banned: <b>Yes</b>";
+                    check_json_array('reasons.json', false, false);
+                    $file = file_get_contents('reasons.json');
+                    $reasons = json_decode($file, true);
+                    if (array_key_exists($id, $reasons)) {
+                        $reason = $reasons[$id];
+                        $message = $message."\nReason: $reason";
+                    }
                 } else {
                     $message = $message."\r\nGlobally banned: <b>No</b>";
                 }

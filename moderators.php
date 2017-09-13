@@ -256,6 +256,7 @@ function from_mod($update, $MadelineProto)
             return false;
         }
     } catch (Exception $e) {
+        if (!isset($userid)) return false;
         $MadelineProto->cache[$ch_id]['mods'][$userid] = ['timestamp' => time(), 'return' => false];
 
         return false;
