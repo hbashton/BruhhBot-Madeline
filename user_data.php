@@ -44,6 +44,7 @@ function get_user_stats($update, $MadelineProto, $user)
             if ($catch[0]) {
                 $id = $catch[1];
                 $user_data = user_specific_data($update, $MadelineProto, $id);
+                if (!$user_data) return;
                 $id = $user_data['id'];
                 $firstname = htmlentities($user_data['firstname']);
                 if (array_key_exists('lastname', $user_data)) {
