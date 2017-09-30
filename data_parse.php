@@ -148,61 +148,65 @@ function parse_query($update, $MadelineProto)
 
 function user_specific_data($update, $MadelineProto, $user)
 {
-    $id = catch_id($update, $MadelineProto, $user);
-    if ($id[0]) {
-        $info = cache_get_info($update, $MadelineProto, $id[1])['User'];
-        $userid = $info['id'];
-        $firstname = $info['first_name'];
-        if (array_key_exists('last_name', $info)) {
-            $lastname = $info['last_name'];
-        }
-        if (array_key_exists('username', $info)) {
-            $username = $info['username'];
-        }
-        if (is_gbanned($update, $MadelineProto, $userid)) {
-            $gbanned = true;
-        }
-        $isbanned = is_banned_anywhere($update, $MadelineProto, $userid);
-        if ($isbanned[0]) {
-            unset($isbanned[0]);
-            foreach ($isbanned as $key => $value) {
-                $chat = cache_get_info($update, $MadelineProto, $value);
-                $title = htmlentities($chat['Chat']['title']);
-                $id = $chat['Chat']['id'];
-                if (!is_null($title) && !is_null($id)) {
-                    $title_id = [
-                        'title' => $title,
-                        'id'    => $id, ];
-                    if (!isset($ban_array)) {
-                        $ban_array = [];
-                        $ban_array[] = $title_id;
-                    } else {
-                        $ban_array[] = $title_id;
+    try {
+        $id = catch_id($update, $MadelineProto, $user);
+        if ($id[0]) {
+            $info = cache_get_info($update, $MadelineProto, $id[1])['User'];
+            $userid = $info['id'];
+            $firstname = $info['first_name'];
+            if (array_key_exists('last_name', $info)) {
+                $lastname = $info['last_name'];
+            }
+            if (array_key_exists('username', $info)) {
+                $username = $info['username'];
+            }
+            if (is_gbanned($update, $MadelineProto, $userid)) {
+                $gbanned = true;
+            }
+            $isbanned = is_banned_anywhere($update, $MadelineProto, $userid);
+            if ($isbanned[0]) {
+                unset($isbanned[0]);
+                foreach ($isbanned as $key => $value) {
+                    $chat = cache_get_info($update, $MadelineProto, $value);
+                    $title = htmlentities($chat['Chat']['title']);
+                    $id = $chat['Chat']['id'];
+                    if (!is_null($title) && !is_null($id)) {
+                        $title_id = [
+                            'title' => $title,
+                            'id'    => $id, ];
+                        if (!isset($ban_array)) {
+                            $ban_array = [];
+                            $ban_array[] = $title_id;
+                        } else {
+                            $ban_array[] = $title_id;
+                        }
                     }
                 }
             }
-        }
-        $fwd_array = [
-            'id'        => $userid,
-            'firstname' => $firstname, ];
+            $fwd_array = [
+                'id'        => $userid,
+                'firstname' => $firstname, ];
 
-        if (isset($lastname)) {
-            $fwd_array['lastname'] = $lastname;
-        }
-        if (isset($username)) {
-            $fwd_array['username'] = $username;
-        }
-        if (isset($ban_array)) {
-            $fwd_array['banned'] = $ban_array;
-        }
-        if (isset($gbanned)) {
-            $fwd_array['gbanned'] = $gbanned;
-        }
+            if (isset($lastname)) {
+                $fwd_array['lastname'] = $lastname;
+            }
+            if (isset($username)) {
+                $fwd_array['username'] = $username;
+            }
+            if (isset($ban_array)) {
+                $fwd_array['banned'] = $ban_array;
+            }
+            if (isset($gbanned)) {
+                $fwd_array['gbanned'] = $gbanned;
+            }
 
-        return $fwd_array;
-    } else {
-        return false;
-    }
+            return $fwd_array;
+        } else {
+            return false;
+        }
+   } catch (Exception $e) {
+       return false;
+   }
 }
 
 function is_gbanned($update, $MadelineProto, $user)
