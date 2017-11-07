@@ -459,8 +459,12 @@ function help3_callback($update, $MadelineProto)
     $replyInlineMarkup = ['_' => 'replyInlineMarkup', 'rows' => $rows];
     $file = file_get_contents('start_help.json');
     $startj = json_decode($file, true);
-    $default['message'] = $startj['commands_help'][$e][$v];
-    $default['reply_markup'] = $replyInlineMarkup;
+    try {
+        $default['message'] = $startj['commands_help'][$e][$v];
+        $default['reply_markup'] = $replyInlineMarkup;
+    } catch (Exception $e) {
+        $default['message'] = "Please send /help again. You have selected an old command which is no longer in use";
+    }
     if (isset($default['message'])) {
         try {
             $sentMessage = $MadelineProto->messages->sendMessage(
